@@ -20,7 +20,11 @@ export default function Home() {
   const [availableQueues, setAvailableQueues] = useState([
     {
         "createdAt": "2024-04-24T13:51:28.920Z",
-        "hostId": 12345,
+        "hoster": {
+          id: "12345",
+          name: "Gabes",
+          avatar: "https://img.freepik.com/fotos-gratis/estilo-de-anime-celebrando-o-dia-dos-namorados_23-2151258005.jpg",
+        },
         "id": "123",
         "match": {
             "finished": false,
@@ -36,13 +40,15 @@ export default function Home() {
                 "ready": true
             },
             "234": {
-                "name": "Tieri"
+              "name": "Tieri",
+              "avatar": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Azir_0.jpg"
             },
             "345": {
                 "name": "Vanzo"
             },
             "4632": {
-                "name": "Supreme"
+              "name": "Supreme",
+              "avatar": "https://rare-gallery.com/uploads/posts/208114-zed-league-of-legends-3840x2160.jpg"
             },
             "4634": {
                 "name": "Gari"
@@ -97,18 +103,27 @@ export default function Home() {
 
       <div>
         {availableQueues.map((queue: any) => (
-          <Card className="min-w-[400px]">
+          <Card className="min-w-[500px]">
               <CardHeader className="flex flex-row justify-between gap-4 items-center">
                 <CardTitle>{queue.name}</CardTitle>
                 <AvatarStack spacing="lg" id="avatar-stack" avatars={Object.values(queue.players)} />
               </CardHeader>
               <CardContent className="flex justify-between items-center gap-4">
                 <CardDescription>
-                  <p>Hoster: <strong>{queue.hostId}</strong></p>
-                  <p>Criada em: <strong>{formatDate(queue.createdAt)}</strong></p>
+                  <div className="flex gap-1 items-center">
+                    <p>Partida de</p>
+                    <div className="flex gap-1 items-center">
+                      <Avatar
+                        className="w-6 h-6"
+                        image={queue.hoster.avatar}
+                        fallback={String(queue.hoster.name).slice(0, 2)}
+                      />
+                      <strong className="flex items-center gap-1">{queue.hoster.name}</strong></div>
+                  </div>
+                  <p>Criado em <strong>{formatDate(queue.createdAt)}</strong></p>
                   <p>{queue.players?.length}</p>
                 </CardDescription>
-                <Button onClick={handleEnterQueue}>Entrar no lobby</Button>
+                <Button onClick={handleEnterQueue}>Entrar na partida</Button>
               </CardContent>
           </Card>
         ))}

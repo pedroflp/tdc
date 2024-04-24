@@ -32,7 +32,7 @@ export interface AvatarStackProps
     VariantProps<typeof avatarStackVariants> {
   avatars: Array<{
     name: string;
-    url: string;
+    avatar: string;
   }>;
   avatarsOffset?: number;
   maxAvatarsAmount?: number;
@@ -51,14 +51,17 @@ function AvatarStack({ className, orientation, avatars, spacing, avatarsOffset =
       )}
       {...props}
     >
-      {limitedAvatars.map((avatar, index) => (
-        <TooltipProvider key={avatar.name}>
+      {limitedAvatars.map((user, index) => (
+        <TooltipProvider key={user.name}>
           <Tooltip>
             <TooltipTrigger className="cursor-default">
-              <TooltipContent>{avatar.name}</TooltipContent>
-              <Avatar className={avatarStackVariants()}>
-                <AvatarImage className="border-4 border-slate-0" src={avatar.url} />
-                <AvatarFallback className="border-4 border-white text-sm font-bold text-slate-500">{avatar.name.slice(0,2)}</AvatarFallback>
+              <TooltipContent>{user.name}</TooltipContent>
+              <Avatar className={cn(
+                avatarStackVariants(),
+                "border-2 border-slate-200"
+              )}>
+                <AvatarImage className="object-cover rounded-full" src={user.avatar} />
+                <AvatarFallback className="text-sm font-bold text-slate-500">{user.name.slice(0,2)}</AvatarFallback>
               </Avatar>
             </TooltipTrigger>
           </Tooltip>
@@ -67,7 +70,7 @@ function AvatarStack({ className, orientation, avatars, spacing, avatarsOffset =
 
       {limitedAvatars.length < avatars.length ?
         <Avatar className="cursor-default">
-          <AvatarFallback className="border-4 border-white text-sm font-bold text-slate-500">+{avatars.length - limitedAvatars.length }</AvatarFallback>
+          <AvatarFallback className="border-2 border-slate-200 text-sm font-bold text-slate-500">+{avatars.length - limitedAvatars.length }</AvatarFallback>
         </Avatar>
       : null}
     </div>
