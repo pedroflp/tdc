@@ -8,7 +8,7 @@ import { onValue, ref, update } from 'firebase/database';
 import { collection, doc, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 
-export default function QueuePage({ queueId, user }: { queueId: string, user?: any }) {
+export default function QueuePage({ queueId, user }: any) {
   const [queue, setQueue] = useState();
 
   function joinQueue() {
