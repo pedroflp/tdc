@@ -19,37 +19,40 @@ export default function Header({ user }: any) {
   const [password, setPassword] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
-  const [authSuccess, setAuthSuccess] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   async function handleSignIn() {
     setIsAuthenticating(true);
-    try {
-      await signIn(username, password);
+    setAuthError(null);
+
+    const response = await signIn(username, password);
+
+    if (!response.success && response.error) { 
+      setAuthError(response.error)
+    } else {
       router.refresh();
-    } catch (error) {
-    } finally {
-      setIsAuthenticating(false)
     }
+
+    setIsAuthenticating(false);
   }
 
   async function handleSignUp() {
     setIsCreatingAccount(true);
-    try {
-      await signUp(username, password);
+
+    const response = await signUp(username, password);
+
+    if (!response.success && response.error) {
+      setAuthError(response.error)
+    } else {
       router.refresh();
-    } catch (error) {
-    } finally {
-      setIsCreatingAccount(false)
     }
+
+    setIsCreatingAccount(false)
   }
 
   async function handleSignOut() {
-    try {
-      const response = await signOut();
-      router.refresh();
-    } catch (error) {
-      
-    }
+    await signOut();
+    router.refresh();
   }
 
   function navigateToUserProfile(userId: string) {
@@ -85,6 +88,8 @@ export default function Header({ user }: any) {
             handleSignUp={handleSignUp}
             isAuthenticating={isAuthenticating}
             isCreatingAccount={isCreatingAccount}
+            authError={authError}
+            setAuthError={setAuthError}
           />
         </div>
       )}

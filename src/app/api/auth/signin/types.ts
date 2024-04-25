@@ -1,5 +1,13 @@
 export type SignInResponseDTO = {
   token: string
-  success: boolean
   userId: string,
-} | null;
+};
+
+
+export enum SignInErrors {
+  CREDENTIA_INVALID = "auth/invalid-credential",
+}
+
+export const signInErrorsMessages = {
+  [SignInErrors.CREDENTIA_INVALID]: "Username ou senha estão incorretos!",
+}

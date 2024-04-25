@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth'
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
-import { auth, firestore } from "@/services/firebase";
-import { cookies } from "next/headers";
 import { cookiesKeys } from "@/constants/cookies";
 import { collections } from "@/services/constants";
+import { auth, firestore } from "@/services/firebase";
 import { parseUsernameToEmail } from "@/utils/parseUsername";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, doc, setDoc } from 'firebase/firestore';
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { SignInErrors, signInErrorsMessages } from "./types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +30,12 @@ export async function POST(request: NextRequest) {
       token,
       userId: response.user.uid
     })
-  } catch (error) {
-    return NextResponse.error();
+  } catch (err) {
+    const error = err as { code: SignInErrors };
+    console.log(error.code)
+    return NextResponse.json(
+      { success: false, error: signInErrorsMessages[error.code] },
+      { status: 400 }
+    );
   }
 }

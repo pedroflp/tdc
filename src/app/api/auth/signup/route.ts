@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { cookiesKeys } from "@/constants/cookies";
 import { collections } from "@/services/constants";
 import { parseUsernameToEmail } from "@/utils/parseUsername";
+import { SignUpErrors, signUpErrorsMessages } from "./types";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +30,12 @@ export async function POST(request: NextRequest) {
       token,
       userId: response.user.uid
     })
-  } catch (error) {
-    return NextResponse.error();
+  } catch (err) {
+    const error = err as { code: SignUpErrors };
+    
+    return NextResponse.json(
+      { success: false, error: signUpErrorsMessages[error.code] },
+      { status: 400 }
+    );
   }
 }
