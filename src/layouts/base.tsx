@@ -25,7 +25,7 @@ export default async function BaseLayout({ children }: any) {
       <main className="w-screen h-full p-12">{
         React.Children.map(children, (child) =>
           React.isValidElement(child)
-            ? React.cloneElement(child, {
+            ? React.cloneElement<any>(child, {
                 user,
               })
             : child
