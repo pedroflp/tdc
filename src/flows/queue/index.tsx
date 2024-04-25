@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button'
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { onValue, ref, update } from 'firebase/database';
-import { collection, doc, onSnapshot, query, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState } from 'react'
 
 export default function QueuePage({ queueId, user }: any) {
   const [queue, setQueue] = useState();
 
-  function joinQueue() {
+  async function joinQueue() {
+    const queueDoc = await getDoc(doc(firestore, collections.QUEUES, queueId));
+    const players = queueDoc.data().players ?? [];
     setDoc(doc(firestore, collections.QUEUES, queueId), {
       players: [
-        ...queue?.players,
+        ...players,
         {
           id: user.id,
           name: user.name,
