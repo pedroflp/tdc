@@ -1,9 +1,11 @@
 
 import QueuePage from "@/flows/queue";
+import BaseLayout from "@/layouts/base";
 
-export default function Queue({ params }: { params: { id: string } }) {
-
+export default async function Queue({ params }: { params: { id: string } }) {
   return (
-    <QueuePage queueId={params.id} />
+    <BaseLayout>
+      <QueuePage queueId={params.id} />
+    </BaseLayout>
   );
 }

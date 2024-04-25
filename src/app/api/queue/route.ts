@@ -1,32 +1,53 @@
-import { database } from "@/services/firebase";
-import { ref, set } from "firebase/database";
+import { cookiesKeys } from "@/constants/cookies";
+import { MatchTeamsEnum } from "@/flows/queue/types";
+import { collections } from "@/services/constants";
+import { firestore } from "@/services/firebase";
+import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const queueId = '123';
-  const {name, password}: { name: string, password: string } = await request.json();
+  const {name}: { name: string, password: string } = await request.json();
+  const userId = cookies().get(cookiesKeys.CONNECTED_AS)?.value;
 
+  const userDoc = await getDoc(doc(firestore, collections.USERS, userId!))
+  const userData = userDoc.data()!;
 
   try {
-    await set(ref(database, 'queues/' + queueId), {
-      createdAt: new Date().toISOString(),
-      password,
+    const queue = await addDoc(collection(firestore, collections.QUEUES), {
       name,
-      id: queueId,
+      active: true,
+      hoster: {
+        id: userDoc.id,
+        name: userData.name,
+        avatar: userData.avatar ?? "",
+      },
       players: [],
-      teams: [],
-      teamWinnerId: null,
-      matchFinished: false
+      teams: {
+        [MatchTeamsEnum.BLUE]: {},
+        [MatchTeamsEnum.RED]: {}
+      },
+      match: {
+        id: null,
+        started: false,
+        finished: false,
+        teamWinner: null
+      },
+      matchFinished: false,
+      createdAt: new Date().toISOString(),
     });
+
+    const queueId = queue.id;
+    await updateDoc(queue, { id: queueId });
 
     return NextResponse.json({
       success: true,
-      queueId
+      queueId,
     })
   } catch (error) {
-    
+    console.log(error)
     return NextResponse.json({
-      hello: "post"
+      error: true,
     })
   }
 

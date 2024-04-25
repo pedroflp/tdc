@@ -12,19 +12,20 @@ export async function POST(request: NextRequest) {
     const response = await signInAnonymously(auth);
     const { token } = await response.user.getIdTokenResult();
 
-    cookies().set(cookiesKeys.TOKEN, response.user.uid)
+    cookies().set(cookiesKeys.TOKEN, token);
+    cookies().set(cookiesKeys.CONNECTED_AS, response.user.uid);
 
     const col = collection(firestore, collections.USERS)
     await setDoc(doc(col, response.user.uid), {
-      name: body.username,
-      uid: response.user.uid,
+      name: body.username ?? "",
+      id: response.user.uid,
       createdAt: new Date().toISOString(),
-      score: 0,
     })
 
     return NextResponse.json({
       success: true,
-      token: token,
+      token,
+      userId: response.user.uid
     })
   } catch (error) {
     return NextResponse.json({

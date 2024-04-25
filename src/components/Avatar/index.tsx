@@ -4,9 +4,9 @@ import { cn } from '@/lib/utils'
 
 export default function Avatar({ image, fallback, className }: {image?: string, fallback: any, className?: string}) {
   return (
-    <AvatarContainer className={cn(className, "border-2 border-slate-200")}>
+    <AvatarContainer className={cn(className)}>
       <AvatarImage className='object-cover rounded-full' src={image} />
-      <AvatarFallback>{fallback}</AvatarFallback>
+      <AvatarFallback className='text-sm font-bold text-slate-500 uppercase'>{fallback}</AvatarFallback>
     </AvatarContainer>
   )
 }

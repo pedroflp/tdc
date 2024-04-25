@@ -1,54 +1,49 @@
 'use client';
 
-import { getQueue } from '@/app/api/queue/requests';
 import QueueSlot from '@/components/QueueSlot'
 import { Button } from '@/components/ui/button'
-import { database } from '@/services/firebase';
+import { collections } from '@/services/constants';
+import { firestore } from '@/services/firebase';
 import { onValue, ref, update } from 'firebase/database';
+import { collection, doc, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 
-export default function QueuePage({ queueId }: { queueId: string }) {
+export default function QueuePage({ queueId, user }: { queueId: string, user: any }) {
   const [queue, setQueue] = useState();
 
-  function getQueue(id: string) {
-    const queueRef = ref(database, `queues/${id}`);
-    onValue(queueRef, (snapshot) => setQueue(snapshot.val()))
-  }
-
   function joinQueue() {
-    update(ref(database), {
-      [`queues/${queueId}/players/${123}`]: {
-        name: 'Pedin',
-        ready: false,
-      }
+    setDoc(doc(firestore, collections.QUEUES, queueId), {
+      players: [
+        ...queue?.players,
+        {
+          user,
+          ready: false
+        }
+      ]
     })
   }
 
-  function handleReadyQueue() {
-    update(ref(database), {
-      [`queues/${queueId}/players/${123}/ready`]: true,
+  function getQueueData() {
+    onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
+      setQueue(doc.data() as any);
     })
   }
 
   useEffect(() => {
-    getQueue(queueId);
+    const unsubscribe = getQueueData();
+    // return () => unsubscribe();
   }, [])
 
-  if (!queue) return null;
-
-  const players = Object.entries(queue.players ?? {});
-  const emptySlots = 10 - players.length;
-  const queuePlayers = [...players, ...Array(emptySlots).fill([null, null])];
-
+  const queueEmptySlots = new Array(10-queue?.players.length).fill(null)
+  const players = [...queue?.players, ...queueEmptySlots]
   return (
-    <main className="flex flex-col items-center">
-      <div className="grid grid-cols-2 grid-rows-5 gap-12 mb-16">
-        {queuePlayers.map(([userId, user], i) => (
-          <QueueSlot user={user} onClick={joinQueue} key={userId ?? i} />
+    <main className="h-screen flex flex-col items-center justify-center gap-10">
+      <div className='grid grid-cols-2 grid-rows-5 gap-10'>
+        {players.map((player: any, index: number) => (
+          <QueueSlot key={index} player={player} />
         ))}
       </div>
-
-      <Button onClick={handleReadyQueue}>Estou pronto!</Button>
+      <Button variant="outline" className='w-60 h-20' onClick={joinQueue}>Estou pronto!</Button>
     </main>
   )
 }

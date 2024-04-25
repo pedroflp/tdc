@@ -41,7 +41,6 @@ export interface AvatarStackProps
 function AvatarStack({ className, orientation, avatars, spacing, avatarsOffset = 4, maxAvatarsAmount = 4, ...props }: AvatarStackProps) {
   const limitedAvatars = avatars.slice(0, maxAvatarsAmount);
 
-
   return (
     <div
       className={cn(
@@ -51,28 +50,27 @@ function AvatarStack({ className, orientation, avatars, spacing, avatarsOffset =
       )}
       {...props}
     >
-      {limitedAvatars.map((user, index) => (
+      {limitedAvatars.map((user, index) => !!user && (
         <TooltipProvider key={user.name}>
           <Tooltip>
             <TooltipTrigger className="cursor-default">
               <TooltipContent>{user.name}</TooltipContent>
               <Avatar className={cn(
                 avatarStackVariants(),
-                "border-2 border-slate-200"
               )}>
                 <AvatarImage className="object-cover rounded-full" src={user.avatar} />
-                <AvatarFallback className="text-sm font-bold text-slate-500">{user.name.slice(0,2)}</AvatarFallback>
+                <AvatarFallback className="text-sm font-bold text-slate-500 border-1">{user.name.slice(0,2)}</AvatarFallback>
               </Avatar>
             </TooltipTrigger>
           </Tooltip>
         </TooltipProvider>
       ))}
 
-      {limitedAvatars.length < avatars.length ?
+      {/* {limitedAvatars.length < avatars.length ?
         <Avatar className="cursor-default">
-          <AvatarFallback className="border-2 border-slate-200 text-sm font-bold text-slate-500">+{avatars.length - limitedAvatars.length }</AvatarFallback>
+          <AvatarFallback className="text-sm font-bold text-slate-500">+{avatars.length - limitedAvatars.length }</AvatarFallback>
         </Avatar>
-      : null}
+      : null} */}
     </div>
   );
 }

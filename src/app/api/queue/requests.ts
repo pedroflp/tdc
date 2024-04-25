@@ -1,5 +1,3 @@
-import { database } from "@/services/firebase";
-import { onValue, ref } from "firebase/database";
 import { StartQueueResponseDTO } from "./types";
 
 export async function startQueue(): Promise<StartQueueResponseDTO> {
@@ -7,11 +5,11 @@ export async function startQueue(): Promise<StartQueueResponseDTO> {
     const response = await fetch('/api/queue', {
       method: 'POST',
       body: JSON.stringify({
-        password: '123',
         name: 'Personalizada',
       })
     });
     const data = await response.json();
+    console.log(data)
 
     return data;
   } catch (error) {

@@ -1,6 +1,6 @@
 import { SignInResponseDTO } from "./types";
 
-export async function signIn(username: string): Promise<SignInResponseDTO> {
+export async function signIn(username?: string): Promise<SignInResponseDTO> {
   try {
     const response = await fetch('/api/auth/signin', {
       method: 'POST',
