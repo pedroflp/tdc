@@ -2,18 +2,22 @@ import { cookiesKeys } from "@/constants/cookies";
 import { MatchTeamsEnum } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
+import { decodeJwt } from "@/utils/decodeJwt";
 import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const {name}: { name: string, password: string } = await request.json();
-  const userId = cookies().get(cookiesKeys.CONNECTED_AS)?.value;
+  const token = cookies().get(cookiesKeys.TOKEN);
 
-  const userDoc = await getDoc(doc(firestore, collections.USERS, userId!))
-  const userData = userDoc.data()!;
+  if (!token) return NextResponse.error();
 
   try {
+    const userId = decodeJwt(token.value).user_id;
+    const userDoc = await getDoc(doc(firestore, collections.USERS, userId!));
+
+    const userData = userDoc.data()!;
     const queue = await addDoc(collection(firestore, collections.QUEUES), {
       name,
       active: true,
@@ -45,10 +49,7 @@ export async function POST(request: NextRequest) {
       queueId,
     })
   } catch (error) {
-    console.log(error)
-    return NextResponse.json({
-      error: true,
-    })
+    return NextResponse.error();
   }
 
 }

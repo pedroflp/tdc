@@ -1,9 +1,9 @@
 import { fetchApi } from "@/utils/fetchApi";
 import { SignInResponseDTO } from "./types";
 
-export async function signIn(username: string, password: string): Promise<SignInResponseDTO> {
+export async function signUp(username: string, password: string) {
   try {
-    const response = await fetchApi('auth/signin', {
+    const response = await fetchApi('auth/signup', {
       method: 'POST',
       body: JSON.stringify({username, password}),
     });

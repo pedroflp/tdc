@@ -7,5 +7,6 @@ namespace NodeJS {
     NEXT_PUBLIC_storageBucket: string;
     NEXT_PUBLIC_messagingSenderId: string;
     NEXT_PUBLIC_appId: string;
+    NEXT_PUBLIC_apiBaseUrl: string;
   }
 }

@@ -52,7 +52,7 @@ export default function HomePage({ user }: any) {
       <div className="flex flex-col gap-10 w-full max-w-[50%]">
         <div className="flex justify-between items-center">
           <h1 className="font-bold text-3xl">Partidas disponíveis</h1>
-          <Button onClick={handleStartQueue}>Criar nova partida</Button>
+          {!!user ? <Button onClick={handleStartQueue}>Criar uma partida</Button> : null}
         </div>
         <div className="flex flex-wrap w-full flex-col gap-6">
           {fetchingQueues ? (
@@ -74,12 +74,12 @@ export default function HomePage({ user }: any) {
               ) : (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-xl text-slate-700">Nenhuma fila encontrada!</CardTitle>
+                    <CardTitle className="text-xl text-slate-700">Nenhuma partida encontrada!</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-slate-400">
-                        Não foi possível encontrar nenhuma fila ativa.
-                        <strong className="text-slate-500"> Inicie uma nova fila clicando no botão acima!</strong>
+                        Não foi possível encontrar nenhuma partida disponível.
+                        <strong className="text-slate-500"> Crie uma nova partida para abrir a sua fila!</strong>
                       </CardDescription>
                   </CardContent>
                 </Card>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth'
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
 import { auth, firestore } from "@/services/firebase";
 import { cookies } from "next/headers";
@@ -12,14 +12,14 @@ export async function POST(request: NextRequest) {
     const body: { username: string, password: string } = await request.json();
     const email = parseUsernameToEmail(body.username);
     
-    const response = await signInWithEmailAndPassword(auth, email, body.password);
+    const response = await createUserWithEmailAndPassword(auth, email, body.password);
     const { token } = await response.user.getIdTokenResult();
-
     cookies().set(cookiesKeys.TOKEN, token);
 
-    const col = collection(firestore, collections.USERS)
-    await setDoc(doc(col, response.user.uid), {
-      name: body.username ?? "",
+    const coll = collection(firestore, collections.USERS)
+    await setDoc(doc(coll, body.username), {
+      username: body.username,
+      name: body.username,
       id: response.user.uid,
       createdAt: new Date().toISOString(),
     })
