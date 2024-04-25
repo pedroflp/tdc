@@ -13,6 +13,9 @@ export default function QueuePage({ queueId, user }: any) {
 
   async function joinQueue() {
     const queueDoc = await getDoc(doc(firestore, collections.QUEUES, queueId));
+
+    if (!queueDoc.exists()) return;
+
     const players = queueDoc.data().players ?? [];
     setDoc(doc(firestore, collections.QUEUES, queueId), {
       players: [
