@@ -9,9 +9,7 @@ export interface Player {
 }
 
 export interface Team {
-  players: {
-    [id: string]: Player
-  };
+  players: Array<Player>
 }
 
 export interface Match {
@@ -43,7 +41,5 @@ export interface QueueItem {
     [MatchTeamsEnum.BLUE]: Team;
     [MatchTeamsEnum.RED]: Team;
   };
-  players: {
-    [id: string]: Player
-  };
+  players: Array<Player>
 }

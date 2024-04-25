@@ -7,9 +7,10 @@ import { firestore } from '@/services/firebase';
 import { onValue, ref, update } from 'firebase/database';
 import { collection, doc, getDoc, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState } from 'react'
+import { QueueItem } from './types';
 
 export default function QueuePage({ queueId, user }: any) {
-  const [queue, setQueue] = useState();
+  const [queue, setQueue] = useState<QueueItem>();
 
   async function joinQueue() {
     const queueDoc = await getDoc(doc(firestore, collections.QUEUES, queueId));
@@ -18,6 +19,7 @@ export default function QueuePage({ queueId, user }: any) {
 
     const players = queueDoc.data().players ?? [];
     setDoc(doc(firestore, collections.QUEUES, queueId), {
+      ...queueDoc.data(),
       players: [
         ...players,
         {
