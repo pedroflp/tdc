@@ -1,4 +1,5 @@
 import { cookiesKeys } from "@/constants/cookies";
+import { MatchModesEnum } from "@/flows/home/components/MatchOptionCard/types";
 import { MatchTeamsEnum } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
@@ -8,7 +9,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const {name}: { name: string, password: string } = await request.json();
+  const {name, mode}: { name: string, mode: MatchModesEnum } = await request.json();
   const token = cookies().get(cookiesKeys.TOKEN);
 
   if (!token) return NextResponse.error();
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
     const userData = userDoc.data()!;
     const queue = await addDoc(collection(firestore, collections.QUEUES), {
       name,
+      mode,
       active: true,
       hoster: {
         id: userDoc.id,
