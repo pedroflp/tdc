@@ -29,8 +29,8 @@ export function SignDialog({ username, setUsername, password, setPassword, isAut
       <DialogContent>
         <Tabs defaultValue="account" className="mt-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger onClick={clearFields} value="sigin">Entrar</TabsTrigger>
-            <TabsTrigger onClick={clearFields} value="signup">Criar conta</TabsTrigger>
+            <TabsTrigger disabled={isCreatingAccount || isAuthenticating} onClick={clearFields} value="sigin">Entrar</TabsTrigger>
+            <TabsTrigger disabled={isCreatingAccount || isAuthenticating} onClick={clearFields} value="signup">Criar conta</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sigin">
@@ -44,11 +44,11 @@ export function SignDialog({ username, setUsername, password, setPassword, isAut
               <CardContent className="space-y-2">
                 <div className="space-y-1">
                   <Label>Username</Label>
-                  <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+                  <Input disabled={isCreatingAccount || isAuthenticating} value={username} onChange={(e) => setUsername(e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <Label>Senha</Label>
-                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input disabled={isCreatingAccount || isAuthenticating} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 <ErrorCard error={authError} />
               </CardContent>
@@ -71,11 +71,11 @@ export function SignDialog({ username, setUsername, password, setPassword, isAut
               <CardContent className="space-y-2">
                 <div className="space-y-1">
                   <Label htmlFor="current">Username (esse não será seu nome de exibição)</Label>
-                  <Input placeholder="gilsocasboy" value={username} onChange={(e) => setUsername(e.target.value)} />
+                  <Input disabled={isCreatingAccount || isAuthenticating} placeholder="gilsocasboy" value={username} onChange={(e) => setUsername(e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="new">Senha (min. 6 caracteres)</Label>
-                  <Input type="password" placeholder="piupiu123" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input disabled={isCreatingAccount || isAuthenticating} type="password" placeholder="piupiu123" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 <ErrorCard error={authError} />
               </CardContent>
