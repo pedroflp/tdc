@@ -73,10 +73,10 @@ export default function HomePage({ user }: any) {
                 availableQueues.map((queue: any) => (
                   <QueueCard
                     key={queue.id}
+                    user={user}
+                    queue={queue}
                     disableJoinByAuth={!user}
                     disableJoinByStarted={queue.match?.started}
-                    queue={queue}
-                    user={user}
                     handleEnterQueue={handleEnterQueue}
                   />
                 ))

@@ -1,11 +1,9 @@
 import { cookiesKeys } from "@/constants/cookies";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { decodeJwt } from "@/utils/decodeJwt";
 import { getUserFromToken } from "@/utils/getUsernameFromToken";
 import { parseEmailToUsername } from "@/utils/parseUsername";
-import { getDoc, doc } from "firebase/firestore";
-import { cookies } from "next/headers";
+import { doc, getDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -18,6 +16,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(userData);
   } catch (error) {
-    return NextResponse.error().status;
+    return NextResponse.error();
   }
 }

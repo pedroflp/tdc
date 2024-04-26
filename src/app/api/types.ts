@@ -1,4 +1,4 @@
-export type ApiError<T> = T & {
+export type ApiResponse<T> = T & {
   error?: string,
   success?: boolean,
 }

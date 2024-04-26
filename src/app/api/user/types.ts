@@ -1,9 +1,3 @@
-export type GetUserResponseDTO = IUserData | null;
+import { Player } from "@/flows/queue/types";
 
-export type IUserData = {
-  name: string;
-  avatar: string;
-  id: string;
-  createdAt: string;
-  username: string;
-}
+export type GetUserResponseDTO = Player | null;
