@@ -1,7 +1,7 @@
 // queue-data.d.ts
 
 export interface Player {
-  id?: string;
+  username: string;
   name: string;
   score?: number;
   avatar?: string;
@@ -25,9 +25,9 @@ export enum MatchTeamsEnum {
 }
 
 export interface Host {
-  id: string;
   name: string;
   avatar: string;
+  username: string;
 }
 
 export interface QueueItem {

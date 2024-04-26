@@ -4,6 +4,8 @@ import { MatchTeamsEnum } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { decodeJwt } from "@/utils/decodeJwt";
+import { getUserFromToken } from "@/utils/getUsernameFromToken";
+import { parseEmailToUsername } from "@/utils/parseUsername";
 import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,20 +17,20 @@ export async function POST(request: NextRequest) {
   if (!token) return NextResponse.error();
 
   try {
-    const userId = decodeJwt(token.value).user_id;
-    const userDoc = await getDoc(doc(firestore, collections.USERS, userId!));
-
+    const username = parseEmailToUsername(getUserFromToken(token.value, "email"));
+    const userDoc = await getDoc(doc(firestore, collections.USERS, username));
     const userData = userDoc.data()!;
+
     const queue = await addDoc(collection(firestore, collections.QUEUES), {
       name,
       mode,
       active: true,
       hoster: {
-        id: userDoc.id,
+        username: userData.username,
         name: userData.name,
-        avatar: userData.avatar ?? "",
+        avatar: userData.avatar,
       },
-      players: [],
+      players: Array(10).fill({}),
       teams: {
         [MatchTeamsEnum.BLUE]: {},
         [MatchTeamsEnum.RED]: {}

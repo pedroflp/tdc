@@ -5,8 +5,9 @@ import { AvatarStack } from '../Avatar/avatar-stack'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Player } from '@/flows/queue/types'
 
-export default function QueueCard({ queue, disableJoinByAuth, disabledJoinByStarted, handleEnterQueue }: any) {
+export default function QueueCard({ queue, user, disableJoinByAuth, disabledJoinByStarted, handleEnterQueue }: any) {
   const QueueBadgeStatus = useCallback(({match}: any) => {
     if (match?.started) return <Badge>Iniciada</Badge>
     if (match?.finished) return <Badge variant="outline">Finalizada</Badge>
@@ -16,7 +17,7 @@ export default function QueueCard({ queue, disableJoinByAuth, disabledJoinByStar
   const QueueJoinButton = useCallback(({disableJoinByAuth, disabledJoinByStarted, onClick}: any) => {
     if (disableJoinByAuth) return <Button variant="outline" disabled>Faça login para participar</Button>
     if (disabledJoinByStarted) return <Button disabled>Partida já iniciada</Button>
-    return <Button onClick={onClick}>Participar da partida</Button>;
+    return <Button onClick={onClick}>Entrar nessa partida</Button>;
   }, []);
 
   return (
@@ -26,7 +27,7 @@ export default function QueueCard({ queue, disableJoinByAuth, disabledJoinByStar
           <CardTitle className='text-xl text-slate-800'>{queue.name}</CardTitle>
           <QueueBadgeStatus match={queue.match} />
         </div>
-      <AvatarStack spacing="lg" id="avatar-stack" avatars={queue.players} />
+      <AvatarStack spacing="lg" id="avatar-stack" avatars={queue.players.filter((player: Player) => !!player.username)} />
       </CardHeader>
       <CardContent className="flex justify-between items-center gap-4">
         <div className="text-sm text-slate-700">
@@ -41,11 +42,14 @@ export default function QueueCard({ queue, disableJoinByAuth, disabledJoinByStar
           </div>
           <p>Criada em <strong>{formatDate(queue.createdAt)}</strong></p>
         </div>
-        <QueueJoinButton
-          disableJoinByAuth={disableJoinByAuth}
-          disabledJoinByStarted={disabledJoinByStarted}
-          onClick={() => handleEnterQueue(queue.id)}
-        />
+        <div className='flex flex-col gap-2 lg:flex-row'>
+          {user.username === queue.hoster.username && <Button variant="destructive">Fechar partida</Button>}
+          <QueueJoinButton
+            disableJoinByAuth={disableJoinByAuth}
+            disabledJoinByStarted={disabledJoinByStarted}
+            onClick={() => handleEnterQueue(queue.id)}
+          />
+        </div>
       </CardContent>
     </Card>
   )
