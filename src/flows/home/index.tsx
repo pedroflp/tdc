@@ -25,12 +25,10 @@ export default function HomePage({ user }: any) {
   const [fetchingQueues, setFetchingQueues] = useState(true);
 
   async function handleCreateMatch(matchName: string, matchMode: MatchModesEnum) {
-  
-    try {
-      const response = await startQueue(matchName, matchMode);
+    const response = await startQueue(matchName, matchMode);
+
+    if (response?.success) {
       push(`${routeNames.QUEUE}/${response?.queueId}`);
-    } catch (error) {
-      
     }
   }
 
@@ -59,8 +57,7 @@ export default function HomePage({ user }: any) {
           <h1 className="font-bold text-3xl">Partidas disponíveis</h1>
           {!!user ? (
             <MatchCreation onCreateMatch={handleCreateMatch} />
-            ) : null
-          }
+          ) : null}
         </div>
         <div className="flex flex-wrap w-full flex-col gap-6">
           {fetchingQueues ? (

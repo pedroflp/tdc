@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       name: body.username,
       id: response.user.uid,
       createdAt: new Date().toISOString(),
+      avatar: "",
     })
 
     return NextResponse.json({

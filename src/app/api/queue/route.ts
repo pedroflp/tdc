@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
       },
       players: Array(10).fill({}),
       teams: {
-        [MatchTeamsEnum.BLUE]: {},
-        [MatchTeamsEnum.RED]: {}
+        [MatchTeamsEnum.BLUE]: [],
+        [MatchTeamsEnum.RED]: []
       },
       match: {
         id: null,
