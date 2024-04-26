@@ -14,15 +14,14 @@ export default function QueuePage({ queueId, user }: any) {
   const [queue, setQueue] = useState<QueueItem>();
 
   async function joinQueue(slot: number) {
-    const queueDoc = await getDoc(doc(firestore, collections.QUEUES, queueId));
+    if (!queue) return;
 
-    if (!queueDoc.exists()) return;
-
-    const queueData = queueDoc.data();
+    const newPlayers = queue.players;
+    newPlayers[slot] = user
 
     setDoc(doc(firestore, collections.QUEUES, queueId), {
-      ...queueData,
-      players: queueData.players.map((_: any, index: number) => index === slot && user)
+      ...queue,
+      players: newPlayers
     })
   }
 
