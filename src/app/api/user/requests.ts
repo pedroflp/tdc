@@ -4,8 +4,10 @@ import { cookies } from "next/headers";
 import { ApiResponse } from "../types";
 import { GetUserResponseDTO } from "./types";
 
-export async function getUserData(): Promise<ApiResponse<GetUserResponseDTO>> {
+export async function getUserData(): Promise<ApiResponse<GetUserResponseDTO> | null> {
   const token = cookies().get(cookiesKeys.TOKEN);
+
+  if (!token) return null;
 
   const response = await fetchApi('user', {
     method: 'GET',
