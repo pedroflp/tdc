@@ -17,8 +17,9 @@ export default function QueueCard({ queue, user, disableJoinByAuth, disabledJoin
   const QueueJoinButton = useCallback(({disableJoinByAuth, disabledJoinByStarted, onClick}: any) => {
     if (disableJoinByAuth) return <Button variant="outline" disabled>Faça login para participar</Button>
     if (disabledJoinByStarted) return <Button disabled>Partida já iniciada</Button>
-    return <Button onClick={onClick}>Entrar nessa partida</Button>;
-  }, []);
+    if (queue.players.find((player: Player) => player.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
+    return <Button onClick={onClick}>Entrar na sala da partida</Button>;
+  }, [user]);
 
   return (
     <Card className="min-w-[500px] w-full">

@@ -1,9 +1,10 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
+import Avatar from "@/components/Avatar";
+import { Player } from "@/flows/queue/types";
 
 const avatarStackVariants = cva(
   "flex",
@@ -30,10 +31,7 @@ const avatarStackVariants = cva(
 export interface AvatarStackProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof avatarStackVariants> {
-  avatars: Array<{
-    name: string;
-    avatar: string;
-  }>;
+  avatars: Array<Player>;
   avatarsOffset?: number;
   maxAvatarsAmount?: number;
 }
@@ -50,27 +48,20 @@ function AvatarStack({ className, orientation, avatars, spacing, avatarsOffset =
       )}
       {...props}
     >
-      {limitedAvatars.map((user, index) => !!user && (
-        <TooltipProvider key={user.name}>
+      {limitedAvatars.map((user) => !!user && (
+        <TooltipProvider key={user.username}>
           <Tooltip>
             <TooltipTrigger className="cursor-default">
               <TooltipContent>{user.name}</TooltipContent>
-              <Avatar className={cn(
-                avatarStackVariants(),
-              )}>
-                <AvatarImage className="object-cover rounded-full" src={user.avatar} />
-                <AvatarFallback className="text-sm font-bold text-slate-500 border-1">{user.name.slice(0,2)}</AvatarFallback>
-              </Avatar>
+              <Avatar fallback={String(user.name).slice(0, 2)} image={user.avatar} />
             </TooltipTrigger>
           </Tooltip>
         </TooltipProvider>
       ))}
 
-      {/* {limitedAvatars.length < avatars.length ?
-        <Avatar className="cursor-default">
-          <AvatarFallback className="text-sm font-bold text-slate-500">+{avatars.length - limitedAvatars.length }</AvatarFallback>
-        </Avatar>
-      : null} */}
+      {limitedAvatars.length < avatars.length ?
+        <Avatar fallback={`+${avatars.length - limitedAvatars.length }`} />
+      : null}
     </div>
   );
 }
