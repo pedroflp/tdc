@@ -1,8 +1,8 @@
 import { fetchApi } from "@/utils/fetchApi";
+import { ApiResponse } from "../../types";
 import { SignInResponseDTO } from "./types";
-import { ApiError } from "../../types";
 
-export async function signIn(username: string, password: string): Promise<ApiError<SignInResponseDTO>> {
+export async function signIn(username: string, password: string): Promise<ApiResponse<SignInResponseDTO>> {
   const response = await fetchApi('auth/signin', {
     method: 'POST',
     body: JSON.stringify({username, password}),
