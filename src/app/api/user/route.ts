@@ -12,10 +12,12 @@ export async function GET(request: Request) {
   try {
     const username = parseEmailToUsername(getUserFromToken(token, "email"));
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));
-    const userData = userDoc.data();
 
+    if (!userDoc.exists()) return NextResponse.json(null);
+
+    const userData = userDoc.data();
     return NextResponse.json(userData);
   } catch (error) {
-    return NextResponse.error();
+    return NextResponse.json({ }, { status: 400 });
   }
 }

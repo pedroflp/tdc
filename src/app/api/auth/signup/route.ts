@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     const coll = collection(firestore, collections.USERS)
     await setDoc(doc(coll, body.username), {
-      username: body.username,
+      username: String(body.username).toLocaleLowerCase(),
       name: body.username,
       id: response.user.uid,
       createdAt: new Date().toISOString(),

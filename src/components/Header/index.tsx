@@ -25,7 +25,7 @@ export default function Header({ user }: any) {
     setIsAuthenticating(true);
     setAuthError(null);
 
-    const response = await signIn(username, password);
+    const response = await signIn(String(username).toLocaleLowerCase(), password);
 
     if (!response.success && response.error) { 
       setAuthError(response.error)
@@ -39,7 +39,7 @@ export default function Header({ user }: any) {
   async function handleSignUp() {
     setIsCreatingAccount(true);
 
-    const response = await signUp(username, password);
+    const response = await signUp(String(username).toLocaleLowerCase(), password);
 
     if (!response.success && response.error) {
       setAuthError(response.error)

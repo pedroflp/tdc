@@ -12,7 +12,7 @@ export async function getUserData(): Promise<ApiResponse<GetUserResponseDTO> | n
   const response = await fetchApi('user', {
     method: 'GET',
     headers: {
-      [cookiesKeys.TOKEN]: token?.value!
+      [cookiesKeys.TOKEN]: token.value
     }
   });
 
