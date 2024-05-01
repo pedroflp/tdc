@@ -1,20 +1,58 @@
+'use client';
+
+import { signIn } from "@/app/api/auth/signin/requests"
+import { signUp } from "@/app/api/auth/signup/requests"
 import ErrorCard from "@/components/ErrorCard"
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
-export function SignDialog({ username, setUsername, password, setPassword, isAuthenticating, isCreatingAccount, handleSignUp, handleSignIn, authError, setAuthError }: any) {
+export function SignDialog() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  async function handleSignIn() {
+    setIsAuthenticating(true);
+    setAuthError(null);
+
+    const response = await signIn(String(username).toLocaleLowerCase(), password);
+
+    if (!response.success && response.error) { 
+      setAuthError(response.error)
+    } else {
+      router.refresh();
+    }
+
+    setIsAuthenticating(false);
+  }
+
+  async function handleSignUp() {
+    setIsCreatingAccount(true);
+
+    const response = await signUp(String(username).toLocaleLowerCase(), password);
+
+    if (!response.success && response.error) {
+      setAuthError(response.error)
+    } else {
+      router.refresh();
+    }
+
+    setIsCreatingAccount(false)
+  }
+ 
   function clearFields() {
     setUsername('')
     setPassword('')

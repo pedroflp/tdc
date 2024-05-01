@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 export default function MatchCreation({
+  creatingQueue,
   onCreateMatch
-}: { onCreateMatch: (name: string, mode: MatchModesEnum) => void }) {
+}: { creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum) => void }) {
   const [name, setName] = useState("");
   const [selectedMode, setSelectedMode] = useState<MatchModesEnum>();
 
@@ -36,7 +37,7 @@ export default function MatchCreation({
             <Input placeholder='Personalizada' value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className='space-y-2'>
-            <Label>Escolha o modo</Label>
+            <Label>Escolha o modo da partida</Label>
             <div className="grid grid-cols-2 gap-4">
               <MatchOptionCard
                 name="Clássico"
@@ -60,8 +61,13 @@ export default function MatchCreation({
             </div>
           </div>
         </div>
-        <Button disabled={!selectedMode} onClick={handleCreateMatch} className='w-full mt-4'>
-          {selectedMode ? `Confirmar criação da ${matchName.length > 0 ? matchName : "Personalizada"}` : "Selecione o modo de jogo para continuar!" }
+        <Button disabled={creatingQueue || !selectedMode} onClick={handleCreateMatch} className='w-full mt-4'>
+          {creatingQueue
+            ? `Criando partida ${matchName}...`
+            : selectedMode
+              ? `Confirmar criação da ${matchName}`
+              : "Selecione o modo de jogo para continuar!"
+          }
         </Button>
       </DialogContent>
     </Dialog>

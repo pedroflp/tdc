@@ -1,7 +1,7 @@
 import { cookiesKeys } from "@/constants/cookies";
 import { collections } from "@/services/constants";
 import { auth, firestore } from "@/services/firebase";
-import { parseUsernameToEmail } from "@/utils/parseUsername";
+import { parseEmailToUsername, parseUsernameToEmail } from "@/utils/parseUsername";
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import { cookies } from "next/headers";
@@ -14,16 +14,11 @@ export async function POST(request: NextRequest) {
     const email = parseUsernameToEmail(body.username);
     
     const response = await signInWithEmailAndPassword(auth, email, body.password);
+
+    if (!response?.user?.email) return;
+
     const { token } = await response.user.getIdTokenResult();
-
     cookies().set(cookiesKeys.TOKEN, token);
-
-    const col = collection(firestore, collections.USERS)
-    await setDoc(doc(col, response.user.uid), {
-      name: body.username ?? "",
-      id: response.user.uid,
-      createdAt: new Date().toISOString(),
-    })
 
     return NextResponse.json({
       success: true,
@@ -32,7 +27,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (err) {
     const error = err as { code: SignInErrors };
-    console.log(error.code)
     return NextResponse.json(
       { success: false, error: signInErrorsMessages[error.code] },
       { status: 400 }

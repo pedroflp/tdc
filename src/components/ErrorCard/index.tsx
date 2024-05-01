@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { cn } from '@/lib/utils';
 
-export default function ErrorCard({ error, className }: { error: string, className?: string }) {
+export default function ErrorCard({ error, className }: { error: string | null, className?: string }) {
   if (!error) return null;
 
   return (

@@ -1,3 +1,11 @@
 import { Player } from "@/flows/queue/types";
 
-export type GetUserResponseDTO = Player | null;
+export type UserDTO = { 
+  username: string;
+  name: string;
+  score?: number;
+  avatar?: string;
+  ready?: boolean;
+}
+
+export type GetUserResponseDTO = UserDTO | null;

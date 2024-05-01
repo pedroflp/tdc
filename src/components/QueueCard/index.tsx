@@ -44,7 +44,6 @@ export default function QueueCard({ queue, user, disableJoinByAuth, disabledJoin
           <p>Criada em <strong>{formatDate(queue.createdAt)}</strong></p>
         </div>
         <div className='flex flex-col gap-2 lg:flex-row'>
-          {user.username === queue.hoster.username && <Button variant="destructive">Fechar partida</Button>}
           <QueueJoinButton
             disableJoinByAuth={disableJoinByAuth}
             disabledJoinByStarted={disabledJoinByStarted}

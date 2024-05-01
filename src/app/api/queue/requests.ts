@@ -1,5 +1,5 @@
 import { fetchApi } from "@/utils/fetchApi";
-import { StartQueueResponseDTO } from "./types";
+import { StartQueueResponseDTO } from "./compositions/types";
 import { MatchModesEnum } from "@/flows/home/components/MatchOptionCard/types";
 
 export async function startQueue(name: string, mode: MatchModesEnum): Promise<StartQueueResponseDTO> {

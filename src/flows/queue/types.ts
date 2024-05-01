@@ -1,12 +1,6 @@
-// queue-data.d.ts
+import { UserDTO } from "@/app/api/user/types";
 
-export interface Player {
-  username: string;
-  name: string;
-  score?: number;
-  avatar?: string;
-  ready?: boolean;
-}
+export type Player = UserDTO
 
 export interface Team {
   players: Array<Player>
@@ -30,6 +24,15 @@ export interface Host {
   username: string;
 }
 
+export interface Composition {
+  id: string,
+  votes: Array<Player>,
+  teams: {
+    [MatchTeamsEnum.BLUE]: Team;
+    [MatchTeamsEnum.RED]: Team;
+  },
+}
+
 export interface QueueItem {
   id: string;
   name: string;
@@ -41,5 +44,6 @@ export interface QueueItem {
     [MatchTeamsEnum.BLUE]: Team;
     [MatchTeamsEnum.RED]: Team;
   };
+  compositions?: Array<Composition>
   players: Array<Player>
 }

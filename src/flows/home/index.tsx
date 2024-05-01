@@ -11,7 +11,7 @@ import { queueMoc } from "@/flows/home/moc";
 import { QueueItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,14 +22,18 @@ import { MatchModesEnum } from "./components/MatchOptionCard/types";
 export default function HomePage({ user }: any) {
   const { push } = useRouter();
   const [availableQueues, setAvailableQueues] = useState<Array<QueueItem>>([]);
-  const [fetchingQueues, setFetchingQueues] = useState(true);
+  const [fetchingQueues, setFetchingQueues] = useState(true); 
+  const [creatingQueue, setCreatingQueue] = useState(false);
 
   async function handleCreateMatch(matchName: string, matchMode: MatchModesEnum) {
+    setCreatingQueue(true);
     const response = await startQueue(matchName, matchMode);
 
     if (response?.success) {
       push(`${routeNames.QUEUE}/${response?.queueId}`);
     }
+
+    setCreatingQueue(false);
   }
 
   function handleEnterQueue(queueId: string) {
@@ -56,7 +60,7 @@ export default function HomePage({ user }: any) {
         <div className="flex justify-between items-center">
           <h1 className="font-bold text-3xl">Partidas disponíveis</h1>
           {!!user ? (
-            <MatchCreation onCreateMatch={handleCreateMatch} />
+            <MatchCreation creatingQueue={creatingQueue} onCreateMatch={handleCreateMatch} />
           ) : null}
         </div>
         <div className="flex flex-wrap w-full flex-col gap-6">

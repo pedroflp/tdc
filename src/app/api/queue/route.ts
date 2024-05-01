@@ -24,24 +24,18 @@ export async function POST(request: NextRequest) {
     const queue = await addDoc(collection(firestore, collections.QUEUES), {
       name,
       mode,
-      active: true,
       hoster: {
         username: userData.username,
         name: userData.name,
         avatar: userData.avatar,
       },
-      players: Array(10).fill({}),
-      teams: {
-        [MatchTeamsEnum.BLUE]: [],
-        [MatchTeamsEnum.RED]: []
-      },
-      match: {
-        id: null,
-        started: false,
-        finished: false,
-        teamWinner: null
-      },
-      matchFinished: false,
+      players: [
+        userData,
+        ...Array(9).fill({})
+      ],
+      teams: [],
+      
+      matchStarted: false,
       createdAt: new Date().toISOString(),
     });
 
