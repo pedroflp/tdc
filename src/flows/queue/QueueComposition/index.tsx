@@ -1,26 +1,23 @@
 'use client';
 
-import { selectQueueCompositions } from '@/app/api/queue/compositions/requests'
-import { routeNames } from '@/app/route.names'
-import Avatar from '@/components/Avatar'
-import { AvatarStack } from '@/components/Avatar/avatar-stack'
-import QueueSlot from '@/components/QueueSlot'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { collections } from '@/services/constants'
-import { firestore } from '@/services/firebase'
-import { deleteDoc, doc, onSnapshot } from 'firebase/firestore'
-import Image from 'next/image'
-import router from 'next/router'
-import { useEffect, useState } from 'react'
-import { Player, QueueItem } from '../types'
-import { useRouter } from 'next/navigation';
 import { createMatch } from '@/app/api/match/requests';
+import { selectQueueCompositions } from '@/app/api/queue/compositions/requests';
+import { routeNames } from '@/app/route.names';
+import Avatar from '@/components/Avatar';
+import { AvatarStack } from '@/components/Avatar/avatar-stack';
+import QueueSlot from '@/components/QueueSlot';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { Label } from '@/components/ui/label';
-import { updateQueue } from '@/app/api/queue/requests';
+import { collections } from '@/services/constants';
+import { firestore } from '@/services/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Player, QueueItem } from '../types';
 
-export default function QueueCompositionPage({ user, queueId }: any) {
+export default function QueueCompositionPage({ queueId, user }: any) {
   const router = useRouter();
 
   const [queue, setQueue] = useState<QueueItem>();
@@ -70,9 +67,12 @@ export default function QueueCompositionPage({ user, queueId }: any) {
     // return () => unsubscribe();
   }, []);
 
-  if (!queue) return;
+  if (!queue) return null;
 
-  if (!queue.players.some(player => player.username === user.username)) return router.push(`${routeNames.QUEUE}/${queueId}`)
+  if (!queue.players.some(player => player.username === user.username)) {
+    router.push(`${routeNames.QUEUE}/${queueId}`)
+    return null;
+  }
 
   return (
     <main className='flex flex-col m-auto gap-12 min-w-[60%] w-full max-w-[60%]'>

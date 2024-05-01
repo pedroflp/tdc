@@ -15,7 +15,7 @@ export default async function BaseLayout({ children }: any) {
     <>
       <Header user={user as UserDTO} />
       <main className="w-screen h-full p-12">{
-        React.Children.map(children, (child: ReactNode) =>
+        React.Children.map(children, (child: any) =>
           React.isValidElement(child)
             ? React.cloneElement<any>(child, {
                 user,
