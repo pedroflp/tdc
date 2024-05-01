@@ -58,7 +58,7 @@ export default function HomePage({ user }: any) {
     <main className="flex flex-col justify-center items-center">
       <div className="flex flex-col gap-10 w-full max-w-[50%]">
         <div className="flex justify-between items-center">
-          <h1 className="font-bold text-3xl">Partidas disponíveis</h1>
+          <h1 className="font-bold text-4xl text-slate-700">Partidas disponíveis</h1>
           {!!user ? (
             <MatchCreation creatingQueue={creatingQueue} onCreateMatch={handleCreateMatch} />
           ) : null}

@@ -2,15 +2,13 @@ import { UserDTO } from "@/app/api/user/types";
 
 export type Player = UserDTO
 
-export interface Team {
-  players: Array<Player>
+export interface Teams {
+  [MatchTeamsEnum.BLUE]: Array<Player>;
+  [MatchTeamsEnum.RED]: Array<Player>;
 }
-
 export interface Match {
   id: string;
   started: boolean;
-  finished: boolean;
-  teamWinner?: MatchTeamsEnum;
 }
 
 export enum MatchTeamsEnum {
@@ -24,13 +22,9 @@ export interface Host {
   username: string;
 }
 
-export interface Composition {
+export interface Composition extends Teams {
   id: string,
   votes: Array<Player>,
-  teams: {
-    [MatchTeamsEnum.BLUE]: Team;
-    [MatchTeamsEnum.RED]: Team;
-  },
 }
 
 export interface QueueItem {
@@ -40,10 +34,20 @@ export interface QueueItem {
   createdAt: string;
   hoster: Host;
   match: Match;
-  teams: {
-    [MatchTeamsEnum.BLUE]: Team;
-    [MatchTeamsEnum.RED]: Team;
-  };
+  readyToStartMatch: boolean;
+  teams: Teams;
   compositions?: Array<Composition>
   players: Array<Player>
+}
+
+export interface MatchItem {
+  id: string;
+  name: string;
+  createdAt: string;
+  hoster: Host;
+  teams: Teams;
+  winner: MatchTeamsEnum,
+  finished: boolean;
+  matchIdInLoL: string,
+  queueId: string,
 }

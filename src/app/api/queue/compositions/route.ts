@@ -1,5 +1,5 @@
 import { cookiesKeys } from "@/constants/cookies";
-import { MatchTeamsEnum, QueueItem, Team } from "@/flows/queue/types";
+import { MatchTeamsEnum, QueueItem, Teams } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { getUserFromToken } from "@/utils/getUsernameFromToken";
@@ -12,10 +12,7 @@ import { UserDTO } from "../../user/types";
 export async function POST(request: NextRequest) {
   const { queueId, compositions }: {
     queueId: string,
-    compositions: Array<{
-      [MatchTeamsEnum.BLUE]: Team;
-      [MatchTeamsEnum.RED]: Team;
-    }>
+    compositions: Array<Teams>
   } = await request.json();
 
   if (!queueId || !compositions) return NextResponse.error();
@@ -84,6 +81,25 @@ export async function PUT(request: NextRequest) {
       ...queueData,
       compositions
     })
+
+    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 6);
+    if (!!compositionSelectedToBeTeam) { 
+      setDoc(queueDocRef, {
+        ...queueData,
+        compositions,
+        readyToStartMatch: true,
+        teams: {
+          [MatchTeamsEnum.BLUE]: compositionSelectedToBeTeam[MatchTeamsEnum.BLUE],
+          [MatchTeamsEnum.RED]: compositionSelectedToBeTeam[MatchTeamsEnum.RED],
+        }
+      })
+    } else {
+      setDoc(queueDocRef, {
+        ...queueData,
+        compositions,
+        readyToStartMatch: false,
+      })
+    }
 
     return NextResponse.json({
       success: true,

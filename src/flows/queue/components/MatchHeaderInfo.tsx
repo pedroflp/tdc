@@ -7,20 +7,17 @@ export default function QueueHeader({ queue, user, onDeleteQueue }: { queue: Que
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
-        <div className='space-y-2'>
-        <h1 className='text-3xl font-bold text-slate-800'>{queue?.name}</h1>
-        <span className='flex items-center gap-2'>
-          Partida de
-          <span className='flex gap-1 items-center'>
-            <Avatar className='w-8 h-8' image={queue?.hoster?.avatar} fallback={String(queue?.hoster?.name).slice(0, 2)} />
-            <strong>{queue?.hoster?.name}</strong>
+        <div>
+          <h1 className='text-4xl font-bold text-slate-700'>Lobby da Partida</h1>
+          <span className='flex items-center text-slate-400 gap-2'>
+            {queue.name} de
+            <Avatar size={6} fallbackSize='text-xs' image={queue?.hoster?.avatar} fallback={String(queue?.hoster?.name).slice(0, 2)} />{queue?.hoster?.name}
           </span>
-        </span>
-      </div>
+        </div>
         {user?.username === queue?.hoster?.username && <Button onClick={onDeleteQueue} variant="destructive">Fechar partida</Button>}
       </div>
 
-      <p className='text-sm text-slate-500'>Entre nos slots para participar da partida!</p>
+      <p className='text-slate-500'>Selecione um slot para entrar no lobby de espera e participar da composição de time e formação da partida!</p>
     </div>
   )
 }

@@ -6,7 +6,7 @@ import { firestore } from "@/services/firebase";
 import { decodeJwt } from "@/utils/decodeJwt";
 import { getUserFromToken } from "@/utils/getUsernameFromToken";
 import { parseEmailToUsername } from "@/utils/parseUsername";
-import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -34,8 +34,6 @@ export async function POST(request: NextRequest) {
         ...Array(9).fill({})
       ],
       teams: [],
-      
-      matchStarted: false,
       createdAt: new Date().toISOString(),
     });
 
@@ -50,4 +48,42 @@ export async function POST(request: NextRequest) {
     return NextResponse.error();
   }
 
+}
+
+export async function PUT(request: NextRequest) {
+  const {queueId, body}: { queueId: string, body: any } = await request.json();
+  const token = cookies().get(cookiesKeys.TOKEN);
+
+  if (!token) return NextResponse.error();
+
+  try {
+    const queue = await getDoc(doc(firestore, collections.QUEUES, queueId))
+
+    if (!queue.exists()) return NextResponse.error();
+
+    await updateDoc(doc(firestore, collections.QUEUES, queueId), body);
+
+    return NextResponse.json({
+      success: true,
+      queueId,
+    })
+  } catch (error) {
+    return NextResponse.error();
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const {queueId}: { queueId: string, } = await request.json();
+
+  try {
+
+    await deleteDoc(doc(firestore, collections.QUEUES, queueId));
+
+    return NextResponse.json({
+      success: true,
+      queueId,
+    })
+  } catch (error) {
+    return NextResponse.error();
+  }
 }

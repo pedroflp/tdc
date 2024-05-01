@@ -19,6 +19,7 @@ const avatarStackVariants = cva(
             md:"-space-x-4 -space-y-4",
             lg: "-space-x-3 -space-y-3",
             xl: "-space-x-2 -space-y-2",
+            "2xl": "-space-x-1 -space-y-1",
       },
     },
     defaultVariants: {

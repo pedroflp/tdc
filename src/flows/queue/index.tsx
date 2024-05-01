@@ -1,31 +1,23 @@
 'use client';
 
-import Avatar from '@/components/Avatar';
-import QueueSlot from '@/components/QueueSlot';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { collections } from '@/services/constants';
+import { createQueueCompositions } from '@/app/api/queue/compositions/requests';
+import { routeNames } from '@/app/route.names';
+import { collections, remoteConfigs } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { useEffect, useMemo, useState } from 'react';
-import { MatchTeamsEnum, Player, QueueItem } from './types';
-import { Eye, Heading1 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { routeNames } from '@/app/route.names';
-import QueueHeader from './components/MatchHeaderInfo';
+import { useEffect, useMemo, useState } from 'react';
+import QueueCompositionSelect from './QueueComposition';
 import Loading from './components/Loading';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Image from 'next/image';
-import { createQueueCompositions, selectQueueCompositions } from '@/app/api/queue/compositions/requests';
 import QueueLobby from './components/QueueLobby';
-import QueueCompositionSelect from './components/QueueCompositionSelect';
+import { MatchTeamsEnum, Player, QueueItem } from './types';
+import { getValue } from 'firebase/remote-config';
+import { remoteConfig } from '@/services/remoteConfig';
 
 export default function QueuePage({ queueId, user }: any) {
   const router = useRouter();
   const [queue, setQueue] = useState<QueueItem>();
   const [isFetching, setIsFetching] = useState(true);
-  const [teamOptions, setTeamOptions] = useState<any>([])
-  const [teamOptionSelectedView, setTeamOptionSelectedView] = useState(0);
 
   if (!user) router.push(routeNames.HOME)
   
@@ -50,8 +42,11 @@ export default function QueuePage({ queueId, user }: any) {
   function getQueueData() {
     onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
+      const queueData = doc.data() as QueueItem;
 
-      setQueue(doc.data() as any);
+      if (queueData?.match?.started) return router.push(`${routeNames.MATCH}/${queueData.match.id}`);
+
+      setQueue(queueData);
       setIsFetching(false);
     })
   }
@@ -59,7 +54,7 @@ export default function QueuePage({ queueId, user }: any) {
   useEffect(() => {
     const unsubscribe = getQueueData();
     // return () => unsubscribe();
-  }, [])
+  }, []);
 
   const isQueueReadyToPlay = useMemo(() => {
     if (!queue?.players) return false;
@@ -73,7 +68,7 @@ export default function QueuePage({ queueId, user }: any) {
   }, [queue?.players, user?.username]);
 
 
-  async function generateTeamOptions() {
+  async function generateQueueCompositions() {
     function shuffleArray(array: Array<Player>) {
       let currentIndex = array.length;
   
@@ -99,41 +94,36 @@ export default function QueuePage({ queueId, user }: any) {
         [MatchTeamsEnum.RED]: redTeam
       };
   
-      return composition
+      return composition;
     }
 
-    const options = new Array(4).fill(null).map(handleRandomizeTeam)
-    await createQueueCompositions(queueId, options);
-    // setTeamOptions(options)
+    const queueCompositionLimit = getValue(remoteConfig, remoteConfigs.QUEUE_COMPOSITION_LIMIT).asNumber();
+    const options = new Array(queueCompositionLimit).fill(null).map(handleRandomizeTeam);
+    const response = await createQueueCompositions(queueId, options);
+    
+    if (response?.success) return handleNavigateToComposition();
   }
 
-  async function handleSelectQueueCompositions(compositionId: string) {
-    await selectQueueCompositions(queueId, compositionId, user);
+  function handleNavigateToComposition() {
+    router.push(`${routeNames.QUEUE}/${queueId}/compositions`)
   }
 
   return (
     <main className="flex justify-center items-center gap-10">
-      {queue?.compositions?.length! > 0 ?
-        <QueueCompositionSelect
-          user={user}
-          teamOptions={queue?.compositions}
-          generateTeamOptions={generateTeamOptions}
-          handleSelectQueueCompositions={handleSelectQueueCompositions}
-        />
-        : (
-          isFetching ? (
-            <Loading />
-          ) : (
-            <QueueLobby
-              user={user}
-              queue={queue}
-              deleteQueue={deleteQueue}
-              playerAlreadyInQueue={playerAlreadyInQueue}
-              isQueueReadyToPlay={isQueueReadyToPlay}
-              generateTeamOptions={generateTeamOptions}
-              joinQueue={joinQueue}
-            />
-          )
+      {
+        isFetching ? (
+          <Loading />
+        ) : (
+          <QueueLobby
+            user={user}
+            queue={queue}
+            deleteQueue={deleteQueue}
+            playerAlreadyInQueue={playerAlreadyInQueue}
+            isQueueReadyToPlay={isQueueReadyToPlay}
+            generateQueueCompositions={generateQueueCompositions}
+            handleNavigateToComposition={handleNavigateToComposition}
+            joinQueue={joinQueue}
+          />
         )}
     </main>
   )
