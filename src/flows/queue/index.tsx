@@ -115,7 +115,7 @@ export default function QueuePage({ queueId, user }: any) {
         ) : (
           <QueueLobby
             user={user}
-            queue={queue}
+            queue={queue!}
             deleteQueue={deleteQueue}
             playerAlreadyInQueue={playerAlreadyInQueue}
             isQueueReadyToPlay={isQueueReadyToPlay}

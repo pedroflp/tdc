@@ -36,7 +36,7 @@ export interface QueueItem {
   match: Match;
   readyToStartMatch: boolean;
   teams: Teams;
-  compositions?: Array<Composition>
+  compositions: Array<Composition>
   players: Array<Player>
 }
 

@@ -4,7 +4,7 @@ import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { getUserFromToken } from "@/utils/getUsernameFromToken";
 import { parseEmailToUsername } from "@/utils/parseUsername";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { UserDTO } from "../../user/types";
@@ -20,13 +20,9 @@ export async function POST(request: NextRequest) {
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
     const queueDoc = await getDoc(queueDocRef);
-
     if (!queueDoc.exists) return NextResponse.error();
 
-    const queueData = queueDoc.data();
-
-    setDoc(queueDocRef, {
-      ...queueData,
+    updateDoc(queueDocRef, {
       compositions: compositions.map((composition, index) => ({
         ...composition,
         votes: [],
@@ -50,7 +46,6 @@ export async function PUT(request: NextRequest) {
     user: UserDTO,
   } = await request.json();
   if (!queueId) return NextResponse.error();
-
 
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
@@ -77,15 +72,11 @@ export async function PUT(request: NextRequest) {
       return composition
     })
 
-    setDoc(queueDocRef, {
-      ...queueData,
-      compositions
-    })
+    updateDoc(queueDocRef, {compositions})
 
-    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 6);
+    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 1);
     if (!!compositionSelectedToBeTeam) { 
-      setDoc(queueDocRef, {
-        ...queueData,
+      updateDoc(queueDocRef, {
         compositions,
         readyToStartMatch: true,
         teams: {
@@ -94,8 +85,7 @@ export async function PUT(request: NextRequest) {
         }
       })
     } else {
-      setDoc(queueDocRef, {
-        ...queueData,
+      updateDoc(queueDocRef, {
         compositions,
         readyToStartMatch: false,
       })

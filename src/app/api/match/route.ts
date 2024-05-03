@@ -25,6 +25,14 @@ export async function POST(request: Request) {
   const matchId = match.id;
   await updateDoc(match, { id: matchId });
 
+  const queueDocRef = doc(firestore, collections.QUEUES, queueId);
+  await updateDoc(queueDocRef, { 
+    match: {
+      id: matchId,
+      started: true
+    }
+  });
+
   return NextResponse.json({
     success: true,
     matchId,
