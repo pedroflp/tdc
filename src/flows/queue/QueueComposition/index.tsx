@@ -25,11 +25,12 @@ export default function QueueCompositionPage({ queueId, user }: any) {
   const [isCreatingMatch, setIsCreatingMatch] = useState(false);
 
   function getQueueData() {
-   return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
+    return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
 
       const queue = doc.data() as QueueItem;
 
+      if (!queue?.compositions || queue?.compositions?.length === 0) return router.push(`${routeNames.QUEUE}/${queueId}`);
       if (queue?.match?.started) return router.push(`${routeNames.MATCH}/${queue.match.id}`);
       setQueue(doc.data() as any);
     })

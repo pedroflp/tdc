@@ -18,8 +18,9 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { updateMatch } from '@/app/api/match/requests';
 import { Badge } from '@/components/ui/badge';
+import { UserDTO } from '@/app/api/user/types';
 
-export default function MatchPage({ user, matchId }: any) {
+export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
   const [match, setMatch] = useState<MatchItem>();
   const [winner, setWinner] = useState<MatchTeamsEnum>();
@@ -59,7 +60,7 @@ export default function MatchPage({ user, matchId }: any) {
     <main className='flex flex-col m-auto gap-12 min-w-[60%] w-full max-w-[60%]'>
       <div className='flex justify-between items-center'>
         <div>
-          <h1 className='text-4xl font-bold text-slate-700'>Partida {match.finished ? 'Finalizada' : 'Em andamento'}</h1>
+          <h1 className='text-4xl font-bold text-slate-700'>Partida {match.finished ? 'finalizada!' : 'em andamento...'}</h1>
           <h2 className='flex gap-2 items-center text-slate-400'>{match.name} de
             <span className='flex gap-1 items-center'>
               <Avatar image={match.hoster.avatar} size={6} fallbackSize='text-xs' fallback={String(match.hoster.name).slice(0, 2)} />{match.hoster.name}
@@ -116,7 +117,7 @@ export default function MatchPage({ user, matchId }: any) {
       <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
         <div className={cn(
           'space-y-4',
-          match.winner === MatchTeamsEnum.BLUE ? 'border-4 border-yellow-500 bg-yellow-50 p-10 rounded-lg' : 'scale-[85%] opacity-60'
+          match.winner && (match.winner === MatchTeamsEnum.BLUE ? 'border-4 border-yellow-500 bg-yellow-50 p-10 rounded-lg' : 'scale-[85%] opacity-60')
         )}>
           <h1 className='text-slate-600 text-2xl font-bold'>Time Azul</h1>
           {match.teams[MatchTeamsEnum.BLUE].map((player, index: number) => (
@@ -139,7 +140,7 @@ export default function MatchPage({ user, matchId }: any) {
           />
         </div>
         <div className={cn('space-y-4',
-           match.winner === MatchTeamsEnum.RED ? 'border-4 border-yellow-500 bg-yellow-50 p-10 rounded-lg' : 'scale-[85%] opacity-60'
+           match.winner && (match.winner === MatchTeamsEnum.RED ? 'border-4 border-yellow-500 bg-yellow-50 p-10 rounded-lg' : 'scale-[85%] opacity-60')
         )}>
           <h1 className='text-slate-600 text-2xl font-bold text-right'>Time Vermelho</h1>
           {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
