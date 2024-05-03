@@ -11,6 +11,15 @@ import { SignUpErrors, signUpErrorsMessages } from "./types";
 export async function POST(request: NextRequest) {
   try {
     const body: { username: string, password: string } = await request.json();
+    
+    const usernameHasValidChars = RegExp(/^([a-z]+)$/).test(body.username);
+    if (!usernameHasValidChars) {
+      return NextResponse.json({
+        success: false,
+        error: "O Username deve conter apenas letras minúsculas (sem espaços, números ou caracteres especiais)"
+      }, { status: 400 })
+    }
+
     const email = parseUsernameToEmail(body.username);
     
     const response = await createUserWithEmailAndPassword(auth, email, body.password);

@@ -37,7 +37,7 @@ export default function HomePage({ user }: any) {
 
   function getAvailableQueues() {
     setFetchingQueues(true);
-    onSnapshot(collection(firestore, collections.QUEUES), (snapshot) => {
+    return onSnapshot(collection(firestore, collections.QUEUES), (snapshot) => {
       const queues = snapshot.docs.map((doc) => doc.data());
       setAvailableQueues(queues as any);
       setFetchingQueues(false);
@@ -46,7 +46,7 @@ export default function HomePage({ user }: any) {
 
   useEffect(() => {
     const unsubscribe = getAvailableQueues();
-    // return () => unsubscribe();
+    return () => unsubscribe();
   }, [])
 
   return (

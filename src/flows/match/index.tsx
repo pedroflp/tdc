@@ -27,7 +27,7 @@ export default function MatchPage({ user, matchId }: any) {
   const [fetchingWinner, setFetchingWinner] = useState(false);
 
   function getQueueData() {
-    onSnapshot(doc(firestore, collections.MATCHES, matchId), (doc) => {
+    return onSnapshot(doc(firestore, collections.MATCHES, matchId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
 
       const match = doc.data() as MatchItem;      
@@ -50,7 +50,7 @@ export default function MatchPage({ user, matchId }: any) {
 
   useEffect(() => {
     const unsubscribe = getQueueData();
-    // return () => unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   if (!match) return;

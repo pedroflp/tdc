@@ -24,7 +24,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
   const [isSelectingQueueComposition, setIsSelectingQueueComposition] = useState(false);
 
   function getQueueData() {
-    onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
+   return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
 
       const queue = doc.data() as QueueItem;
@@ -64,7 +64,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   useEffect(() => {
     const unsubscribe = getQueueData();
-    // return () => unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   if (!queue) return null;

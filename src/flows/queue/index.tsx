@@ -39,7 +39,7 @@ export default function QueuePage({ queueId, user }: any) {
   }
 
   function getQueueData() {
-    onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
+    return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
       const queueData = doc.data() as QueueItem;
 
@@ -52,7 +52,7 @@ export default function QueuePage({ queueId, user }: any) {
 
   useEffect(() => {
     const unsubscribe = getQueueData();
-    // return () => unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   const isQueueReadyToPlay = useMemo(() => {
