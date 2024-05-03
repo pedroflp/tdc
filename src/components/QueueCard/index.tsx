@@ -7,7 +7,7 @@ import { Badge } from '../ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Player } from '@/flows/queue/types'
 
-export default function QueueCard({ queue, user, disableJoinByAuth, disabledJoinByStarted, handleEnterQueue }: any) {
+export default function QueueCard({ queue, user, disableJoinByAuth, disableJoinByStarted, handleEnterQueue }: any) {
   const QueueBadgeStatus = useCallback(({match}: any) => {
     if (match?.started) return <Badge>Iniciada</Badge>
     if (match?.finished) return <Badge variant="outline">Finalizada</Badge>
@@ -46,7 +46,7 @@ export default function QueueCard({ queue, user, disableJoinByAuth, disabledJoin
         <div className='flex flex-col gap-2 lg:flex-row'>
           <QueueJoinButton
             disableJoinByAuth={disableJoinByAuth}
-            disabledJoinByStarted={disabledJoinByStarted}
+            disableJoinByStarted={disableJoinByStarted}
             onClick={() => handleEnterQueue(queue.id)}
           />
         </div>
