@@ -44,7 +44,7 @@ export default function QueuePage({ queueId, user }: any) {
       const queueData = doc.data() as QueueItem;
 
       if (queueData?.match?.started) return router.push(`${routeNames.MATCH}/${queueData.match.id}`);
-      if (queueData?.compositions?.length > 0) return router.push(`${routeNames.QUEUE}/${queueData.id}/composition`);
+      if (queueData?.compositions?.length > 0) return router.push(`${routeNames.QUEUE}/${queueData.id}/compositions`);
 
       setQueue(queueData);
       setIsFetching(false);
