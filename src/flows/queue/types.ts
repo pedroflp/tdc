@@ -34,7 +34,7 @@ export interface QueueItem {
   password?: string;
   createdAt: string;
   hoster: Host;
-  match: Match;
+  match: QueueMatch;
   readyToStartMatch: boolean;
   teams: Teams;
   compositions: Array<Composition>
