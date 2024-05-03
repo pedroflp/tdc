@@ -30,13 +30,13 @@ export function SignDialog() {
 
     const response = await signIn(String(username).toLocaleLowerCase(), password);
 
-    if (!response.success && response.error) { 
+    if (!response.success && response.error) {
       setAuthError(response.error)
-    } else {
-      router.refresh();
+      setIsAuthenticating(false);
+      return;
     }
 
-    setIsAuthenticating(false);
+    router.refresh();
   }
 
   async function handleSignUp() {
@@ -45,12 +45,11 @@ export function SignDialog() {
     const response = await signUp(String(username).toLocaleLowerCase(), password);
 
     if (!response.success && response.error) {
-      setAuthError(response.error)
-    } else {
-      router.refresh();
+      setIsCreatingAccount(false)
+      setAuthError(response.error) 
     }
-
-    setIsCreatingAccount(false)
+  
+    router.refresh();
   }
  
   function clearFields() {

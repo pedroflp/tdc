@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (err) {
     const error = err as { code: SignInErrors };
+    console.log(error)
     return NextResponse.json(
       { success: false, error: signInErrorsMessages[error.code] },
       { status: 400 }

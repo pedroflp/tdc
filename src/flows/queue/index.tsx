@@ -4,15 +4,14 @@ import { createQueueCompositions } from '@/app/api/queue/compositions/requests';
 import { routeNames } from '@/app/route.names';
 import { collections, remoteConfigs } from '@/services/constants';
 import { firestore } from '@/services/firebase';
+import { remoteConfig } from '@/services/remoteConfig';
 import { deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { getValue } from 'firebase/remote-config';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import QueueCompositionSelect from './QueueComposition';
 import Loading from './components/Loading';
 import QueueLobby from './components/QueueLobby';
 import { MatchTeamsEnum, Player, QueueItem } from './types';
-import { getValue } from 'firebase/remote-config';
-import { remoteConfig } from '@/services/remoteConfig';
 
 export default function QueuePage({ queueId, user }: any) {
   const router = useRouter();

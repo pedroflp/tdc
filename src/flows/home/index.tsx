@@ -3,19 +3,14 @@
 import { startQueue } from "@/app/api/queue/requests";
 import { routeNames } from "@/app/route.names";
 import QueueCard from "@/components/QueueCard";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { queueMoc } from "@/flows/home/moc";
 import { QueueItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import Image from "next/image";
+import { collection, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import MatchOptionCard from "./components/MatchOptionCard";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
 
