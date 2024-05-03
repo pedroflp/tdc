@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { updateMatch } from '@/app/api/match/requests';
+import { Badge } from '@/components/ui/badge';
 
 export default function MatchPage({ user, matchId }: any) {
   const router = useRouter();
@@ -72,28 +73,35 @@ export default function MatchPage({ user, matchId }: any) {
           </h2>
         </div>
        {match?.hoster?.username === user?.username && <Dialog>
-          <DialogTrigger>Declarar vencedor</DialogTrigger>
+          <DialogTrigger className='p-3 px-6 bg-black rounded text-white font-bold text-sm hover:bg-gray-800'>Declarar vencedor</DialogTrigger>
           <DialogContent>
             <h1 className='text-2xl font-bold text-slate-700'>Declarar vencedor da {match.name}</h1>
+            <p className='text-slate-500'>Declare o time vencedor da partida e compartilhe o número da partida encontrado no histórico da partida</p>
             <div className='grid grid-cols-2 gap-8'>
-              <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
+              <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
+                {winner === MatchTeamsEnum.RED &&
+                  <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
+                }
                 <CardHeader className='text-xl font-bold text-slate-700'>Time Vermelho</CardHeader>
                 <CardContent className='space-y-2'>
                   {match.teams[MatchTeamsEnum.RED].map(player => (
                     <div key={player.username} className='flex gap-2 items-center'>
                       <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
-                      <p>{player.name}</p>
+                      <p className='text-slate-700 font-bold'>{player.name}</p>
                     </div>
                   ))}
                 </CardContent>
               </Card>
-              <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-black', "cursor-pointer")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
+              <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
+              {winner === MatchTeamsEnum.BLUE &&
+                  <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
+                }
                 <CardHeader className='text-xl font-bold text-slate-700'>Time Azul</CardHeader>
                 <CardContent className='space-y-2'>
                   {match.teams[MatchTeamsEnum.BLUE].map(player => (
                     <div key={player.username} className='flex gap-2 items-center'>
                       <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
-                      <p>{player.name}</p>
+                      <p className='text-slate-700 font-bold'>{player.name}</p>
                     </div>
                   ))}
                 </CardContent>
@@ -103,7 +111,7 @@ export default function MatchPage({ user, matchId }: any) {
               <Label>ID da partida no League of Legends</Label>
               <Input placeholder='12342331' value={matchIdInLoL} onChange={e => setMatchIdInLoL(e.target.value)} />
             </div>
-            <Button disabled={fetchingWinner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedor</Button>
+            <Button disabled={fetchingWinner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedores</Button>
           </DialogContent>
         </Dialog>}
       </div>

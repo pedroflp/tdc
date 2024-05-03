@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
 
     updateDoc(queueDocRef, {compositions})
 
-    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 1);
+    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 6);
     if (!!compositionSelectedToBeTeam) { 
       updateDoc(queueDocRef, {
         compositions,

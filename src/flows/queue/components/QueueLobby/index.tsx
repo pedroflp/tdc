@@ -29,7 +29,7 @@ export default function QueueLobby({
           user?.username === queue?.hoster?.username &&
             <Button
               onClick={generateQueueCompositions}
-              // disabled={!isQueueReadyToPlay}
+              disabled={!isQueueReadyToPlay}
               className='min-w-60 px-10 h-20 mt-6'>
               {!isQueueReadyToPlay
                 ? `Aguardando todos os jogadores preencherem os slots`
