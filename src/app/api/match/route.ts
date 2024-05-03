@@ -1,4 +1,4 @@
-import { Host, Match, Teams } from "@/flows/queue/types";
+import { Host, QueueMatch, Teams } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   const { matchId, body }: {
-    matchId: string, body: Match
+    matchId: string, body: QueueMatch
   } = await request.json();
 
   const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId))

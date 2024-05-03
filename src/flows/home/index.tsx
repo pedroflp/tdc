@@ -71,8 +71,8 @@ export default function HomePage({ user }: any) {
                     key={queue.id}
                     user={user}
                     queue={queue}
-                    disableJoinByAuth={!user}
-                    disableJoinByStarted={queue.match?.started}
+                    disabledJoinByAuth={!user}
+                    disabledJoinByStarted={queue.match?.started}
                     handleEnterQueue={handleEnterQueue}
                   />
                 ))

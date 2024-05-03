@@ -6,9 +6,10 @@ export interface Teams {
   [MatchTeamsEnum.BLUE]: Array<Player>;
   [MatchTeamsEnum.RED]: Array<Player>;
 }
-export interface Match {
+export interface QueueMatch {
   id: string;
   started: boolean;
+  finished: boolean;
 }
 
 export enum MatchTeamsEnum {

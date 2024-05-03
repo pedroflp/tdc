@@ -1,23 +1,36 @@
-import React, { useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Player, QueueMatch } from '@/flows/queue/types'
 import { formatDate } from '@/utils/formatDate'
+import { useCallback } from 'react'
 import { AvatarStack } from '../Avatar/avatar-stack'
-import { Button } from '../ui/button'
-import { Badge } from '../ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { Player } from '@/flows/queue/types'
+import { Badge } from '../ui/badge'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { QueueCardProps } from './types'
 
-export default function QueueCard({ queue, user, disableJoinByAuth, disableJoinByStarted, handleEnterQueue }: any) {
-  const QueueBadgeStatus = useCallback(({match}: any) => {
+export default function QueueCard({
+  queue,
+  user,
+  disabledJoinByAuth,
+  disabledJoinByStarted,
+  handleEnterQueue
+}: QueueCardProps) {
+  const QueueBadgeStatus = useCallback(({match}: {match: QueueMatch}) => {
     if (match?.started) return <Badge>Iniciada</Badge>
     if (match?.finished) return <Badge variant="outline">Finalizada</Badge>
     return <Badge variant="secondary">Em preparação</Badge>;
   }, []);
 
-  const QueueJoinButton = useCallback(({disableJoinByAuth, disableJoinByStarted, onClick}: any) => {
-    if (disableJoinByAuth) return <Button disabled>Faça login para participar</Button>
+  const QueueJoinButton = useCallback(({
+    disabledJoinByAuth,
+    disabledJoinByStarted,
+    onClick
+  }: Pick<QueueCardProps, 'disabledJoinByAuth' | 'disabledJoinByStarted'> & {
+      onClick: () => void,
+  }) => {
+    if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
     if (queue.players.find((player: Player) => player.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
-    if (disableJoinByStarted) return <Button disabled>Partida já iniciada</Button>
+    if (disabledJoinByStarted) return <Button disabled>Partida já iniciada</Button>
     return <Button onClick={onClick}>Entrar na sala da partida</Button>;
   }, [user]);
 
@@ -45,8 +58,8 @@ export default function QueueCard({ queue, user, disableJoinByAuth, disableJoinB
         </div>
         <div className='flex flex-col gap-2 lg:flex-row'>
           <QueueJoinButton
-            disableJoinByAuth={disableJoinByAuth}
-            disableJoinByStarted={disableJoinByStarted}
+            disabledJoinByAuth={disabledJoinByAuth}
+            disabledJoinByStarted={disabledJoinByStarted}
             onClick={() => handleEnterQueue(queue.id)}
           />
         </div>
