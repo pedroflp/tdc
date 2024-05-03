@@ -78,13 +78,13 @@ export default function MatchPage({ user, matchId }: any) {
             <h1 className='text-2xl font-bold text-slate-700'>Declarar vencedor da {match.name}</h1>
             <p className='text-slate-500'>Declare o time vencedor da partida e compartilhe o número da partida encontrado no histórico da partida</p>
             <div className='grid grid-cols-2 gap-8'>
-              <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
-                {winner === MatchTeamsEnum.RED &&
+              <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
+                {winner === MatchTeamsEnum.BLUE &&
                   <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
                 }
-                <CardHeader className='text-xl font-bold text-slate-700'>Time Vermelho</CardHeader>
+                <CardHeader className='text-xl font-bold text-slate-700'>Time Azul</CardHeader>
                 <CardContent className='space-y-2'>
-                  {match.teams[MatchTeamsEnum.RED].map(player => (
+                  {match.teams[MatchTeamsEnum.BLUE].map(player => (
                     <div key={player.username} className='flex gap-2 items-center'>
                       <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
                       <p className='text-slate-700 font-bold'>{player.name}</p>
@@ -92,13 +92,13 @@ export default function MatchPage({ user, matchId }: any) {
                   ))}
                 </CardContent>
               </Card>
-              <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
-              {winner === MatchTeamsEnum.BLUE &&
+              <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
+              {winner === MatchTeamsEnum.RED &&
                   <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
                 }
-                <CardHeader className='text-xl font-bold text-slate-700'>Time Azul</CardHeader>
+                <CardHeader className='text-xl font-bold text-slate-700'>Time Vermelho</CardHeader>
                 <CardContent className='space-y-2'>
-                  {match.teams[MatchTeamsEnum.BLUE].map(player => (
+                  {match.teams[MatchTeamsEnum.RED].map(player => (
                     <div key={player.username} className='flex gap-2 items-center'>
                       <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
                       <p className='text-slate-700 font-bold'>{player.name}</p>
@@ -117,8 +117,8 @@ export default function MatchPage({ user, matchId }: any) {
       </div>
       <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
         <div className='space-y-4'>
-          <h1 className='text-slate-600 text-2xl font-bold'>Time Vermelho</h1>
-          {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
+          <h1 className='text-slate-600 text-2xl font-bold'>Time Azul</h1>
+          {match.teams[MatchTeamsEnum.BLUE].map((player, index: number) => (
             <QueueSlot disabled key={index} player={player} />
           ))}
         </div>
@@ -133,8 +133,8 @@ export default function MatchPage({ user, matchId }: any) {
           />
         </div>
         <div className='space-y-4'>
-          <h1 className='text-slate-600 text-2xl font-bold text-right'>Time Azul</h1>
-          {match.teams.blue.map((player, index: number) => (
+          <h1 className='text-slate-600 text-2xl font-bold text-right'>Time Vermelho</h1>
+          {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
             <QueueSlot disabled key={index} player={player} />
           ))}
         </div>

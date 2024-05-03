@@ -114,8 +114,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
               <TabsContent key={index} className='space-y-8' value={`composition-${index + 1}`}>
                 <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
                   <div className='space-y-4'>
-                    <h1 className='text-slate-600 text-2xl font-bold'>Time Vermelho</h1>
-                    {red.map((player: Player, index: number) => (
+                    <h1 className='text-slate-600 text-2xl font-bold'>Time Azul</h1>
+                    {blue.map((player: Player, index: number) => (
                       <QueueSlot disabled key={index} player={player} />
                     ))}
                   </div>
@@ -130,8 +130,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                     />
                   </div>
                   <div className='space-y-4'>
-                    <h1 className='text-slate-600 text-2xl font-bold text-right'>Time Azul</h1>
-                    {blue.map((player: Player, index: number) => (
+                    <h1 className='text-slate-600 text-2xl font-bold text-right'>Time Vermelho</h1>
+                    {red.map((player: Player, index: number) => (
                       <QueueSlot disabled key={index} player={player} />
                     ))}
                   </div>
