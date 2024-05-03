@@ -22,6 +22,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   const [queue, setQueue] = useState<QueueItem>();
   const [isSelectingQueueComposition, setIsSelectingQueueComposition] = useState(false);
+  const [isCreatingMatch, setIsCreatingMatch] = useState(false);
 
   function getQueueData() {
    return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
@@ -50,6 +51,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
   async function handleStartMatch() {
     if (!queue) return;
 
+    setIsCreatingMatch(true);
+
     const response = await createMatch(
       queue.teams,
       queue.hoster,
@@ -59,6 +62,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
     if (response.success) {
       router.push(`${routeNames.MATCH}/${response.matchId}`)
+    } else {
+      setIsCreatingMatch(false);
     }
   }
 
@@ -70,7 +75,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
   if (!queue) return null;
 
   if (!queue.players.some(player => player.username === user.username)) {
-    router.push(`${routeNames.QUEUE}/${queueId}`)
+    router.push(routeNames.HOME)
     return null;
   }
 
@@ -89,7 +94,13 @@ export default function QueueCompositionPage({ queueId, user }: any) {
         {/* <Button onClick={handleNavigateToLobby} variant="outline">Voltar para o lobby</Button> */}
       </div>
       {queue?.hoster?.username === user?.username && queue?.readyToStartMatch && (
-        <Button onClick={handleStartMatch} className='h-16 bg-emerald-200 hover:bg-emerald-300/80 text-emerald-700 text-lg font-bold'>Iniciar partida {queue?.name}</Button>
+        <Button
+          disabled={isCreatingMatch}
+          onClick={handleStartMatch}
+          className='h-16 bg-emerald-200 hover:bg-emerald-300/80 text-emerald-700 text-lg font-bold'
+        >
+          {isCreatingMatch ? "Iniciando " : "Iniciar "} partida {queue?.name}
+        </Button>
       )}
       <Tabs className='grid grid-cols-[1fr_2.5fr] gap-12' defaultValue="composition-1">
         <TabsList className='w-full h-min flex flex-col justify-start items-start mt-2'>
