@@ -6,8 +6,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate } from '@/utils/formatDate';
 
 import { getUserData } from '@/app/api/user/requests';
+import ErrorCard from '@/components/ErrorCard';
+import { redirect } from 'next/navigation';
 import EditUserInformationDialog from './components/EditUserInformationDialog';
 import UserStats from './components/UserStats';
+import { routeNames } from '@/app/route.names';
 
 export default async function ProfilePage({ user, username }: any) {
   const profileUser = await fetchUserData(username) as UserDTO;
@@ -21,6 +24,8 @@ export default async function ProfilePage({ user, username }: any) {
     
     return response;
   }
+
+  if (!profileUser) redirect(routeNames.HOME);
 
   return (
     <main className='grid lg:grid-cols-2 2xl:grid-cols-[1fr_2fr] w-full h-full m-auto gap-8'>
