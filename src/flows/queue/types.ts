@@ -1,4 +1,5 @@
 import { UserDTO } from "@/app/api/user/types";
+import { MatchModesEnum } from "../home/components/MatchOptionCard/types";
 
 export type Player = UserDTO
 
@@ -34,6 +35,7 @@ export interface QueueItem {
   createdAt: string;
   hoster: Host;
   match: QueueMatch;
+  mode: MatchModesEnum;
   readyToStartMatch: boolean;
   teams: Teams;
   compositions: Array<Composition>;

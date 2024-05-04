@@ -88,16 +88,18 @@ export default function QueueCompositionPage({ queueId, user }: any) {
       {isFetching ? <Loading /> : (
         <>
           <div className='flex justify-between items-center'>
-        <div>
-          <h1 className='text-4xl font-bold'>Escolha de Composição</h1>
-          <h2 className='flex gap-2 items-center text-muted-foreground'>{queue.name} de
-            <span className='flex gap-1 items-center'>
-              <Avatar image={queue.hoster.avatar} size={6} fallbackSize='text-xs' fallback={String(queue.hoster.name).slice(0, 2)} />{queue.hoster.name}
-            </span>
-          </h2>
-          <p className='text-muted-foreground/50 mt-4'>Visualize as composições que foram formadas e vote na composição de sua preferência! <br/> A composição que tiver 6 ou mais votos terá os times definitivos para competição.</p>
-        </div>
-        {/* <Button onClick={handleNavigateToLobby} variant="outline">Voltar para o lobby</Button> */}
+            <div>
+              <h1 className='text-4xl font-bold'>Escolha de Composição</h1>
+              <h2 className='flex gap-2 items-center text-muted-foreground'><strong>{queue.name}</strong> de
+                <span className='flex gap-1 items-center'>
+                  <Avatar image={queue.hoster.avatar} className='w-8 h-8' fallbackSize='text-xs' fallback={String(queue.hoster.name).slice(0, 2)} />
+                  <strong>{queue.hoster.name}</strong>
+                </span>
+              </h2>
+              <p className='text-muted-foreground/50 mt-4'>Visualize as composições que foram formadas e vote na composição de sua preferência! <br />
+                <strong className='text-muted-foreground'>A primeira composição que tiver 6 ou mais votos, permite iniciar a partida.</strong>
+              </p>
+            </div>
           </div>
           {queue?.readyToStartMatch && (
             queue?.hoster?.username === user?.username ? (
@@ -127,7 +129,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                   value={`composition-${index + 1}`}
                 >
                   <p>Opção de <strong>Composição {index + 1}</strong> <span className='text-xs text-muted-foreground'>(Votos: {votes.length})</span></p>
-                  <AvatarStack fallbackSize="text-xs" size={6} spacing="2xl" maxAvatarsAmount={10} avatars={votes} />
+                  <AvatarStack avatarClassName='w-8 h-8' fallbackSize="text-xs" spacing="2xl" maxAvatarsAmount={10} avatars={votes} />
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -147,9 +149,9 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                         <Image
                           src="/assets/icons/default-match.png"
                           alt="versus"
-                          width={80}
-                          height={100}
-                          className='relative z-2 bg-background'
+                          width={1000}
+                          height={1000}
+                          className='w-20 h-20 relative z-2 bg-background'
                         />
                       </div>
                       <div className='space-y-4'>

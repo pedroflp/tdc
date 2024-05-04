@@ -11,7 +11,7 @@ export default function QueueHeader({ queue, user, onDeleteQueue }: { queue: Que
           <h1 className='text-4xl font-bold '>Lobby da Partida</h1>
           <span className='flex items-center text-muted-foreground gap-2'>
             {queue.name} de
-            <Avatar size={6} fallbackSize='text-xs' image={queue?.hoster?.avatar} fallback={String(queue?.hoster?.name).slice(0, 2)} />{queue?.hoster?.name}
+            <Avatar className='w-8 h-8' fallbackSize='text-xs' image={queue?.hoster?.avatar} fallback={String(queue?.hoster?.name).slice(0, 2)} />{queue?.hoster?.name}
           </span>
         </div>
         {user?.username === queue?.hoster?.username && <Button onClick={onDeleteQueue} variant="destructive">Fechar partida</Button>}

@@ -37,9 +37,10 @@ export interface AvatarStackProps
   maxAvatarsAmount?: number;
   size?: number;
   fallbackSize?: "text-xs" | "text-sm" | "text-md" | "text-lg";
+  avatarClassName?: string;
 }
 
-function AvatarStack({ className, size = 10, fallbackSize = "text-sm", orientation, avatars, spacing, avatarsOffset = 4, maxAvatarsAmount = 4, ...props }: AvatarStackProps) {
+function AvatarStack({ className, avatarClassName, size = 10, fallbackSize = "text-sm", orientation, avatars, spacing, avatarsOffset = 4, maxAvatarsAmount = 4, ...props }: AvatarStackProps) {
   const limitedAvatars = avatars.slice(0, maxAvatarsAmount);
 
   return (
@@ -56,7 +57,7 @@ function AvatarStack({ className, size = 10, fallbackSize = "text-sm", orientati
           <Tooltip>
             <TooltipTrigger className="cursor-default">
               <TooltipContent>{user.name}</TooltipContent>
-              <Avatar fallbackSize={fallbackSize} size={size} fallback={String(user.name).slice(0, 2)} image={user.avatar} />
+              <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user.name).slice(0, 2)} image={user.avatar} />
             </TooltipTrigger>
           </Tooltip>
         </TooltipProvider>

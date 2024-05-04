@@ -24,7 +24,7 @@ export default function ProfileDropdown({ user }: { user: UserDTO }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='outline-none flex gap-2 items-center'>
-        <Avatar fallback={String(user.name).slice(0, 2)} />
+        <Avatar image={user.avatar} fallback={String(user.name).slice(0, 2)} />
         <CardTitle className='text-lg text-primary'>{user.name}</CardTitle>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' alignOffset={-24}>

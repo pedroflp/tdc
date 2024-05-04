@@ -11,6 +11,10 @@ import { Lock } from 'lucide-react'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
 import { validateQueueProtectionCode } from '@/app/api/queue/requests'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import { routeNames } from '@/app/route.names'
+import { MatchModesEnum, MatchModesIcons, MatchModesNames } from '@/flows/home/components/MatchOptionCard/types'
+import Image from 'next/image'
 
 export default function QueueCard({
   queue,
@@ -19,17 +23,13 @@ export default function QueueCard({
   disabledJoinByStarted,
   handleEnterQueue
 }: QueueCardProps) {
+  const router = useRouter();
+
   const [protectionInput, setProtectionInput] = useState<{show?: boolean, code?: string, error?: string | null}>({
     show: false,
     code: "",
     error: null,
   });
-
-  const QueueBadgeStatus = useCallback(({match}: {match: QueueMatch}) => {
-    if (match?.started) return <Badge>Iniciada</Badge>
-    if (match?.finished) return <Badge variant="outline">Finalizada</Badge>
-    return <Badge variant="secondary">Em preparação</Badge>;
-  }, []);
 
   const joinQueue = () => {
     if (queue.protection?.enabled && !queue.players.some(player => player.username === user?.username)) {
@@ -53,6 +53,11 @@ export default function QueueCard({
     handleEnterQueue(queue.id);
   }
 
+  const QueueBadgeStatus = useCallback(({match}: {match: QueueMatch}) => {
+    if (match?.started) return <Badge>Partida Iniciada</Badge>
+    if (match?.finished) return <Badge variant="outline">Partida Finalizada</Badge>
+    return <Badge variant="secondary">Partida em preparação</Badge>;
+  }, []);
 
   const QueueJoinButton = useCallback(({
     disabledJoinByAuth,
@@ -63,28 +68,43 @@ export default function QueueCard({
   }) => {
     if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
     if (queue.players.find((player: Player) => player.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
-    if (disabledJoinByStarted) return <Button disabled>Partida já iniciada</Button>
+    if (disabledJoinByStarted) return <Button onClick={() => router.push(`${routeNames.MATCH}/${queue?.match?.id}`)}>Visualizar essa partida</Button>
     return <Button onClick={onClick}>Entrar na sala da partida</Button>;
   }, [user]);
 
   return (
     <Card className="min-w-[500px] w-full">
       <CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
-        <div className="flex gap-4">
-          <CardTitle className='text-xl'>{queue.name}</CardTitle>
-          <QueueBadgeStatus match={queue.match} />
+        <div className='flex flex-col gap-1'>
+          <div className="flex items-center gap-3">
+            <CardTitle className='text-xl'>{queue.name}</CardTitle>
+            <QueueBadgeStatus match={queue.match} />
+          </div>
+          <div className="text-xs text-muted-foreground/60 flex gap-1 items-center">
+            <p>Criada por</p>
+            <div className="flex gap-1 items-center">
+              <Avatar className='w-6 h-6' image={queue.hoster.avatar} fallback={String(queue.hoster.name).slice(0, 2)} size={120} fallbackSize='text-xs' />
+              <strong className="flex items-center gap-1 text-muted-foreground">{queue.hoster.name}</strong>
+            </div>
+          </div>
         </div>
       <AvatarStack spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player.username)} />
       </CardHeader>
       <CardContent className="flex justify-between items-end gap-4">
         <div className="text-sm text-muted-foreground">
-          <div className="flex gap-1 items-center">
-            <p>Partida de</p>
-            <div className="flex gap-1 items-center">
-            <Avatar image={queue.hoster.avatar} fallback={String(queue.hoster.name).slice(0, 2)} size={6} fallbackSize='text-xs' />
-            <strong className="flex items-center gap-1 text-primary">{queue.hoster.name}</strong></div>
-          </div>
-          <p>Criada em <strong>{formatDate(queue.createdAt)}</strong></p>
+          <p className='flex gap-1 items-center'>
+            Modo
+            <Image
+              src={MatchModesIcons[queue?.mode]}
+              width={1000}
+              height={1000}
+              objectFit='cover'
+              className='w-8 h-8'
+              alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
+            />
+            <strong>{MatchModesNames[queue.mode]}</strong>
+          </p>
+          <p>Iniciado em <strong>{formatDate(queue.createdAt)}</strong></p>
         </div>
         <div className='flex flex-col gap-4 items-end 2xl:flex-row'>
           {queue.protection?.enabled && (

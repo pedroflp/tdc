@@ -19,8 +19,9 @@ export default function MatchOptionCard({
       <Image
         src={src}
         alt={alt}
-        width={70}
-        height={100}
+        width={1000}
+        height={1000}
+        className='w-20 h-20'
       />
       <div className="flex flex-col gap-2 items-center">
         <h1 className="font-bold">{name}</h1>

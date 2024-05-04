@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useMemo, useState } from 'react';
 import MatchOptionCard from '../MatchOptionCard';
-import { MatchModesEnum } from '../MatchOptionCard/types';
+import { MatchModesEnum, MatchModesIcons, MatchModesNames } from '../MatchOptionCard/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -64,19 +64,19 @@ export default function MatchCreation({
             <Label>Escolha o modo da partida</Label>
             <div className="grid grid-cols-2 gap-4">
               <MatchOptionCard
-                name="Clássico"
+                name={MatchModesNames[MatchModesEnum.CLASSIC]}
                 mode={MatchModesEnum.CLASSIC}
                 selected={selectedMode === MatchModesEnum.CLASSIC}
-                src="/assets/icons/default-match.png"
+                src={MatchModesIcons[MatchModesEnum.CLASSIC]}
                 alt="Badge de experiência do modo clássico"
                 onClick={setSelectedMode}
                 description="Os jogadores serão aleatoriamente escolhidos para os times. Os jogadores do time vencedor ganharão pontuação pela vitória."
               />
               <MatchOptionCard
-                name="Hardcore"
+                name={MatchModesNames[MatchModesEnum.HARDCORE]}
                 mode={MatchModesEnum.HARDCORE}
                 selected={selectedMode === MatchModesEnum.HARDCORE}
-                src="/assets/icons/hardcore-match.png"
+                src={MatchModesIcons[MatchModesEnum.HARDCORE]}
                 alt="Troféu vitorioso do modo hardcore"
                 onClick={setSelectedMode}
                 disabled
