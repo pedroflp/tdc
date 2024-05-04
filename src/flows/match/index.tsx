@@ -116,19 +116,16 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
         }
       </div>
       <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
-        <div className={cn(
-          'space-y-4',
-          match.winner && (match.winner === MatchTeamsEnum.BLUE ? 'border-4 border-yellow-500 p-10 rounded-lg' : 'scale-[85%] opacity-60')
-        )}>
-          <h1 className='text-slate-600 text-2xl font-bold'>Time Azul</h1>
+      <div className='space-y-4'>
+          <h1 className={cn('text-3xl font-bold text-left', match?.winner === MatchTeamsEnum.BLUE && 'text-yellow-500')}>{match?.winner === MatchTeamsEnum.BLUE && 'Vencedores - '} Time Azul</h1>
           {match.teams[MatchTeamsEnum.BLUE].map((player, index: number) => (
-            <QueueSlot disabled key={index} player={player} />
+            <QueueSlot className={match?.winner === MatchTeamsEnum.BLUE && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400'} disabled key={index} player={player} />
           ))}
         </div>
         <div className='flex items-center justify-center relative mx-8 overflow-hidden'>
           <div className={cn(
             'w-[2px] h-full absolute z-0',
-            match.finished && match.winner ? 'bg-yellow-500' : 'bg-slate-200/60'
+            match.finished && match.winner ? 'bg-yellow-400' : 'bg-border/50'
           )} />
           <Image
             src="/assets/icons/winner-match.png"
