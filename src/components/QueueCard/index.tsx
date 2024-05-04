@@ -69,14 +69,14 @@ export default function QueueCard({
 
   return (
     <Card className="min-w-[500px] w-full">
-      <CardHeader className="flex flex-row justify-between gap-16 items-center mb-4">
+      <CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
         <div className="flex gap-4">
           <CardTitle className='text-xl'>{queue.name}</CardTitle>
           <QueueBadgeStatus match={queue.match} />
         </div>
       <AvatarStack spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player.username)} />
       </CardHeader>
-      <CardContent className="flex justify-between items-center gap-4">
+      <CardContent className="flex justify-between items-end gap-4">
         <div className="text-sm text-muted-foreground">
           <div className="flex gap-1 items-center">
             <p>Partida de</p>
@@ -86,12 +86,12 @@ export default function QueueCard({
           </div>
           <p>Criada em <strong>{formatDate(queue.createdAt)}</strong></p>
         </div>
-        <div className='flex flex-col gap-4 items-center lg:flex-row'>
+        <div className='flex flex-col gap-4 items-end 2xl:flex-row'>
           {queue.protection?.enabled && (
-            <Badge className='bg-secondary/60 text-secondary-foreground/40 p-3 px-6'>
+            <Badge className='bg-secondary/70 text-secondary-foreground/50 p-3 px-6'>
               <span className='flex gap-2 items-center'>
                 <Lock size={16} />
-                Proteção habilitada
+                Sala com senha
               </span>
             </Badge>
           )}

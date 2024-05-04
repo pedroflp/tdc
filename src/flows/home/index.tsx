@@ -51,7 +51,7 @@ export default function HomePage({ user }: any) {
 
   return (
     <main className="flex flex-col justify-center items-center">
-      <div className="flex flex-col gap-10 w-full max-w-[50%]">
+      <div className="flex flex-col gap-10 w-full md:max-w-[80%] xl:max-w-[50%]">
         <div className="flex justify-between items-center">
           <h1 className="font-bold text-4xl text-primary">Salas disponíveis</h1>
           {!!user ? (

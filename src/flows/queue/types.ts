@@ -31,7 +31,6 @@ export interface Composition extends Teams {
 export interface QueueItem {
   id: string;
   name: string;
-  password?: string;
   createdAt: string;
   hoster: Host;
   match: QueueMatch;

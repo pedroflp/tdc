@@ -60,8 +60,8 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
     <main className='flex flex-col m-auto gap-12 min-w-[60%] w-full max-w-[60%]'>
       <div className='flex justify-between items-center'>
         <div>
-          <h1 className='text-4xl font-bold text-slate-700'>Partida {match.finished ? 'finalizada!' : 'em andamento...'}</h1>
-          <h2 className='flex gap-2 items-center text-slate-400'>{match.name} de
+          <h1 className='text-4xl font-bold'>Partida {match.finished ? 'finalizada!' : 'em andamento...'}</h1>
+          <h2 className='flex gap-2 items-center text-muted-foreground'>{match.name} de
             <span className='flex gap-1 items-center'>
               <Avatar image={match.hoster.avatar} size={6} fallbackSize='text-xs' fallback={String(match.hoster.name).slice(0, 2)} />{match.hoster.name}
             </span>
@@ -70,54 +70,55 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
         {match.finished
           ? <Button onClick={() => router.push(routeNames.HOME)}>Voltar para o início</Button>
           : match?.hoster?.username === user?.username && (
-          <Dialog>
-            <DialogTrigger className='p-3 px-6 bg-black rounded text-white font-bold text-sm hover:bg-gray-800'>Declarar vencedor</DialogTrigger>
-            <DialogContent>
-              <h1 className='text-2xl font-bold text-slate-700'>Declarar vencedor da {match.name}</h1>
-              <p className='text-slate-500'>Declare o time vencedor da partida e compartilhe o número da partida encontrado no histórico da partida</p>
-              <div className='grid grid-cols-2 gap-8'>
-                <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
-                  {winner === MatchTeamsEnum.BLUE &&
-                    <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
-                  }
-                  <CardHeader className='text-xl font-bold text-slate-700'>Time Azul</CardHeader>
-                  <CardContent className='space-y-2'>
-                    {match.teams[MatchTeamsEnum.BLUE].map(player => (
-                      <div key={player.username} className='flex gap-2 items-center'>
-                        <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
-                        <p className='text-slate-700 font-bold'>{player.name}</p>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-                <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
-                {winner === MatchTeamsEnum.RED &&
-                    <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
-                  }
-                  <CardHeader className='text-xl font-bold text-slate-700'>Time Vermelho</CardHeader>
-                  <CardContent className='space-y-2'>
-                    {match.teams[MatchTeamsEnum.RED].map(player => (
-                      <div key={player.username} className='flex gap-2 items-center'>
-                        <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
-                        <p className='text-slate-700 font-bold'>{player.name}</p>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
-              <div>
-                <Label>ID da partida no League of Legends</Label>
-                <Input placeholder='12342331' value={matchIdInLoL} onChange={e => setMatchIdInLoL(e.target.value)} />
-              </div>
-              <Button disabled={fetchingWinner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedores</Button>
-            </DialogContent>
-          </Dialog>
-        )}
+            <Dialog>
+              <DialogTrigger className='p-3 px-6 bg-black rounded text-white font-bold text-sm hover:bg-gray-800'>Declarar vencedor</DialogTrigger>
+              <DialogContent>
+                <h1 className='text-2xl font-bold'>Declarar vencedor da partida</h1>
+                <p className='text-muted-foreground'>Declare o time vencedor da <strong>{match.name}</strong> para distrubuir os pontos e dar a vitória.</p>
+                <div className='grid grid-cols-2 gap-8'>
+                  <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-primary', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
+                    {winner === MatchTeamsEnum.BLUE &&
+                      <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
+                    }
+                    <CardHeader className='text-xl font-bold mt-2'>Time Azul</CardHeader>
+                    <CardContent className='space-y-2'>
+                      {match.teams[MatchTeamsEnum.BLUE].map(player => (
+                        <div key={player.username} className='flex gap-2 items-center'>
+                          <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
+                          <p className='font-bold'>{player.name}</p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                  <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
+                  {winner === MatchTeamsEnum.RED &&
+                      <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
+                    }
+                    <CardHeader className='text-xl font-bold mt-2'>Time Vermelho</CardHeader>
+                    <CardContent className='space-y-2'>
+                      {match.teams[MatchTeamsEnum.RED].map(player => (
+                        <div key={player.username} className='flex gap-2 items-center'>
+                          <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
+                          <p className='font-bold'>{player.name}</p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
+                {/* <div>
+                  <Label>ID da partida no League of Legends</Label>
+                  <Input placeholder='12342331' value={matchIdInLoL} onChange={e => setMatchIdInLoL(e.target.value)} />
+                </div> */}
+                <Button disabled={fetchingWinner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedores</Button>
+              </DialogContent>
+            </Dialog>
+          )
+        }
       </div>
       <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
         <div className={cn(
           'space-y-4',
-          match.winner && (match.winner === MatchTeamsEnum.BLUE ? 'border-4 border-yellow-500 bg-yellow-50 p-10 rounded-lg' : 'scale-[85%] opacity-60')
+          match.winner && (match.winner === MatchTeamsEnum.BLUE ? 'border-4 border-yellow-500 p-10 rounded-lg' : 'scale-[85%] opacity-60')
         )}>
           <h1 className='text-slate-600 text-2xl font-bold'>Time Azul</h1>
           {match.teams[MatchTeamsEnum.BLUE].map((player, index: number) => (
@@ -130,21 +131,17 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
             match.finished && match.winner ? 'bg-yellow-500' : 'bg-slate-200/60'
           )} />
           <Image
-            src={
-              match.finished && match.winner ? "/assets/winner-trophy.png" : "/assets/versus-battle.png"
-            }
-            alt="versus"
+            src="/assets/icons/winner-match.png"
+            alt="Match team versus team badge"
             width={100}
             height={100}
-            className='relative z-2 bg-white border-8 border-white'
+            className='relative z-2 bg-background border-8 border-background'
           />
         </div>
-        <div className={cn('space-y-4',
-           match.winner && (match.winner === MatchTeamsEnum.RED ? 'border-4 border-yellow-500 bg-yellow-50 p-10 rounded-lg' : 'scale-[85%] opacity-60')
-        )}>
-          <h1 className='text-slate-600 text-2xl font-bold text-right'>Time Vermelho</h1>
+        <div className='space-y-4'>
+          <h1 className={cn('text-3xl font-bold text-right', match?.winner === MatchTeamsEnum.RED && 'text-yellow-500')}>{match?.winner === MatchTeamsEnum.RED && 'Vencedores - '} Time Vermelho</h1>
           {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
-            <QueueSlot disabled key={index} player={player} />
+            <QueueSlot className={match?.winner === MatchTeamsEnum.RED && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400'} disabled key={index} player={player} />
           ))}
         </div>
       </div>

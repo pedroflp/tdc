@@ -90,7 +90,7 @@ export default function MatchCreation({
           </div>
           <div className='space-y-4'>
            <div className='flex gap-2 items-center'>
-            <Label>Bloquear sala por senha (opcional)</Label>
+            <Label>Solicitar senha para entrar na sala (opcional)</Label>
             <Switch checked={protectMode.enabled} onCheckedChange={value => setProtectMode({ ...protectMode, enabled: value })} />
             </div>
             {protectMode.enabled && (
