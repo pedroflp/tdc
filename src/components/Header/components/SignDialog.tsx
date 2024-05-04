@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -44,9 +46,9 @@ export function SignDialog() {
 
     const response = await signUp(String(username).toLocaleLowerCase(), password);
 
-    if (!response.success && response.error) {
+    if (!response.success) {
       setIsCreatingAccount(false)
-      setAuthError(response.error) 
+      setAuthError(response.error!) 
     }
   
     router.refresh();
@@ -64,7 +66,8 @@ export function SignDialog() {
         <Button variant="outline">Entrar ou criar conta</Button>
       </DialogTrigger>
       <DialogContent>
-        <Tabs defaultValue="account" className="mt-6">
+        <DialogTitle className="text-2xl">Ingressar na plataforma</DialogTitle>
+        <Tabs defaultValue="account">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger disabled={isCreatingAccount || isAuthenticating} onClick={clearFields} value="sigin">Entrar</TabsTrigger>
             <TabsTrigger disabled={isCreatingAccount || isAuthenticating} onClick={clearFields} value="signup">Criar conta</TabsTrigger>

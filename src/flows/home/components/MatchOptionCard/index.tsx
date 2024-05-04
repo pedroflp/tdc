@@ -12,8 +12,8 @@ export default function MatchOptionCard({
       disabled={disabled}
       onClick={() => onClick(mode)}
       className={cn(
-        "flex flex-col gap-5 p-5 border-2 border-slate-200 rounded-md items-center disabled:opacity-50",
-        selected && "border-slate-800"
+        "flex flex-col gap-5 p-5 border-2 rounded-md items-center disabled:opacity-50",
+        selected && "border-primary"
       )}
     >
       <Image
@@ -23,8 +23,8 @@ export default function MatchOptionCard({
         height={100}
       />
       <div className="flex flex-col gap-2 items-center">
-        <h1 className="font-bold text-slate-900">{name}</h1>
-        <p className="text-xs text-center text-slate-600">{description}</p>
+        <h1 className="font-bold">{name}</h1>
+        <p className="text-xs text-center text-primary/60">{description}</p>
 
       </div>
       <div className='mt-auto'>

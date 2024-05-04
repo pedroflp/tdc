@@ -5,37 +5,61 @@ import { MatchModesEnum } from '../MatchOptionCard/types';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
 
 export default function MatchCreation({
   creatingQueue,
   onCreateMatch
-}: { creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum) => void }) {
+}: { creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum, protectMode: { enabled: boolean, code: string }) => void }) {
   const [name, setName] = useState("");
   const [selectedMode, setSelectedMode] = useState<MatchModesEnum>();
+  const [protectMode, setProtectMode] = useState({
+    enabled: false,
+    code: ""
+  })
 
   const matchName = useMemo(() => {
     return name.length > 0 ? name : "Personalizada"
   }, [name]);
   
   function handleCreateMatch() {
-    onCreateMatch(matchName, selectedMode!);
-  }
+    onCreateMatch(matchName, selectedMode!, protectMode);
+  };
+
+  const { canCreateQueue, createQueueAlert } = useMemo(() => {
+    if (creatingQueue) return {
+      canCreateQueue: false,
+      createQueueAlert: "Criando a sala..."
+    }
+
+    if (protectMode.enabled && protectMode.code.length !== 6) return {
+        canCreateQueue: false,
+        createQueueAlert: "Preencha os 6 dígitos da senha para continuar"
+      }
+
+    if (!selectedMode) return {
+      canCreateQueue: false,
+      createQueueAlert: "Selecione um modo de jogo para continuar"
+    }
+
+    return {
+      canCreateQueue: true,
+      createQueueAlert: "Confirmar criação da sala"
+    }
+  }, [creatingQueue, selectedMode, protectMode])
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <span className="p-3 px-6 bg-black rounded text-white font-bold text-sm hover:bg-gray-800">Criar nova partida</span>
+      <DialogTrigger asChild>
+        <Button>Criar nova sala</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Criar nova partida</DialogTitle>
+          <DialogTitle className='text-2xl'>Criar nova sala</DialogTitle>
         </DialogHeader>
-        <DialogDescription>Aqui você manda na competição. Defina o modo de jogo da sua partida e chame os amigos para competir!</DialogDescription>
+        <DialogDescription>Aqui você manda na competição. Defina o modo de jogo da sua sala e chame os amigos para competir!</DialogDescription>
         <div className='space-y-4'>
-          <div className='space-y-2'>
-            <Label>Defina o nome da sala (opcional)</Label>
-            <Input placeholder='Personalizada' value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
           <div className='space-y-2'>
             <Label>Escolha o modo da partida</Label>
             <div className="grid grid-cols-2 gap-4">
@@ -60,14 +84,34 @@ export default function MatchCreation({
               />
             </div>
           </div>
+          <div className='space-y-2'>
+            <Label>Nome de exibição da sala (opcional)</Label>
+            <Input placeholder='Personalizada' value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div className='space-y-4'>
+           <div className='flex gap-2 items-center'>
+            <Label>Bloquear sala por senha (opcional)</Label>
+            <Switch checked={protectMode.enabled} onCheckedChange={value => setProtectMode({ ...protectMode, enabled: value })} />
+            </div>
+            {protectMode.enabled && (
+              <InputOTP value={protectMode.code} onChange={e => setProtectMode({ ...protectMode, code: e })} maxLength={6}>
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            )}
+          </div>
         </div>
-        <Button disabled={creatingQueue || !selectedMode} onClick={handleCreateMatch} className='w-full mt-4'>
-          {creatingQueue
-            ? `Criando partida ${matchName}...`
-            : selectedMode
-              ? `Confirmar criação da ${matchName}`
-              : "Selecione o modo de jogo para continuar!"
-          }
+        <Button disabled={!canCreateQueue} onClick={handleCreateMatch} className='w-full mt-4'>
+          {createQueueAlert}
         </Button>
       </DialogContent>
     </Dialog>

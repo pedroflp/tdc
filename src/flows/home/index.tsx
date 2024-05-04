@@ -1,6 +1,6 @@
 'use client';
 
-import { startQueue } from "@/app/api/queue/requests";
+import { startQueue, validateQueueProtectionCode } from "@/app/api/queue/requests";
 import { routeNames } from "@/app/route.names";
 import QueueCard from "@/components/QueueCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,9 +20,9 @@ export default function HomePage({ user }: any) {
   const [fetchingQueues, setFetchingQueues] = useState(true); 
   const [creatingQueue, setCreatingQueue] = useState(false);
 
-  async function handleCreateMatch(matchName: string, matchMode: MatchModesEnum) {
+  async function handleCreateMatch(matchName: string, matchMode: MatchModesEnum, protectMode: { enabled: boolean, code: string }) {
     setCreatingQueue(true);
-    const response = await startQueue(matchName, matchMode);
+    const response = await startQueue(matchName, matchMode, protectMode);
 
     if (response?.success) {
       push(`${routeNames.QUEUE}/${response?.queueId}`);
@@ -31,7 +31,7 @@ export default function HomePage({ user }: any) {
     setCreatingQueue(false);
   }
 
-  function handleEnterQueue(queueId: string) {
+  async function handleEnterQueue(queueId: string) {
     push(`${routeNames.QUEUE}/${queueId}`);
   }
 
@@ -53,7 +53,7 @@ export default function HomePage({ user }: any) {
     <main className="flex flex-col justify-center items-center">
       <div className="flex flex-col gap-10 w-full max-w-[50%]">
         <div className="flex justify-between items-center">
-          <h1 className="font-bold text-4xl text-slate-700">Partidas disponíveis</h1>
+          <h1 className="font-bold text-4xl text-primary">Salas disponíveis</h1>
           {!!user ? (
             <MatchCreation creatingQueue={creatingQueue} onCreateMatch={handleCreateMatch} />
           ) : null}
@@ -79,12 +79,12 @@ export default function HomePage({ user }: any) {
               ) : (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-xl text-slate-700">Nenhuma partida encontrada!</CardTitle>
+                    <CardTitle className="text-xl text-primary/70">Nenhuma sala encontrada!</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-slate-400">
-                        Não foi possível encontrar nenhuma partida disponível.
-                        <strong className="text-slate-500"> Crie uma nova partida para abrir a sua fila!</strong>
+                    <CardDescription className="text-primary/50">
+                        Não foi possível encontrar nenhuma sala disponível.
+                        <strong> Crie uma nova sala para abrir a fila e iniciar novas partidas!</strong>
                       </CardDescription>
                   </CardContent>
                 </Card>

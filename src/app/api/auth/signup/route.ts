@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (err) {
     const error = err as { code: SignUpErrors };
-    
     return NextResponse.json(
       { success: false, error: signUpErrorsMessages[error.code] },
       { status: 400 }

@@ -37,8 +37,12 @@ export interface QueueItem {
   match: QueueMatch;
   readyToStartMatch: boolean;
   teams: Teams;
-  compositions: Array<Composition>
-  players: Array<Player>
+  compositions: Array<Composition>;
+  players: Array<Player>;
+  protection: {
+    enabled: boolean;
+    code: string;
+  } | null
 }
 
 export interface MatchItem {
