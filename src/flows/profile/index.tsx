@@ -1,5 +1,6 @@
 'use client';
 
+import { UserDTO } from '@/app/api/user/types';
 import Avatar from '@/components/Avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,25 +12,25 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { collections } from '@/services/constants';
 import { firestore, storage } from '@/services/firebase';
 import { formatDate } from '@/utils/formatDate';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { ArrowRight, ImageUp, PencilIcon } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function ProfilePage({ user }: any) {
+  const params = useParams<{ username: string }>();
   const router = useRouter();
   const dialogRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [profileUser, setProfileUser] = useState<UserDTO>();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [displayName, setDisplayName] = useState(user?.name ?? '');
+  const [displayName, setDisplayName] = useState(profileUser?.name ?? '');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isEditingInformations, setIsEditingInformations] = useState(false);
-
-  if (!user) return null;
 
   async function handleSubitEditProfileInformations() {
     setIsEditingInformations(true);
@@ -43,7 +44,7 @@ export default function ProfilePage({ user }: any) {
       })
     }
 
-    if (displayName.length >= 4 && displayName !== user?.name) {
+    if (displayName.length >= 4 && displayName !== profileUser?.name) {
       await updateDoc(doc(firestore, collections.USERS, user.username), {
         name: displayName
       });
@@ -55,11 +56,36 @@ export default function ProfilePage({ user }: any) {
     setIsEditingInformations(false);
   }
 
+  async function fetchUserData(username: string) { 
+    if (!username) return;
+
+    const docRef = doc(firestore, collections.USERS, username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      setProfileUser(docSnap.data() as UserDTO);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData(params.username);
+  }, [params.username]);
+
+  if (!profileUser?.username) return (
+    <div className='grid grid-cols-[1fr_2fr] gap-8'>
+      <div className='flex flex-col gap-8'>
+        <Skeleton className='h-[140px] w-full' />
+        <Skeleton className='h-[400px] w-full' />
+      </div>
+      <Skeleton className='h-full w-full' />
+    </div>
+  );
+
   return (
     <main className='grid lg:grid-cols-2 2xl:grid-cols-[1fr_2fr] w-full h-full m-auto gap-8'>
       <div className='grid grid-rows-[auto_1fr] gap-8 w-full'>
         <Card className='flex gap-2 p-6 h-max relative'>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          {user?.username === profileUser?.username && (
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className='absolute top-4 right-4 gap-2 items-center'>
                 <PencilIcon size={16} /> Editar
@@ -75,13 +101,15 @@ export default function ProfilePage({ user }: any) {
                   </Button>
                   <ArrowRight />
                   <div>
-                    <Image
-                      src={imageFile ? URL.createObjectURL(imageFile) : user?.avatar}
-                      width={1000}
-                      height={1000}
-                      className='w-32 object-cover h-32 rounded-full'
-                      alt='Profile picture image preview'
-                    />
+                    {imageFile || profileUser?.avatar ? (
+                      <Image
+                        src={imageFile ? URL.createObjectURL(imageFile) : profileUser?.avatar!}
+                        width={1000}
+                        height={1000}
+                        className='w-32 object-cover h-32 rounded-full'
+                        alt='Profile picture image preview'
+                      />
+                    ) : <Avatar className='w-32 h-32' fallback={String(profileUser?.username).slice(0, 2)} />}
                   </div>
                   <Input onChange={e => setImageFile(e.target.files?.[0]!)} ref={fileInputRef} className='hidden' type='file' aria-hidden />
                 </div>
@@ -93,22 +121,23 @@ export default function ProfilePage({ user }: any) {
                   maxLength={14}
                   onChange={e => setDisplayName(e.target.value)}
                   value={displayName}
-                  placeholder={user?.username}
+                  placeholder={profileUser?.username}
                 />
               </div>
               <Button disabled={isEditingInformations} onClick={handleSubitEditProfileInformations}>Confirmar edição de perfil</Button>
             </DialogContent>
-         </Dialog>
+            </Dialog>
+          )}
           <div className='relative flex md:flex-row items-end justify-center'>
-            <Avatar className='xl:w-24 xl:h-24 w-16 h-16' image={user?.avatar} fallback={String(user?.name).slice(0, 2)} />
-            <Badge variant="secondary" className='font-bold -bottom-1 absolute'>{user?.username}</Badge>
+            <Avatar className='xl:w-24 xl:h-24 w-16 h-16' image={profileUser?.avatar} fallback={String(profileUser?.name).slice(0, 2)} />
+            <Badge variant="secondary" className='font-bold -bottom-1 absolute'>{profileUser?.username}</Badge>
           </div>
           <div className='flex flex-col justify-between'>
-            <h1 className='text-2xl font-bold'>{user?.name}</h1>
-            <p className='text-sm text-muted-foreground'>Membro desde {formatDate(user?.createdAt)}</p>
+            <h1 className='text-2xl font-bold'>{profileUser?.name}</h1>
+            {profileUser?.createdAt && <p className='text-sm text-muted-foreground'>Membro desde {formatDate(profileUser.createdAt)}</p>}
           </div>
         </Card>
-       {user?.statistics && <Card className='h-full'>
+       {profileUser?.statistics && <Card className='h-full'>
           <CardHeader>
             <CardTitle>Estatísticas de jogador</CardTitle>
           </CardHeader>
