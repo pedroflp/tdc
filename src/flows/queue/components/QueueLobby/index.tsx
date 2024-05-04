@@ -12,6 +12,7 @@ export default function QueueLobby({
   isQueueReadyToPlay,
   generateQueueCompositions,
   joinQueue,
+  handleRemove,
   handleNavigateToComposition
 }: QueueLobbyProps) {
   return (
@@ -20,10 +21,18 @@ export default function QueueLobby({
         <QueueHeader queue={queue!} user={user} onDeleteQueue={deleteQueue} />
         <div className='grid grid-cols-2 grid-rows-5 gap-6'>
           {queue?.players.map((player: any, index: number) => (
-            <QueueSlot disabled={playerAlreadyInQueue} onClick={() => joinQueue(index)} key={index} player={player} />
+            <QueueSlot
+              key={index}
+              disabled={playerAlreadyInQueue}
+              onRemove={() => handleRemove(index)}
+              onClick={() => joinQueue(index)}
+              player={player}
+              user={user}
+              queue={queue}
+            />
           ))}
         </div>
-        {queue?.compositions?.length > 0 && queue?.players?.some((player: Player) => player.username === user?.username) ? (
+        {queue?.compositions?.length > 0 && queue?.players?.some((player) => player?.username === user?.username) ? (
           <Button className='h-16' onClick={handleNavigateToComposition}>Ir para Escolha de Composição</Button>
           ) : (
           user?.username === queue?.hoster?.username &&

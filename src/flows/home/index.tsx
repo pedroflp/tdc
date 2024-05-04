@@ -24,11 +24,12 @@ export default function HomePage({ user }: any) {
     setCreatingQueue(true);
     const response = await startQueue(matchName, matchMode, protectMode);
 
-    if (response?.success) {
-      push(`${routeNames.QUEUE}/${response?.queueId}`);
+    if (!response?.success) {
+      setCreatingQueue(false);
+      return;
     }
-
-    setCreatingQueue(false);
+    
+    push(`${routeNames.QUEUE}/${response?.queueId}`);
   }
 
   async function handleEnterQueue(queueId: string) {
@@ -55,7 +56,10 @@ export default function HomePage({ user }: any) {
         <div className="flex justify-between items-center">
           <h1 className="font-bold text-4xl text-primary">Salas disponíveis</h1>
           {!!user ? (
-            <MatchCreation creatingQueue={creatingQueue} onCreateMatch={handleCreateMatch} />
+            <MatchCreation
+              creatingQueue={creatingQueue}
+              onCreateMatch={handleCreateMatch}
+            />
           ) : null}
         </div>
         <div className="flex flex-wrap w-full flex-col gap-6">

@@ -7,6 +7,7 @@ export type QueueLobbyProps = {
   playerAlreadyInQueue: boolean,
   isQueueReadyToPlay: boolean,
   joinQueue: (position: number) => void,
+  handleRemove: (position: number) => void,
   deleteQueue: () => void,
   generateQueueCompositions: () => void,
   handleNavigateToComposition: () => void,

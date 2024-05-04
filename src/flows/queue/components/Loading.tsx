@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function Loading() {
   return (
-    <div className='w-[40%] space-y-16'>
+    <div className='w-[60%] space-y-16'>
       <div className='space-y-2'>
         <Skeleton className='w-[300px] h-[40px]' />
         <Skeleton className='w-[160px] h-[30px]' />

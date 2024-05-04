@@ -33,7 +33,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   if (!queue) return null;
 
-  if (!queue.players.some(player => player.username === user.username)) {
+  if (!queue.players.some(player => player?.username === user?.username)) {
     router.push(routeNames.HOME)
     return null;
   }

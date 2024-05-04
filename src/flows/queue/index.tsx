@@ -5,13 +5,14 @@ import { routeNames } from '@/app/route.names';
 import { collections, remoteConfigs } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { remoteConfig } from '@/services/remoteConfig';
-import { deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { deleteDoc, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { getValue } from 'firebase/remote-config';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import Loading from './components/Loading';
 import QueueLobby from './components/QueueLobby';
 import { MatchTeamsEnum, Player, QueueItem } from './types';
+import { UserDTO } from '@/app/api/user/types';
 
 export default function QueuePage({ queueId, user }: any) {
   const router = useRouter();
@@ -38,6 +39,16 @@ export default function QueuePage({ queueId, user }: any) {
     await deleteDoc(doc(firestore, collections.QUEUES, queue.id));
   }
 
+  async function handleRemoveFromQueue(position: number) {
+    if (!queue) return;
+    const newPlayers = queue.players;
+    newPlayers[position] = null as unknown as UserDTO;
+
+    updateDoc(doc(firestore, collections.QUEUES, queueId), {
+      players: newPlayers
+    });
+  }
+
   function getQueueData() {
     return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
@@ -59,7 +70,7 @@ export default function QueuePage({ queueId, user }: any) {
   const isQueueReadyToPlay = useMemo(() => {
     if (!queue?.players) return false;
 
-    return !queue?.players.some((player: any) => !player.username);
+    return !queue?.players.some((player: any) => !player?.username);
   }, [queue?.players]);
 
   const playerAlreadyInQueue = useMemo(() => {
@@ -97,8 +108,7 @@ export default function QueuePage({ queueId, user }: any) {
       return composition;
     }
 
-    const queueCompositionLimit = getValue(remoteConfig, remoteConfigs.QUEUE_COMPOSITION_LIMIT).asNumber();
-    const options = new Array(queueCompositionLimit).fill(null).map(handleRandomizeTeam);
+    const options = new Array(4).fill(null).map(handleRandomizeTeam);
     const response = await createQueueCompositions(queueId, options);
     
     if (response?.success) return handleNavigateToComposition();
@@ -123,6 +133,7 @@ export default function QueuePage({ queueId, user }: any) {
             generateQueueCompositions={generateQueueCompositions}
             handleNavigateToComposition={handleNavigateToComposition}
             joinQueue={joinQueue}
+            handleRemove={handleRemoveFromQueue}
           />
         )}
     </main>

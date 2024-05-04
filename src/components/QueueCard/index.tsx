@@ -1,20 +1,20 @@
+import { validateQueueProtectionCode } from '@/app/api/queue/requests'
+import { routeNames } from '@/app/route.names'
+import { MatchModesIcons, MatchModesNames } from '@/flows/home/components/MatchOptionCard/types'
 import { Player, QueueMatch } from '@/flows/queue/types'
+import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
+import { Lock } from 'lucide-react'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
+import Avatar from '../Avatar'
 import { AvatarStack } from '../Avatar/avatar-stack'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { QueueCardProps } from './types'
-import Avatar from '../Avatar'
-import { Lock } from 'lucide-react'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
-import { validateQueueProtectionCode } from '@/app/api/queue/requests'
-import { cn } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
-import { routeNames } from '@/app/route.names'
-import { MatchModesEnum, MatchModesIcons, MatchModesNames } from '@/flows/home/components/MatchOptionCard/types'
-import Image from 'next/image'
+import { QueueCardProps } from './types'
 
 export default function QueueCard({
   queue,
@@ -32,7 +32,7 @@ export default function QueueCard({
   });
 
   const joinQueue = () => {
-    if (queue.protection?.enabled && !queue.players.some(player => player.username === user?.username)) {
+    if (queue.protection?.enabled && !queue.players.some(player => player?.username === user?.username)) {
       setProtectionInput({show: true, code: ""});
       return;
     }
@@ -67,7 +67,7 @@ export default function QueueCard({
       onClick: () => void,
   }) => {
     if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
-    if (queue.players.find((player: Player) => player.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
+    if (queue.players.find((player: Player) => player?.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
     if (disabledJoinByStarted) return <Button onClick={() => router.push(`${routeNames.MATCH}/${queue?.match?.id}`)}>Visualizar essa partida</Button>
     return <Button onClick={onClick}>Entrar na sala da partida</Button>;
   }, [user]);
@@ -88,7 +88,7 @@ export default function QueueCard({
             </div>
           </div>
         </div>
-      <AvatarStack spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player.username)} />
+      <AvatarStack spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player?.username)} />
       </CardHeader>
       <CardContent className="flex justify-between items-end gap-4">
         <div className="text-sm text-muted-foreground">
