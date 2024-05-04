@@ -1,6 +1,6 @@
 'use client';
 
-import Avatar from '@/components/Avatar'
+import Avatar from '@/components/Avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,12 +12,12 @@ import { collections } from '@/services/constants';
 import { firestore, storage } from '@/services/firebase';
 import { formatDate } from '@/utils/formatDate';
 import { doc, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, getStream, ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { ArrowRight, ImageUp, PencilIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react';
 
 export default function ProfilePage({ user }: any) {
   const router = useRouter();
@@ -132,7 +132,7 @@ export default function ProfilePage({ user }: any) {
               </div>
               <div className='flex flex-col items-center justify-center'>
                 <h1 className='text-4xl font-bold'>{user.statistics?.mvps}</h1>
-                <p className='text-sm text-muted-foreground'>MVP's conquistados</p>
+                <p className='text-sm text-muted-foreground'>MVPs conquistados</p>
               </div>
             </div>
           </CardContent>
