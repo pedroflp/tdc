@@ -21,9 +21,6 @@ import React, { useRef, useState } from 'react'
 
 export default function ProfilePage({ user }: any) {
   const router = useRouter();
-
-  if (!user) return null;
-
   const dialogRef = useRef(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +28,8 @@ export default function ProfilePage({ user }: any) {
   const [displayName, setDisplayName] = useState(user?.name ?? '');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isEditingInformations, setIsEditingInformations] = useState(false);
+
+  if (!user) return null;
 
   async function handleSubitEditProfileInformations() {
     setIsEditingInformations(true);
