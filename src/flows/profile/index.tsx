@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation';
 import EditUserInformationDialog from './components/EditUserInformationDialog';
 import UserStats from './components/UserStats';
 import { routeNames } from '@/app/route.names';
+import { getUserMatches } from '@/app/api/user/matches/requests';
 
 export default async function ProfilePage({ user, username }: any) {
   const profileUser = await fetchUserData(username) as UserDTO;

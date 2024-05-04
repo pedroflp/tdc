@@ -10,7 +10,7 @@ export default function UserStats({ user }: { user: UserDTO }) {
       </CardHeader>
       <CardContent>
         <Card className='flex flex-col items-center justify-center bg-secondary p-4 mb-8'>
-          <h1 className='text-4xl font-bold'>{Math.round(user.statistics?.won / user.statistics?.played * 100)}%</h1>
+          <h1 className='text-4xl font-bold'>{Math.round(((user.statistics?.won / user.statistics?.played) || 0) * 100)}%</h1>
           <p className='text-sm text-muted-foreground'>Win rate</p>
         </Card>
         <div className='grid grid-cols-2 gap-8'>
