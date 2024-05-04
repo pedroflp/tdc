@@ -1,7 +1,11 @@
+import ProfilePage from '@/flows/profile'
+import BaseLayout from '@/layouts/base'
 import React from 'react'
 
 export default function Profile() {
   return (
-    <div>Profile</div>
+    <BaseLayout>
+      <ProfilePage />
+    </BaseLayout>
   )
 }

@@ -13,13 +13,13 @@ export default function Header({ user }: { user: UserDTO }) {
   const { theme, setTheme } = useTheme();
   return (
     <div className='w-screen bg-secondary/60 border-b-2 border-border p-4 px-16 flex justify-between items-center'>
-      <div className='flex gap-2'>
-        <Link href={'/'} className='text-2xl font-black text-foreground flex gap-2 items-center'>TDCU <Badge>BETA</Badge></Link>
+      <Link href={'/'} className='text-2xl font-black text-foreground flex gap-2 items-center'>TDCU <Badge>BETA</Badge></Link>
+      <div className='flex items-center gap-2'>
         <Button variant="ghost" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
           <SunMoon />
         </Button>
+        {!!user ? <ProfileDropdown user={user} /> : <SignDialog />}
       </div>
-      {!!user ? <ProfileDropdown user={user} /> : <SignDialog />}
     </div>
   )
 }
