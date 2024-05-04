@@ -7,10 +7,14 @@ import { doc, getDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const token = request.headers.get(cookiesKeys.TOKEN)!;
+  const token = request.headers.get(cookiesKeys.TOKEN);
+  const params = new URL(request.url).searchParams;
+  const paramsUsername = params.get("username");
+  
+  if (!token) return NextResponse.json({ error: true }, { status: 400 });
 
   try {
-    const username = parseEmailToUsername(getUserFromToken(token, "email"));
+    const username = paramsUsername ?? parseEmailToUsername(getUserFromToken(token, "email"));
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));
 
     if (!userDoc.exists()) return NextResponse.json(null);

@@ -2,10 +2,10 @@ import ProfilePage from '@/flows/profile'
 import BaseLayout from '@/layouts/base'
 import React from 'react'
 
-export default function Profile() {
+export default async function Profile({ params }: { params: { username: string } }) {
   return (
     <BaseLayout>
-      <ProfilePage />
+      <ProfilePage username={params.username} />
     </BaseLayout>
   )
 }

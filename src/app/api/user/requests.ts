@@ -4,16 +4,18 @@ import { cookies } from "next/headers";
 import { ApiResponse } from "../types";
 import { GetUserResponseDTO } from "./types";
 
-export async function getUserData(): Promise<ApiResponse<GetUserResponseDTO> | null> {
+export async function getUserData(username?: string, options?: RequestInit): Promise<ApiResponse<GetUserResponseDTO> | null> {
   const token = cookies().get(cookiesKeys.TOKEN);
 
   if (!token) return null;
 
-  const response = await fetchApi('user', {
+  const urlToFetch = username ? `user?username=${username}` : 'user';
+  const response = await fetchApi(urlToFetch, {
     method: 'GET',
     headers: {
       [cookiesKeys.TOKEN]: token.value
-    }
+    },
+    ...options,
   });
 
   const data = await response.json();
