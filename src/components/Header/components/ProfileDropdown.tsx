@@ -14,7 +14,7 @@ export default function ProfileDropdown({ user }: { user: UserDTO }) {
   const router = useRouter();
   
   function navigateToUserProfile(username: string) {
-    router.push(username);
+    router.push(`/${username}`);
   }
 
   async function handleSignOut() {
