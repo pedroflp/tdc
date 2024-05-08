@@ -29,6 +29,7 @@ export default function QueueLobby({
               player={player}
               user={user}
               queue={queue}
+              canExitOrCick
             />
           ))}
         </div>
