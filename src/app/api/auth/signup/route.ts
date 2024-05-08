@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createUserWithEmailAndPassword, signInAnonymously, signInWithEmailAndPassword } from 'firebase/auth'
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, firestore } from "@/services/firebase";
 import { cookies } from "next/headers";
 import { cookiesKeys } from "@/constants/cookies";
@@ -27,13 +27,27 @@ export async function POST(request: NextRequest) {
     cookies().set(cookiesKeys.TOKEN, token);
 
     const coll = collection(firestore, collections.USERS)
-    await setDoc(doc(coll, body.username), {
-      username: String(body.username).toLocaleLowerCase(),
-      name: body.username,
-      id: response.user.uid,
-      createdAt: new Date().toISOString(),
-      avatar: "",
-    })
+    const user = await getDoc(doc(coll, body.username));
+
+    if (user.exists()) {
+      updateDoc(doc(coll, body.username), {
+        id: response.user.uid
+      });
+    } else {
+      await setDoc(doc(coll, body.username), {
+        username: String(body.username).toLocaleLowerCase(),
+        name: body.username,
+        id: response.user.uid,
+        createdAt: new Date().toISOString(),
+        avatar: "",
+        statistics: {
+          won: 0,
+          played: 0,
+          mvps: 0,
+          points: 0
+        }
+      });
+    }
 
     return NextResponse.json({
       success: true,
