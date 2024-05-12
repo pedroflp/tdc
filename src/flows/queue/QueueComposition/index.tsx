@@ -17,6 +17,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Player, QueueItem } from '../types';
 import Loading from './components/Loading';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 
 export default function QueueCompositionPage({ queueId, user }: any) {
   const router = useRouter();
@@ -53,16 +55,16 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   async function handleSelectQueueCompositions(compositionId: string) {
     setIsSelectingQueueComposition(true);
+    if (isSelectingQueueComposition) return;
+    
     await selectQueueCompositions(queue!.id, compositionId, user);
 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsSelectingQueueComposition(false);
-    }, 2000);
-  }
+    }, 5000);
 
-  // function handleNavigateToLobby() {
-  //   router.push(`${routeNames.QUEUE}/${queueId}`)
-  // }
+    return () => clearTimeout(timeout);
+  }
 
   async function handleStartMatch() {
     if (!queue) return;
@@ -132,6 +134,12 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                   <AvatarStack avatarClassName='w-8 h-8' fallbackSize="text-xs" spacing="2xl" maxAvatarsAmount={10} avatars={votes} />
                 </TabsTrigger>
               ))}
+              {isSelectingQueueComposition && (
+                <div className='w-full p-2 flex flex-col gap-4'>
+                  <Separator className='bg-muted-foreground/10' />
+                  <span className='text-xs text-muted-foreground/40'>Aguarde até você poder votar novamente!</span>
+                </div>
+              )}
             </TabsList>
               {queue.compositions?.map(({ red, blue, votes }: any, index: number) => {
                 const userAlreadySelectedThisComposition = votes.some((voter: Player) => voter.username === user.username)

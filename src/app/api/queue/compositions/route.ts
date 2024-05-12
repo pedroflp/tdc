@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      // queueId,
     })
   } catch (error) {
     return NextResponse.error();
@@ -58,7 +57,11 @@ export async function PUT(request: NextRequest) {
       if (composition.id === compositionId) {
         return {
           ...composition,
-          votes: [...composition.votes, user]
+          votes: [...composition.votes, {
+            username: user.username,
+            avatar: user.avatar,
+            name: user.name
+          }]
         }
       }
 

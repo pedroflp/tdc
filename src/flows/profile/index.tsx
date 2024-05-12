@@ -14,17 +14,9 @@ import { routeNames } from '@/app/route.names';
 import { getUserMatches } from '@/app/api/user/matches/requests';
 
 export default async function ProfilePage({ user, username }: any) {
-  const profileUser = await fetchUserData(username) as UserDTO;
-
-  async function fetchUserData(username: string) { 
-    if (!username) return;
-
-    const response = await getUserData(username, {
-      cache: "default",
-    });
-    
-    return response;
-  }
+  const profileUser = await getUserData(username, {
+    cache: "default",
+  }) as UserDTO;
 
   if (!profileUser) redirect(routeNames.HOME);
 
