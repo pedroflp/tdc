@@ -21,17 +21,18 @@ export async function POST(request: NextRequest) {
     const username = parseEmailToUsername(getUserFromToken(token.value, "email"));
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));
     const userData = userDoc.data()!;
+    const user = {
+      username: userData.username,
+      name: userData.name,
+      avatar: userData.avatar,
+    };
 
     const queue = await addDoc(collection(firestore, collections.QUEUES), {
       name,
       mode,
-      hoster: {
-        username: userData.username,
-        name: userData.name,
-        avatar: userData.avatar,
-      },
+      hoster: user,
       players: [
-        userData,
+        user,
         ...Array(9).fill({})
       ],
       teams: [],

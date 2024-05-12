@@ -46,8 +46,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
       const queue = doc.data() as QueueItem;
 
-      if (!queue?.compositions || queue?.compositions?.length === 0) return router.push(`${routeNames.QUEUE}/${queueId}`);
-      if (queue?.match?.started) return router.push(`${routeNames.MATCH}/${queue.match.id}`);
+      if (!queue?.compositions || queue?.compositions?.length === 0) return router.push(routeNames.QUEUE(queueId));
+      if (queue?.match?.started) return router.push(routeNames.MATCH(queue?.match?.id));
       setQueue(doc.data() as any);
       setIsFetching(false);
     })
@@ -71,15 +71,16 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
     setIsCreatingMatch(true);
 
-    const response = await createMatch(
-      queue.teams,
-      queue.hoster,
-      queue.name,
-      queue.id
-    )
+    const response = await createMatch({
+      teams: queue.teams,
+      players: queue.players,
+      hoster: queue.hoster,
+      name: queue.name,
+      queueId: queue.id
+    })
 
     if (response.success) {
-      router.push(`${routeNames.MATCH}/${response.matchId}`)
+      router.push(routeNames.MATCH(response.matchId))
     } else {
       setIsCreatingMatch(false);
     }
@@ -108,7 +109,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
             <Button
               disabled={isCreatingMatch}
               onClick={handleStartMatch}
-              className='h-16 bg-primary text-lg font-bold'
+              className='h-16 text-lg font-bold'
             >
               {isCreatingMatch ? "Iniciando " : "Iniciar "} partida {queue?.name}
             </Button>

@@ -15,6 +15,7 @@ import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
 import { QueueCardProps } from './types'
+import Link from 'next/link'
 
 export default function QueueCard({
   queue,
@@ -67,10 +68,14 @@ export default function QueueCard({
       onClick: () => void,
   }) => {
     if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
-    if (queue.players.find((player: Player) => player?.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
-    if (disabledJoinByStarted) return <Button onClick={() => router.push(`${routeNames.MATCH}/${queue?.match?.id}`)}>Visualizar essa partida</Button>
+    if (queue?.players.find((player: Player) => player?.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
+    if (disabledJoinByStarted) return (
+      <Link href={routeNames.MATCH(queue?.match?.id)}>
+        <Button asChild>Visualizar essa partida</Button>
+      </Link>
+    )
     return <Button onClick={onClick}>Entrar na sala da partida</Button>;
-  }, [user]);
+  }, [user, queue]);
 
   return (
     <Card className="min-w-[500px] w-full">

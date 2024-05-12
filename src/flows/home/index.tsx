@@ -29,11 +29,11 @@ export default function HomePage({ user }: any) {
       return;
     }
     
-    push(`${routeNames.QUEUE}/${response?.queueId}`);
+    push(routeNames.QUEUE(response?.queueId));
   }
 
   async function handleEnterQueue(queueId: string) {
-    push(`${routeNames.QUEUE}/${queueId}`);
+    push(routeNames.QUEUE(queueId));
   }
 
   function getAvailableQueues() {

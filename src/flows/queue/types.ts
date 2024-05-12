@@ -1,5 +1,6 @@
 import { UserDTO } from "@/app/api/user/types";
 import { MatchModesEnum } from "../home/components/MatchOptionCard/types";
+import { HonorPlayerDTO } from "@/app/api/match/honor/types";
 
 export type Player = UserDTO
 
@@ -56,4 +57,14 @@ export interface MatchItem {
   finished: boolean;
   matchIdInLoL: string,
   queueId: string,
+  players: Array<Player>,
+  mvp?: Player,
+  hostage?: Player,
+  bricklayer?: Player,
+  voting?: {
+    endDate: string,
+    mvp: Array<HonorPlayerDTO> | [],
+    hostage: Array<HonorPlayerDTO> | [],
+    bricklayer: Array<HonorPlayerDTO> | [],
+  }
 }

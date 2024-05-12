@@ -1,56 +1,54 @@
 'use client';
 
+import { UserDTO } from '@/app/api/user/types';
 import { routeNames } from '@/app/route.names';
 import Avatar from '@/components/Avatar';
-import QueueSlot from '@/components/QueueSlot';
+import PlayerSlot from '@/components/PlayerSlot';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { MatchItem, MatchTeamsEnum, QueueItem } from '../queue/types';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { updateMatch } from '@/app/api/match/requests';
-import { Badge } from '@/components/ui/badge';
-import { UserDTO } from '@/app/api/user/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { MatchItem, MatchTeamsEnum } from '../queue/types';
+import DeclareWinnerDialog from './components/DeclareWinnerDialog';
+import { dateDifferenceInSeconds } from '@/utils/dateDifference';
 
 export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
   const [match, setMatch] = useState<MatchItem>();
   const [winner, setWinner] = useState<MatchTeamsEnum>();
-  const [matchIdInLoL, setMatchIdInLoL] = useState("");
-  const [fetchingWinner, setFetchingWinner] = useState(false);
 
-  function getQueueData() {
+  const isUserInThisMatch = useCallback((match: MatchItem) => {
+    if (!match) return false;
+    return match.players?.some(player => player?.username === user?.username)
+  }, [user]);
+  
+  function getMatchData() {
     return onSnapshot(doc(firestore, collections.MATCHES, matchId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
 
-      const match = doc.data() as MatchItem;      
+      const match = doc.data() as MatchItem; 
       setMatch(match);
     })
   }
 
-  async function handleDeclareMatchWinner() {
-    setFetchingWinner(true);
-    if (!match || !winner) return;
+  const canUserVoteHonorsThisMatch = useMemo(() => {
+    if (!match || !user) return false;
 
-    await updateMatch(match.id, match.queueId, {
-      winner,
-      matchIdInLoL,
-      finished: true
-    } as MatchItem);
-
-    setFetchingWinner(false);
-  }
+    return (
+      !!match.voting &&
+      isUserInThisMatch(match) &&
+      dateDifferenceInSeconds(new Date(), new Date(match.voting?.endDate!)) >= 0 &&
+      !match.voting?.mvp.some(player => player.votes.includes(user?.username!))
+    )
+  }, [match, isUserInThisMatch, user]);
 
   useEffect(() => {
-    const unsubscribe = getQueueData();
+    const unsubscribe = getMatchData();
     return () => unsubscribe();
   }, []);
 
@@ -63,63 +61,37 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           <h1 className='text-4xl font-bold'>Partida {match.finished ? 'finalizada!' : 'em andamento...'}</h1>
           <h2 className='flex gap-2 items-center text-muted-foreground'>{match.name} de
             <span className='flex gap-1 items-center'>
-              <Avatar image={match.hoster.avatar} size={6} fallbackSize='text-xs' fallback={String(match.hoster.name).slice(0, 2)} />{match.hoster.name}
+              <Avatar image={match.hoster.avatar} className='w-7 h-7'  fallbackSize='text-xs' fallback={String(match.hoster.name).slice(0, 2)} />{match.hoster.name}
             </span>
           </h2>
         </div>
-        {match.finished
-          ? <Button onClick={() => router.push(routeNames.HOME)}>Voltar para o início</Button>
-          : match?.hoster?.username === user?.username && (
-            <Dialog>
-              <DialogTrigger className='p-3 px-6 bg-black rounded text-white font-bold text-sm hover:bg-gray-800'>Declarar vencedor</DialogTrigger>
-              <DialogContent>
-                <h1 className='text-2xl font-bold'>Declarar vencedor da partida</h1>
-                <p className='text-muted-foreground'>Declare o time vencedor da <strong>{match.name}</strong> para distrubuir os pontos e dar a vitória.</p>
-                <div className='grid grid-cols-2 gap-8'>
-                  <Card className={cn(winner === MatchTeamsEnum.BLUE && 'border-2 border-primary', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.BLUE)}>
-                    {winner === MatchTeamsEnum.BLUE &&
-                      <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
-                    }
-                    <CardHeader className='text-xl font-bold mt-2'>Time Azul</CardHeader>
-                    <CardContent className='space-y-2'>
-                      {match.teams[MatchTeamsEnum.BLUE].map(player => (
-                        <div key={player.username} className='flex gap-2 items-center'>
-                          <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
-                          <p className='font-bold'>{player.name}</p>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                  <Card className={cn(winner === MatchTeamsEnum.RED && 'border-2 border-black', "cursor-pointer relative")} onClick={() => setWinner(MatchTeamsEnum.RED)}>
-                  {winner === MatchTeamsEnum.RED &&
-                      <Badge className='w-[102%] flex items-center justify-center absolute -left-[2px] rounded-sm'>Vencedores</Badge>
-                    }
-                    <CardHeader className='text-xl font-bold mt-2'>Time Vermelho</CardHeader>
-                    <CardContent className='space-y-2'>
-                      {match.teams[MatchTeamsEnum.RED].map(player => (
-                        <div key={player.username} className='flex gap-2 items-center'>
-                          <Avatar image={player.avatar} fallback={String(player.name).slice(0, 2)} />
-                          <p className='font-bold'>{player.name}</p>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
-                {/* <div>
-                  <Label>ID da partida no League of Legends</Label>
-                  <Input placeholder='12342331' value={matchIdInLoL} onChange={e => setMatchIdInLoL(e.target.value)} />
-                </div> */}
-                <Button disabled={fetchingWinner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedores</Button>
-              </DialogContent>
-            </Dialog>
-          )
+        <div className='space-x-4'>
+          {canUserVoteHonorsThisMatch && (
+            <Link href={routeNames.MATCH_HONOR(matchId)}>
+               <Button>Honrar jogadores</Button>
+            </Link>
+          )}
+          {match.finished
+            ? (
+              <Link href={routeNames.HOME}>
+                <Button variant="outline">Voltar para o início</Button>
+              </Link>
+            )
+            : match?.hoster?.username === user?.username && (
+              <DeclareWinnerDialog
+                match={match}
+                winner={winner}
+                setWinner={setWinner}
+              />
+            )
         }
+        </div>
       </div>
       <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
       <div className='space-y-4'>
           <h1 className={cn('text-3xl font-bold text-left', match?.winner === MatchTeamsEnum.BLUE && 'text-yellow-500')}>{match?.winner === MatchTeamsEnum.BLUE && 'Vencedores - '} Time Azul</h1>
           {match.teams[MatchTeamsEnum.BLUE].map((player, index: number) => (
-            <QueueSlot className={match?.winner === MatchTeamsEnum.BLUE && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400'} disabled key={index} player={player} />
+            <PlayerSlot match={match} className={cn(match?.winner === MatchTeamsEnum.BLUE && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')} key={index} player={player} />
           ))}
         </div>
         <div className='flex items-center justify-center relative mx-8 overflow-hidden'>
@@ -138,7 +110,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
         <div className='space-y-4'>
           <h1 className={cn('text-3xl font-bold text-right', match?.winner === MatchTeamsEnum.RED && 'text-yellow-500')}>{match?.winner === MatchTeamsEnum.RED && 'Vencedores - '} Time Vermelho</h1>
           {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
-            <QueueSlot className={match?.winner === MatchTeamsEnum.RED && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400'} disabled key={index} player={player} />
+            <PlayerSlot match={match} className={cn(match?.winner === MatchTeamsEnum.RED && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')} key={index} player={player} />
           ))}
         </div>
       </div>

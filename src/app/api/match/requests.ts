@@ -1,8 +1,9 @@
-import { Host, MatchItem, Teams } from "@/flows/queue/types";
+import { MatchItem } from "@/flows/queue/types";
 import { fetchApi } from "@/utils/fetchApi";
 import { ApiResponse } from "../types";
+import { CreateMatchRequestDTO } from "./types";
 
-export async function createMatch(teams: Teams, hoster: Host, name: string, queueId: string): Promise<ApiResponse<{
+export async function createMatch({ teams, hoster, name, queueId, players }: CreateMatchRequestDTO): Promise<ApiResponse<{
   matchId: string
 }>> {
   const response = await fetchApi('match', {
@@ -11,7 +12,8 @@ export async function createMatch(teams: Teams, hoster: Host, name: string, queu
       teams,
       hoster,
       name,
-      queueId
+      queueId,
+      players
     })
   });
   

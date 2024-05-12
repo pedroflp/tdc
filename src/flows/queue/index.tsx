@@ -54,8 +54,8 @@ export default function QueuePage({ queueId, user }: any) {
       if (!doc.exists()) return router.push(routeNames.HOME);
       const queueData = doc.data() as QueueItem;
 
-      if (queueData?.match?.started) return router.push(`${routeNames.MATCH}/${queueData.match.id}`);
-      if (queueData?.compositions?.length > 0) return router.push(`${routeNames.QUEUE}/${queueData.id}/compositions`);
+      if (queueData?.match?.started) return router.push(routeNames.MATCH(queueData?.match?.id));
+      if (queueData?.compositions?.length > 0) return router.push(routeNames.QUEUE_COMPOSITIONS(queueData.id));
 
       setQueue(queueData);
       setIsFetching(false);
@@ -115,7 +115,7 @@ export default function QueuePage({ queueId, user }: any) {
   }
 
   function handleNavigateToComposition() {
-    router.push(`${routeNames.QUEUE}/${queueId}/compositions`)
+    router.push(routeNames.QUEUE_COMPOSITIONS(queueId));
   }
 
   return (

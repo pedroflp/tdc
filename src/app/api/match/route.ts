@@ -3,11 +3,10 @@ import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
+import { CreateMatchRequestDTO } from "./types";
 
 export async function POST(request: Request) {
-  const { teams, hoster, name, queueId }: {
-    name: string, hoster: Host, teams: Teams, queueId: string
-  } = await request.json();
+  const { teams, hoster, name, queueId, players }: CreateMatchRequestDTO = await request.json();
 
   if (!teams) return;
 
@@ -16,6 +15,7 @@ export async function POST(request: Request) {
     hoster,
     name,
     queueId,
+    players,
     winner: null,
     matchIdInLoL: "",
     finished: false,
