@@ -47,7 +47,7 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
     const match = matchDoc.data() as MatchItem; 
 
     if (!matchDoc.exists()) return router.push(routeNames.HOME);
-    if (!match.voting?.mvp.some(player => player.votes.includes(user?.username))) {
+    if (match.voting?.mvp.some(player => player.votes.includes(user?.username))) {
       toast({description: 'Você já concedeu as honras para esta partida!', duration: 2500 })
       router.push(routeNames.MATCH(matchId));
       return;
