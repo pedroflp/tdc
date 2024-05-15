@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MatchItem, MatchTeamsEnum } from '@/flows/queue/types'
 import { cn } from '@/lib/utils'
 import React, { useState } from 'react'
-import { updateMatch } from '@/app/api/match/requests'
+import { declareMatchWinnerAndStartHonorVotes } from '@/app/api/match/requests'
 import { Badge } from '@/components/ui/badge'
 import Avatar from '@/components/Avatar'
 
@@ -30,7 +30,7 @@ export default function DeclareWinnerDialog({ winner, setWinner, match }: {
     setFetchingWinner(true);
     if (!match || !winner) return;
 
-    await updateMatch(match.id, match.queueId, {
+    await declareMatchWinnerAndStartHonorVotes(match.id, match.queueId, {
       winner,
       voting: {
         endDate: new Date(new Date().setMinutes(new Date().getMinutes() + 2)).toISOString(),

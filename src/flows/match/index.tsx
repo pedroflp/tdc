@@ -11,14 +11,18 @@ import { firestore } from '@/services/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MatchItem, MatchTeamsEnum } from '../queue/types';
 import DeclareWinnerDialog from './components/DeclareWinnerDialog';
 import { dateDifferenceInSeconds } from '@/utils/dateDifference';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
+  const params = useSearchParams();
+  const { toast } = useToast();
+  
   const [match, setMatch] = useState<MatchItem>();
   const [winner, setWinner] = useState<MatchTeamsEnum>();
 
@@ -26,26 +30,43 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
     if (!match) return false;
     return match.players?.some(player => player?.username === user?.username)
   }, [user]);
-  
-  function getMatchData() {
-    return onSnapshot(doc(firestore, collections.MATCHES, matchId), (doc) => {
-      if (!doc.exists()) return router.push(routeNames.HOME);
 
-      const match = doc.data() as MatchItem; 
-      setMatch(match);
-    })
-  }
-
-  const canUserVoteHonorsThisMatch = useMemo(() => {
+  const canUserVoteHonorsThisMatch = useCallback((match: MatchItem, user: UserDTO, isUserInThisMatch: (match: MatchItem) => boolean) => {
     if (!match || !user) return false;
 
     return (
+      match.finished &&
       !!match.voting &&
       isUserInThisMatch(match) &&
       dateDifferenceInSeconds(new Date(), new Date(match.voting?.endDate!)) >= 0 &&
       !match.voting?.mvp.some(player => player.votes.includes(user?.username!))
     )
-  }, [match, isUserInThisMatch, user]);
+  }, []);
+  
+  function getMatchData() {
+    return onSnapshot(doc(firestore, collections.MATCHES, matchId), (doc) => {
+      if (!doc.exists()) return router.push(routeNames.HOME);
+
+      const match = doc.data() as MatchItem;
+      const isHonorEnded = params.get('honorsEnded') === 'true';
+
+      if (isHonorEnded) toast({
+        title: 'As honras foram finalizadas!',
+        description: 'Todos as honras foram automaticamente distrubuídas para jogadores com maiores votos de MVP, Refém e Pedreiro!',
+        duration: 5000
+      })
+  
+      if (canUserVoteHonorsThisMatch(
+        match,
+        user!,
+        isUserInThisMatch
+      )) {
+        return router.push(routeNames.MATCH_HONOR(matchId));
+      }
+
+      setMatch(match);
+    })
+  }
 
   useEffect(() => {
     const unsubscribe = getMatchData();
@@ -66,12 +87,12 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           </h2>
         </div>
         <div className='space-x-4'>
-          {canUserVoteHonorsThisMatch && (
+          {canUserVoteHonorsThisMatch(match, user!, isUserInThisMatch) ? (
             <Link href={routeNames.MATCH_HONOR(matchId)}>
                <Button>Honrar jogadores</Button>
             </Link>
-          )}
-          {match.finished
+          ) : (
+            match.finished
             ? (
               <Link href={routeNames.HOME}>
                 <Button variant="outline">Voltar para o início</Button>
@@ -84,6 +105,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
                 setWinner={setWinner}
               />
             )
+          )
         }
         </div>
       </div>
@@ -94,13 +116,13 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
             <PlayerSlot match={match} className={cn(match?.winner === MatchTeamsEnum.BLUE && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')} key={index} player={player} />
           ))}
         </div>
-        <div className='flex items-center justify-center relative mx-8 overflow-hidden'>
+        <div className='flex items-center justify-center relative mx-4 overflow-hidden'>
           <div className={cn(
             'w-[2px] h-full absolute z-0',
             match.finished && match.winner ? 'bg-yellow-400' : 'bg-border/50'
           )} />
           <Image
-            src="/assets/icons/winner-match.png"
+            src="/assets/icons/match-versus.png"
             alt="Match team versus team badge"
             width={100}
             height={100}

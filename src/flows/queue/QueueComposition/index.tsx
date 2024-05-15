@@ -19,6 +19,7 @@ import { Player, QueueItem } from '../types';
 import Loading from './components/Loading';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { toast } from '@/components/ui/use-toast';
 
 export default function QueueCompositionPage({ queueId, user }: any) {
   const router = useRouter();
@@ -36,7 +37,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
   if (!queue) return null;
 
   if (!queue.players.some(player => player?.username === user?.username)) {
-    router.push(routeNames.HOME)
+    router.push(routeNames.HOME);
+    toast({description: 'A partida foi iniciada e você não faz parte dos jogadores, levamos você para o início!', duration: 3000 })
     return null;
   }
 
@@ -46,8 +48,9 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
       const queue = doc.data() as QueueItem;
 
-      if (!queue?.compositions || queue?.compositions?.length === 0) return router.push(routeNames.QUEUE(queueId));
       if (queue?.match?.started) return router.push(routeNames.MATCH(queue?.match?.id));
+      if (!queue?.compositions || queue?.compositions?.length === 0) return router.push(routeNames.QUEUE(queueId));
+      
       setQueue(doc.data() as any);
       setIsFetching(false);
     })

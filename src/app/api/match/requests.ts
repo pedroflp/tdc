@@ -2,6 +2,7 @@ import { MatchItem } from "@/flows/queue/types";
 import { fetchApi } from "@/utils/fetchApi";
 import { ApiResponse } from "../types";
 import { CreateMatchRequestDTO } from "./types";
+import { calculateAndDistributePlayersHonors } from "./honor/requests";
 
 export async function createMatch({ teams, hoster, name, queueId, players }: CreateMatchRequestDTO): Promise<ApiResponse<{
   matchId: string
@@ -21,7 +22,7 @@ export async function createMatch({ teams, hoster, name, queueId, players }: Cre
   return data;
 }
 
-export async function updateMatch(matchId: string, queueId: string, body: MatchItem,): Promise<ApiResponse<{
+export async function declareMatchWinnerAndStartHonorVotes(matchId: string, queueId: string, body: MatchItem,): Promise<ApiResponse<{
   matchId: string
 }>> {
   const response = await fetchApi('match', {
@@ -34,10 +35,13 @@ export async function updateMatch(matchId: string, queueId: string, body: MatchI
   const data = await response.json();
 
   if (data.success) {
+    calculateAndDistributePlayersHonors({matchId}).then(res => console.log(res));
+
     await fetchApi('queue', {
       method: 'DELETE',
       body: JSON.stringify({queueId})
     })
+    
   }
 
   return data;

@@ -54,7 +54,7 @@ function AvatarStack({ className, avatarClassName, size = 10, fallbackSize = "te
     >
       {limitedAvatars.map((user) => !!user && (
         <TooltipProvider key={user.username}>
-          <Tooltip>
+          <Tooltip delayDuration={100}>
             <TooltipTrigger className="cursor-default">
               <TooltipContent>{user.name}</TooltipContent>
               <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user.name).slice(0, 2)} image={user.avatar} />
