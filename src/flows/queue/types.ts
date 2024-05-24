@@ -2,7 +2,7 @@ import { UserDTO } from "@/app/api/user/types";
 import { MatchModesEnum } from "../home/components/MatchOptionCard/types";
 import { HonorPlayerDTO } from "@/app/api/match/honor/types";
 
-export type Player = UserDTO
+export type Player = Pick<UserDTO, "name" | "avatar" | "username">
 
 export interface Teams {
   [MatchTeamsEnum.BLUE]: Array<Player>;
@@ -57,11 +57,14 @@ export interface MatchItem {
   finished: boolean;
   matchIdInLoL: string,
   queueId: string,
-  players: Array<Player>,
+  players: Array<Player & {
+    alreadyHonored?: boolean
+  }>,
   mvp?: Player,
   hostage?: Player,
   bricklayer?: Player,
-  voting?: {
+  honors?: {
+    finished: boolean,
     endDate: string,
     mvp: Array<HonorPlayerDTO> | [],
     hostage: Array<HonorPlayerDTO> | [],

@@ -1,33 +1,40 @@
-import { cookiesKeys } from "@/constants/cookies";
-import { MatchTeamsEnum, QueueItem, Teams } from "@/flows/queue/types";
+import { MatchTeamsEnum, QueueItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { getUserFromToken } from "@/utils/getUsernameFromToken";
-import { parseEmailToUsername } from "@/utils/parseUsername";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { cookies } from "next/headers";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { UserDTO } from "../../user/types";
+import { handleRandomizeTeam } from "./utils";
 
 export async function POST(request: NextRequest) {
-  const { queueId, compositions }: {
-    queueId: string,
-    compositions: Array<Teams>
-  } = await request.json();
-
-  if (!queueId || !compositions) return NextResponse.error();
+  const { queueId }: {queueId: string} = await request.json();
+  if (!queueId) return NextResponse.error();
 
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
     const queueDoc = await getDoc(queueDocRef);
+
     if (!queueDoc.exists) return NextResponse.error();
+
+    const queueData = queueDoc.data() as QueueItem;
+    const compositions = new Array(5).fill(null).map(() => handleRandomizeTeam(queueData.players));
 
     updateDoc(queueDocRef, {
       compositions: compositions.map((composition, index) => ({
         ...composition,
+        id: `${queueDoc.id}-composition-${index}`,
         votes: [],
-        id: `${queueDoc.id}-composition-${index}`
       }))
+    });
+
+    queueData.players.map(async player => {
+      if (!player.username) return;
+      const playerDocRef = doc(firestore, collections.USERS, player.username)
+      if (!playerDocRef) return;
+      
+      await updateDoc(playerDocRef, {
+        activeMatch: queueData.id
+      })
     })
 
     return NextResponse.json({
@@ -55,6 +62,10 @@ export async function PUT(request: NextRequest) {
 
     const compositions = queueData.compositions?.map(composition => {
       if (composition.id === compositionId) {
+        if (composition.votes.some(vote => vote.username === user.username)) {
+          return composition;  
+        };
+
         return {
           ...composition,
           votes: [...composition.votes, {
@@ -96,7 +107,6 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      // queueId,
     })
   } catch (error) {
     return NextResponse.error();

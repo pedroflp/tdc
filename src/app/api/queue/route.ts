@@ -8,7 +8,6 @@ import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from "firebase/
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcrypt';
-import { error } from "console";
 import { QueueItem } from "@/flows/queue/types";
 
 export async function POST(request: NextRequest) {
@@ -21,6 +20,7 @@ export async function POST(request: NextRequest) {
     const username = parseEmailToUsername(getUserFromToken(token.value, "email"));
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));
     const userData = userDoc.data()!;
+    
     const user = {
       username: userData.username,
       name: userData.name,
@@ -90,7 +90,6 @@ export async function POST(request: NextRequest) {
       queueId,
     })
   } catch (error) {
-    console.log(error)
     return NextResponse.error();
   }
 
@@ -119,10 +118,9 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const {queueId}: { queueId: string, } = await request.json();
+  const {queueId}: { queueId: string } = await request.json();
 
   try {
-
     await deleteDoc(doc(firestore, collections.QUEUES, queueId));
 
     return NextResponse.json({
@@ -155,7 +153,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({success: true});
   } catch (error) {
-    console.log(error)
     return NextResponse.error();
   }
 }

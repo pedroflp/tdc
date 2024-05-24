@@ -5,13 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate } from '@/utils/formatDate';
 
-import { getUserData } from '@/app/api/user/requests';
-import ErrorCard from '@/components/ErrorCard';
+import { getUserData } from '@/app/api/user/[username]/requests';
+import { routeNames } from '@/app/route.names';
 import { redirect } from 'next/navigation';
 import EditUserInformationDialog from './components/EditUserInformationDialog';
 import UserStats from './components/UserStats';
-import { routeNames } from '@/app/route.names';
-import { getUserMatches } from '@/app/api/user/matches/requests';
 
 export default async function ProfilePage({ user, username }: any) {
   const profileUser = await getUserData(username, {

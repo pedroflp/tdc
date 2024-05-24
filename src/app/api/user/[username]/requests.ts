@@ -1,14 +1,14 @@
 import { cookiesKeys } from "@/constants/cookies";
 import { fetchApi } from "@/utils/fetchApi";
 import { cookies } from "next/headers";
-import { ApiResponse } from "../types";
-import { GetUserResponseDTO } from "./types";
+import { GetUserResponseDTO } from "../types";
+import { ApiResponse } from "../../types";
 
-export async function getMyUserData(options?: RequestInit): Promise<ApiResponse<GetUserResponseDTO> | null> {
+export async function getUserData(username: string, options?: RequestInit): Promise<ApiResponse<GetUserResponseDTO> | null> {
   const token = cookies().get(cookiesKeys.TOKEN);
   if (!token) return null;
 
-  const response = await fetchApi('user', {
+  const response = await fetchApi(`user/${username}`, {
     method: 'GET',
     headers: {
       [cookiesKeys.TOKEN]: token.value

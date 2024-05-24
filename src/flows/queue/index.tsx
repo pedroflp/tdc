@@ -5,7 +5,7 @@ import { routeNames } from '@/app/route.names';
 import { collections, remoteConfigs } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { remoteConfig } from '@/services/remoteConfig';
-import { deleteDoc, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { getValue } from 'firebase/remote-config';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -25,7 +25,11 @@ export default function QueuePage({ queueId, user }: any) {
     if (!queue) return;
 
     const newPlayers = queue.players;
-    newPlayers[slot] = user
+    newPlayers[slot] = {
+      username: user.username,
+      avatar: user.avatar,
+      name: user.name
+    }
 
     setDoc(doc(firestore, collections.QUEUES, queueId), {
       ...queue,
@@ -50,9 +54,14 @@ export default function QueuePage({ queueId, user }: any) {
   }
 
   function getQueueData() {
-    return onSnapshot(doc(firestore, collections.QUEUES, queueId), (doc) => {
-      if (!doc.exists()) return router.push(routeNames.HOME);
-      const queueData = doc.data() as QueueItem;
+    return onSnapshot(doc(firestore, collections.QUEUES, queueId), async (queueDoc) => {
+      if (!queueDoc.exists()) {
+        const match = await getDoc(doc(firestore, collections.MATCHES, queueId));
+        if (match.exists()) router.push(routeNames.MATCH(queueId));
+        else router.push(routeNames.HOME);
+        return;
+      };
+      const queueData = queueDoc.data() as QueueItem;
 
       if (queueData?.match?.started) return router.push(routeNames.MATCH(queueData?.match?.id));
       if (queueData?.compositions?.length > 0) return router.push(routeNames.QUEUE_COMPOSITIONS(queueData.id));
@@ -80,36 +89,7 @@ export default function QueuePage({ queueId, user }: any) {
 
 
   async function generateQueueCompositions() {
-    function shuffleArray(array: Array<Player>) {
-      let currentIndex = array.length;
-  
-      while (currentIndex != 0) {
-        let randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-  
-        [array[currentIndex], array[randomIndex]] = [
-          array[randomIndex], array[currentIndex]];
-      }
-  
-      return array;
-    }
-
-    function handleRandomizeTeam() {
-      if (!queue?.players) return;
-  
-      const teams = shuffleArray(queue.players);
-      const blueTeam = teams.slice(0, 5);
-      const redTeam = teams.slice(5, 10);
-      const composition = {
-        [MatchTeamsEnum.BLUE]: blueTeam,
-        [MatchTeamsEnum.RED]: redTeam
-      };
-  
-      return composition;
-    }
-
-    const options = new Array(4).fill(null).map(handleRandomizeTeam);
-    const response = await createQueueCompositions(queueId, options);
+    const response = await createQueueCompositions(queueId);
     
     if (response?.success) return handleNavigateToComposition();
   }

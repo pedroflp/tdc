@@ -1,39 +1,36 @@
 'use client';
 
 import { honorPlayers } from '@/app/api/match/honor/requests';
-import { HonorPlayerDTO, HonorPlayersRequestDTO } from '@/app/api/match/honor/types';
+import { HonorPlayersRequestDTO } from '@/app/api/match/honor/types';
+import { UserDTO } from '@/app/api/user/types';
 import { routeNames } from '@/app/route.names';
-import PlayerSlot from '@/components/PlayerSlot';
+import { AvatarStack } from '@/components/Avatar/avatar-stack';
 import UserAvatarAndName from '@/components/UserAvatarAndName';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ToastAction } from '@/components/ui/toast';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/components/ui/use-toast';
 import { MatchItem, Player } from '@/flows/queue/types';
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { dateDifferenceInSeconds, formatSecondsInDateDifference } from '@/utils/dateDifference';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react';
 import LoadingHonorPage from './components/Loading';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserDTO } from '@/app/api/user/types';
-import { formatDate } from '@/utils/formatDate';
-import { AvatarStack } from '@/components/Avatar/avatar-stack';
+import { cn } from '@/lib/utils';
+import Countdown from 'react-countdown';
 
 export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: string }) {
   const router = useRouter();
   const { toast } = useToast();
 
   const [match, setMatch] = useState<MatchItem>();
-  const [votingTimeLeft, setVotingTimeLeft] = useState(0);
   const [fetchingVotes, setFetchingVotes] = useState(false);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
   const [vote, setVote] = useState({
@@ -49,13 +46,11 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
     const match = matchDoc.data() as MatchItem; 
 
     if (!matchDoc.exists()) return router.push(routeNames.HOME);
-    if (match.voting?.mvp.some(player => player.votes.includes(user?.username))) {
-      toast({description: 'Você já concedeu as honras para esta partida!', duration: 2500 })
+    if (match.players.find(player => player.username === user?.username)?.alreadyHonored) {
+      toast({title: 'Não é possível mais votar!',description: 'Você já concedeu as honras para esta partida, e por isso não pode votar mais!', duration: 2500 })
       router.push(routeNames.MATCH(matchId));
-      return;
     };
 
-    getTimeLeftToCloseHonorVotes(match.voting?.endDate!);
     setMatch(match);
   }
   
@@ -110,20 +105,6 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
     ]
   }, [players, vote]);
 
-  function getTimeLeftToCloseHonorVotes(endDate: string) {
-    const interval = setInterval(() => {
-      const time = dateDifferenceInSeconds(new Date(), new Date(endDate));
-
-      if (time < 0) {
-        router.push(`${routeNames.MATCH(matchId)}?honorsEnded=true`);
-        return () => {
-          clearInterval(interval)
-        }
-      };
-      setVotingTimeLeft(time)
-    }, 1000);
-  };
-
   async function handleHonorPlayers() {
     if (!user) return;
     
@@ -139,28 +120,26 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
       return;
     }
 
+    toast({title: 'Honras votadas!', description: 'Você votou nos jogadores honrados dessa partida, voltando para overview da partida!', duration: 4000 })
+    router.push(routeNames.MATCH(matchId));
     setIsVoteSubmitted(true);
-    const timeout = setTimeout(() => {
-      router.push(routeNames.MATCH(matchId));
-      return () => clearTimeout(timeout);
-    }, 2000);
   };
 
   return (
     <main className='max-w-[70%] m-auto space-y-14'>
       <div className='grid grid-cols-[2fr_2fr] gap-24 items-start'>
         <div className='flex flex-col justify-between h-full'>
-          <h1 className='text-4xl font-bold'>Honre os jogadores da partida</h1>
-          <p className='text-sm text-muted-foreground'>Vote nos jogadores que você deseja honrar como MVP, Refém ou Pedreiro, para atribuir (ou desatribuir) pontos extras aos somatórios de pontos individuais dos jogadores.</p>
-          {vote?.mvp && (
-            <Button
-              disabled={fetchingVotes || isVoteSubmitted}
-              onClick={handleHonorPlayers}
-              className='w-full py-6'
-            >
-              {isVoteSubmitted ? "As honras foram concedidas com sucesso, voltando para histórico da partida..." : 'Confirmar as honras escolhidas'}
-            </Button>
-          )}
+          <div className='space-y-4'>
+            <h1 className='text-4xl font-bold'>Honre os jogadores da partida</h1>
+            <p className='text-sm text-muted-foreground'>Vote nos jogadores que você deseja honrar como MVP, Refém ou Pedreiro, para atribuir (ou desatribuir) pontos extras aos somatórios de pontos individuais dos jogadores.</p>
+          </div>
+          <Button
+            disabled={fetchingVotes || isVoteSubmitted || !vote.mvp}
+            onClick={handleHonorPlayers}
+            className='w-full py-6'
+          >
+            {isVoteSubmitted ? "As honras foram concedidas com sucesso..." : 'Confirmar as honras escolhidas'}
+          </Button>
         </div>
         <div>
           {!match ? (
@@ -178,7 +157,10 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
                 <TooltipProvider>
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger className='ml-auto cursor-default'>
-                      <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(votingTimeLeft)}</h2>
+                      <Countdown
+                        date={new Date(match?.honors?.endDate!)}
+                        renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
+                      />
                     </TooltipTrigger>
                     <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
                   </Tooltip>

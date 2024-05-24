@@ -6,6 +6,7 @@ export type UserDTO = {
   avatar: string;
   createdAt: string;
   statistics: UserStatistics;
+  activeMatch?: string;
 }
 
 export type UserStatistics = {

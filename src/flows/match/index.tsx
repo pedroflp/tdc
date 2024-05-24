@@ -8,20 +8,20 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
+import { dateDifferenceInSeconds, formatSecondsInDateDifference } from '@/utils/dateDifference';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { MatchItem, MatchTeamsEnum } from '../queue/types';
 import DeclareWinnerDialog from './components/DeclareWinnerDialog';
-import { dateDifferenceInSeconds } from '@/utils/dateDifference';
-import { useToast } from '@/components/ui/use-toast';
+import Countdown from 'react-countdown';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
-  const params = useSearchParams();
-  const { toast } = useToast();
   
   const [match, setMatch] = useState<MatchItem>();
   const [winner, setWinner] = useState<MatchTeamsEnum>();
@@ -36,10 +36,11 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
 
     return (
       match.finished &&
-      !!match.voting &&
+      !!match.honors &&
       isUserInThisMatch(match) &&
-      dateDifferenceInSeconds(new Date(), new Date(match.voting?.endDate!)) >= 0 &&
-      !match.voting?.mvp.some(player => player.votes.includes(user?.username!))
+      dateDifferenceInSeconds(new Date(), new Date(match.honors?.endDate!)) >= 0 &&
+      !match.honors.finished &&
+      !match.players.find(player => player.username === user.username)?.alreadyHonored
     )
   }, []);
   
@@ -48,25 +49,9 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
       if (!doc.exists()) return router.push(routeNames.HOME);
 
       const match = doc.data() as MatchItem;
-      const isHonorEnded = params.get('honorsEnded') === 'true';
-
-      if (isHonorEnded) toast({
-        title: 'As honras foram finalizadas!',
-        description: 'Todos as honras foram automaticamente distrubuídas para jogadores com maiores votos de MVP, Refém e Pedreiro!',
-        duration: 5000
-      })
-  
-      if (canUserVoteHonorsThisMatch(
-        match,
-        user!,
-        isUserInThisMatch
-      )) {
-        return router.push(routeNames.MATCH_HONOR(matchId));
-      }
-
       setMatch(match);
     })
-  }
+  };
 
   useEffect(() => {
     const unsubscribe = getMatchData();
@@ -75,6 +60,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
 
   if (!match) return;
 
+  
   return (
     <main className='flex flex-col m-auto gap-12 min-w-[60%] w-full max-w-[60%]'>
       <div className='flex justify-between items-center'>
@@ -86,11 +72,24 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
             </span>
           </h2>
         </div>
-        <div className='space-x-4'>
+        <div className='flex gap-8 items-center'>
+          {match.honors?.endDate && dateDifferenceInSeconds(new Date(), new Date(match.honors?.endDate!)) >= 0 && (
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger className='ml-auto cursor-default'>
+                  <Countdown
+                    date={new Date(match?.honors?.endDate!)}
+                    renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {canUserVoteHonorsThisMatch(match, user!, isUserInThisMatch) ? (
-            <Link href={routeNames.MATCH_HONOR(matchId)}>
-               <Button>Honrar jogadores</Button>
-            </Link>
+            <Button className='text-xl p-8 gap-4 font-bold' onClick={() => router.push(routeNames.MATCH_HONOR(matchId))}>
+              Honrar jogadores
+            </Button>
           ) : (
             match.finished
             ? (

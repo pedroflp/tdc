@@ -24,8 +24,6 @@ export default function QueueCard({
   disabledJoinByStarted,
   handleEnterQueue
 }: QueueCardProps) {
-  const router = useRouter();
-
   const [protectionInput, setProtectionInput] = useState<{show?: boolean, code?: string, error?: string | null}>({
     show: false,
     code: "",
@@ -57,7 +55,7 @@ export default function QueueCard({
   const QueueBadgeStatus = useCallback(({match}: {match: QueueMatch}) => {
     if (match?.started) return <Badge>Partida Iniciada</Badge>
     if (match?.finished) return <Badge variant="outline">Partida Finalizada</Badge>
-    return <Badge variant="secondary">Partida em preparação</Badge>;
+    return <Badge variant="secondary">Sala em preparação</Badge>;
   }, []);
 
   const QueueJoinButton = useCallback(({
@@ -84,6 +82,9 @@ export default function QueueCard({
           <div className="flex items-center gap-3">
             <CardTitle className='text-xl'>{queue.name}</CardTitle>
             <QueueBadgeStatus match={queue.match} />
+            {queue.players.find((player: Player) => player?.username === user?.username) && (
+              <Badge className='bg-emerald-400 text-slate-800'>Você está na sala!</Badge>
+            )}
           </div>
           <div className="text-xs text-muted-foreground/60 flex gap-1 items-center">
             <p>Criada por</p>

@@ -23,7 +23,15 @@ export async function calculateAndDistributePlayersHonors({ matchId }: { matchId
     method: 'PUT',
     body: JSON.stringify({ matchId }),
   });
-  
+
   const data = await response.json();
+
+  if (data.success) {
+    await fetchApi('queue', {
+      method: 'DELETE',
+      body: JSON.stringify({ queueId: matchId })
+    });
+  }
+
   return data;
 };

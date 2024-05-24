@@ -30,17 +30,7 @@ export default function DeclareWinnerDialog({ winner, setWinner, match }: {
     setFetchingWinner(true);
     if (!match || !winner) return;
 
-    await declareMatchWinnerAndStartHonorVotes(match.id, match.queueId, {
-      winner,
-      voting: {
-        endDate: new Date(new Date().setMinutes(new Date().getMinutes() + 2)).toISOString(),
-        mvp: [],
-        hostage: [],
-        bricklayer: []
-      },
-      finished: true
-    } as MatchItem);
-
+    await declareMatchWinnerAndStartHonorVotes(match.id, winner);
     setFetchingWinner(false);
   }
 
@@ -78,7 +68,7 @@ export default function DeclareWinnerDialog({ winner, setWinner, match }: {
             </Card>
           ))}
         </div>
-        <Button disabled={fetchingWinner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedores</Button>
+        <Button disabled={fetchingWinner || !winner} onClick={handleDeclareMatchWinner}>Finalizar partida e declarar vencedores</Button>
       </DialogContent>
     </Dialog>
   )

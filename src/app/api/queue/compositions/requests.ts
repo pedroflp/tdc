@@ -3,14 +3,11 @@ import { StartQueueResponseDTO } from "../types";
 import { MatchModesEnum } from "@/flows/home/components/MatchOptionCard/types";
 import { UserDTO } from "../../user/types";
 
-export async function createQueueCompositions(queueId: string, compositions: any): Promise<StartQueueResponseDTO> {
+export async function createQueueCompositions(queueId: string): Promise<StartQueueResponseDTO> {
   try {
     const response = await fetchApi('queue/compositions', {
       method: 'POST',
-      body: JSON.stringify({
-        queueId,
-        compositions,
-      })
+      body: JSON.stringify({ queueId })
     });
     
     const data = await response.json();

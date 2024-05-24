@@ -58,13 +58,11 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   async function handleSelectQueueCompositions(compositionId: string) {
     setIsSelectingQueueComposition(true);
-    if (isSelectingQueueComposition) return;
-    
     await selectQueueCompositions(queue!.id, compositionId, user);
 
     const timeout = setTimeout(() => {
       setIsSelectingQueueComposition(false);
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timeout);
   }
@@ -145,8 +143,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                 </div>
               )}
             </TabsList>
-              {queue.compositions?.map(({ red, blue, votes }: any, index: number) => {
-                const userAlreadySelectedThisComposition = votes.some((voter: Player) => voter.username === user.username)
+            {queue.compositions?.map(({ red, blue, votes }: any, index: number) => {
+                const userAlreadySelectedThisComposition = votes.find((voter: Player) => voter.username === user.username)
                 return (
                   <TabsContent key={index} className='space-y-8' value={`composition-${index + 1}`}>
                     <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>

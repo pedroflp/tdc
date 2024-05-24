@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     const { token } = await response.user.getIdTokenResult();
     cookies().set(cookiesKeys.TOKEN, token);
+    localStorage.setItem(cookiesKeys.TOKEN, token);
 
     return NextResponse.json({
       success: true,
@@ -27,7 +28,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (err) {
     const error = err as { code: SignInErrors };
-    console.log(error)
     return NextResponse.json(
       { success: false, error: signInErrorsMessages[error.code] },
       { status: 400 }

@@ -22,27 +22,16 @@ export async function createMatch({ teams, hoster, name, queueId, players }: Cre
   return data;
 }
 
-export async function declareMatchWinnerAndStartHonorVotes(matchId: string, queueId: string, body: MatchItem,): Promise<ApiResponse<{
+export async function declareMatchWinnerAndStartHonorVotes(matchId: string, winner: MatchItem["winner"]): Promise<ApiResponse<{
   matchId: string
 }>> {
   const response = await fetchApi('match', {
     method: 'PUT',
-    body: JSON.stringify({
-      matchId, body
-    })
+    body: JSON.stringify({matchId, winner})
   });
   
   const data = await response.json();
-
-  if (data.success) {
-    calculateAndDistributePlayersHonors({matchId}).then(res => console.log(res));
-
-    await fetchApi('queue', {
-      method: 'DELETE',
-      body: JSON.stringify({queueId})
-    })
-    
-  }
+  await calculateAndDistributePlayersHonors({matchId});
 
   return data;
 }

@@ -1,9 +1,9 @@
-import { Host, MatchItem, QueueMatch, Teams } from "@/flows/queue/types";
+import { MatchItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
-import { HonorPlayersRequestDTO, HonorPlayersTimer } from "./types";
+import { HonorPlayersRequestDTO, HonorPlayersTimerMinutes } from "./types";
 
 export async function POST(request: Request) {
   const { honors, matchId, honoredBy }: HonorPlayersRequestDTO = await request.json();
@@ -12,18 +12,15 @@ export async function POST(request: Request) {
 
   const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId));
   const match = matchDoc.data() as MatchItem;
-  
-  const voting = match.voting!;
   const honorList = Object.entries(honors);
+  const voting = match.honors!;
 
   const matchHonors = honorList.reduce((acc, [honor, playerUsername]) => {
-    if (!playerUsername) return acc; 
-
     type Honor = 'mvp' | 'hostage' | 'bricklayer';
+    if (!playerUsername) return acc; 
 
     const honors = voting[honor as Honor] ?? [];
     const honoredPlayer = honors?.length > 0 && honors.find((player) => player.username === playerUsername);
-    
     const newVoting = voting;
 
     if (honoredPlayer) {
@@ -55,8 +52,15 @@ export async function POST(request: Request) {
   }, voting);
   
   await updateDoc(doc(firestore, collections.MATCHES, matchId), {
-    voting: matchHonors
+    honors: matchHonors,
+    players: match.players.map((player) => ({...player, alreadyHonored: true}))
   })
+
+  match.players.forEach(async (player) => {
+    await updateDoc(doc(firestore, collections.USERS, player.username), {
+      activeMatch: "",
+    })
+  });
 
   return NextResponse.json({
     success: true,
@@ -71,19 +75,20 @@ export async function PUT(request: Request) {
   async function distributeHonors() {
     const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId));
     const match = matchDoc.data() as MatchItem;
-    const voting = match.voting!;
-    const mvp = voting.mvp;
-    const hostage = voting.hostage;
-    const bricklayer = voting.bricklayer;
 
-    const mvpPlayer = mvp.sort((a, b) => b.votes.length - a.votes.length)[0];
-    const hostagePlayer = hostage.sort((a, b) => b.votes.length - a.votes.length)[0];
-    const bricklayerPlayer = bricklayer.sort((a, b) => b.votes.length - a.votes.length)[0];
+    const honors = match.honors!;
+    const mvp = honors.mvp;
+    const hostage = honors.hostage;
+    const bricklayer = honors.bricklayer;
+
+    const mvpPlayer = mvp?.length > 0 && mvp.reduce((acc, player) => player.votes.length > acc.votes.length ? player : acc);
+    const hostagePlayer = hostage?.length > 0 && hostage.reduce((acc, player) => player.votes.length > acc.votes.length ? player : acc);
+    const bricklayerPlayer = bricklayer?.length > 0 && bricklayer.reduce((acc, player) => player.votes.length > acc.votes.length ? player : acc);
     
     await updateDoc(doc(firestore, collections.MATCHES, matchId), {
-      mvp: mvpPlayer ?? null,
-      hostage: hostagePlayer ?? null,
-      bricklayer: bricklayerPlayer ?? null
+      mvp: mvpPlayer,
+      hostage: hostagePlayer,
+      bricklayer: bricklayerPlayer
     });
 
     return NextResponse.json({ success: true, message: 'Honras foram distribuídas para os jogadores com mais votos' });
@@ -92,7 +97,7 @@ export async function PUT(request: Request) {
   const timeout = setTimeout(() => {
     distributeHonors();
     return () => clearTimeout(timeout);
-  }, HonorPlayersTimer);
+  }, HonorPlayersTimerMinutes * 60 * 1000);
 
   return NextResponse.json({ success: true })
 }

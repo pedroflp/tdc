@@ -1,10 +1,11 @@
 import React from 'react'
 import Avatar from '../Avatar'
 import { UserDTO } from '@/app/api/user/types';
+import { Player } from '@/flows/queue/types';
 
 export default function UserAvatarAndName({
   user
-}: { user: UserDTO}) {
+}: { user: UserDTO | Player}) {
   if (!user) return null;
 
   return (

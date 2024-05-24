@@ -6,15 +6,14 @@ import { parseEmailToUsername } from "@/utils/parseUsername";
 import { doc, getDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: { username: string } }) {
   const token = request.headers.get(cookiesKeys.TOKEN);
+  const username = params.username;
 
-  if (!token) return NextResponse.json({ error: true }, { status: 400 });
+  if (!token || !username) return NextResponse.json({ error: true }, { status: 400 });
 
   try {
-    const username = parseEmailToUsername(getUserFromToken(token, "email"));
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));
-
     if (!userDoc.exists()) return NextResponse.json(null);
 
     const userData = userDoc.data();

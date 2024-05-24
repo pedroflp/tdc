@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     const response = await createUserWithEmailAndPassword(auth, email, body.password);
     const { token } = await response.user.getIdTokenResult();
     cookies().set(cookiesKeys.TOKEN, token);
+    localStorage.setItem(cookiesKeys.TOKEN, token);
 
     const coll = collection(firestore, collections.USERS)
     const user = await getDoc(doc(coll, body.username));
