@@ -24,7 +24,9 @@ export async function POST(request: NextRequest) {
     
     const response = await createUserWithEmailAndPassword(auth, email, body.password);
     const { token } = await response.user.getIdTokenResult();
-    cookies().set(cookiesKeys.TOKEN, token);
+    cookies().set(cookiesKeys.TOKEN, token, {
+      expires: new Date(Date.now() + 60 * 60 * 24 * 1000 * 14), // 14 days
+    });
 
     const coll = collection(firestore, collections.USERS)
     const user = await getDoc(doc(coll, body.username));
