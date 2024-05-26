@@ -1,0 +1,7 @@
+NEXT_PUBLIC_apiKey=AIzaSyAc3yXXqT5whLh-5KNxcjLnQH5oVNE8kVU
+NEXT_PUBLIC_authDomain=plol-tst.firebaseapp.com
+NEXT_PUBLIC_projectId=plol-tst
+NEXT_PUBLIC_storageBucket=plol-tst.appspot.com
+NEXT_PUBLIC_messagingSenderId=853893139848
+NEXT_PUBLIC_appId=1:853893139848:web:c7caa19f780d2f99843e3d
+NEXT_PUBLIC_apiBaseUrl=http://localhost:3000
