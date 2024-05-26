@@ -14,13 +14,12 @@ export async function POST(request: NextRequest) {
     const email = parseUsernameToEmail(body.username);
     
     const response = await signInWithEmailAndPassword(auth, email, body.password);
-    console.log(response)
 
     if (!response?.user?.email) return;
 
     const { token } = await response.user.getIdTokenResult();
     cookies().set(cookiesKeys.TOKEN, token, {
-      expires: new Date(Date.now() + 60 * 60 * 24 * 1000 * 14), // 14 days
+      expires: new Date().setDate(new Date().getDate() + 24), // 24 days
     });
 
     return NextResponse.json({
