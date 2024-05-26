@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import Avatar from "@/components/Avatar";
 import { Player } from "@/flows/queue/types";
+import Link from "next/link";
+import { routeNames } from "@/app/route.names";
 
 const avatarStackVariants = cva(
   "flex",
@@ -37,9 +39,10 @@ export interface AvatarStackProps
   size?: number;
   fallbackSize?: "text-xs" | "text-sm" | "text-md" | "text-lg";
   avatarClassName?: string;
+  canOpenProfileByAvatar?: boolean;
 }
 
-function AvatarStack({ className, avatarClassName, size = 10, fallbackSize = "text-sm", orientation, avatars, spacing, avatarsOffset = 4, maxAvatarsAmount = 4, ...props }: AvatarStackProps) {
+function AvatarStack({ canOpenProfileByAvatar, className, avatarClassName, size = 10, fallbackSize = "text-sm", orientation, avatars, spacing, avatarsOffset = 4, maxAvatarsAmount = 4, ...props }: AvatarStackProps) {
   const limitedAvatars = avatars.slice(0, maxAvatarsAmount);
 
   return (
@@ -57,7 +60,14 @@ function AvatarStack({ className, avatarClassName, size = 10, fallbackSize = "te
           <Tooltip delayDuration={100}>
             <TooltipTrigger className="cursor-default">
               <TooltipContent>{user?.name ?? user?.username}</TooltipContent>
-              <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
+              <Link 
+                href={routeNames.PROFILE(user?.username)} 
+                className={cn(
+                  !canOpenProfileByAvatar && 'pointer-events-none'
+                )}
+              >
+                <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
+              </Link>
             </TooltipTrigger>
           </Tooltip>
         </TooltipProvider>

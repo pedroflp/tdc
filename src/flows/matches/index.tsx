@@ -1,5 +1,5 @@
 import { getMatches } from "@/app/api/matches/requests";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchItem, MatchTeamsEnum, Player } from "../queue/types";
 import { UserDTO } from "@/app/api/user/types";
 import Avatar from "@/components/Avatar";
@@ -26,7 +26,7 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 				</Link>
 			</div>
 			<div className="grid grid-cols-1 gap-8">
-				{matches.map((match: MatchItem) => (
+				{matches.length > 0 ? matches.map((match: MatchItem) => (
 					<Link key={match.id} href={routeNames.MATCH(match.id)}>
 						<Card>
 							<CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
@@ -37,7 +37,7 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 									<div className="text-xs text-muted-foreground/60 flex gap-1 items-center">
 										<p>Criada por</p>
 										<div className="flex gap-1 items-center">
-											<UserAvatarAndName nameSize="text-md" size={6} user={match.hoster} />
+											<UserAvatarAndName name={{size: "text-md"}} size={6} user={match.hoster} />
 										</div>
 									</div>
 								</div>
@@ -80,7 +80,7 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 												className='w-8 h-8'
 												alt={`Badge medalha MVP`}
 											/>
-											<UserAvatarAndName nameSize="text-md" user={match.mvp} />
+											<UserAvatarAndName name={{size: "text-md"}} user={match.mvp} />
 										</div>
 									)}
 									{match.hostage && (
@@ -93,7 +93,7 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 												className='w-8 h-8'
 												alt={`Badge medalha Refém`}
 											/>
-											<UserAvatarAndName nameSize="text-md" user={match.hostage} />
+											<UserAvatarAndName name={{size: "text-md"}} user={match.hostage} />
 										</div>
 									)}
 									{match.bricklayer && (
@@ -106,7 +106,7 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 												className='w-8 h-8'
 												alt={`Badge medalha Pedreiro`}
 											/>
-											<UserAvatarAndName nameSize="text-md" user={match.bricklayer} />
+											<UserAvatarAndName name={{size: "text-md"}} user={match.bricklayer} />
 										</div>
 									)}
 								</div>
@@ -114,7 +114,19 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 							</CardContent>
 						</Card>
 					</Link>
-				))}
+				)) : (
+				<Card>
+					<CardHeader>
+						<CardTitle className="text-xl text-primary/70">Nenhuma partida encontrada!</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<CardDescription className="text-primary/50">
+							Não foi possível encontrar nenhuma partida com base nos filtros selecionados.
+							<strong> Troque alguns filtros ou crie uma nova partida para talvez encontrarmos a partida que você procura!</strong>
+						</CardDescription>
+					</CardContent>
+				</Card>
+				)}
 			</div>
 		</div>
 	)

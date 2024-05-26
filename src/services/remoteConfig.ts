@@ -8,5 +8,5 @@ export const remoteConfig = getRemoteConfig(app)
 
 remoteConfig.settings.minimumFetchIntervalMillis = 3600000;
 remoteConfig.defaultConfig = {
-  [remoteConfigs.QUEUE_COMPOSITION_LIMIT]: 4
+  [remoteConfigs.QUEUE_COMPOSITION_MAX_GENERATIONS]: 4
 };

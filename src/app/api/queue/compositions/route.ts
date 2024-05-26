@@ -1,10 +1,13 @@
 import { MatchTeamsEnum, QueueItem } from "@/flows/queue/types";
-import { collections } from "@/services/constants";
+import { collections, remoteConfigs } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { UserDTO } from "../../user/types";
 import { handleRandomizeTeam } from "./utils";
+import { fetchAndActivate, getString, getValue } from "firebase/remote-config";
+import { remoteConfig } from "@/services/remoteConfig";
+import { CloudCog } from "lucide-react";
 
 export async function POST(request: NextRequest) {
   const { queueId }: {queueId: string} = await request.json();
@@ -17,6 +20,7 @@ export async function POST(request: NextRequest) {
     if (!queueDoc.exists) return NextResponse.error();
 
     const queueData = queueDoc.data() as QueueItem;
+
     const compositions = new Array(5).fill(null).map(() => handleRandomizeTeam(queueData.players));
 
     updateDoc(queueDocRef, {
@@ -41,6 +45,7 @@ export async function POST(request: NextRequest) {
       success: true,
     })
   } catch (error) {
+    console.log(error)
     return NextResponse.error();
   }
 
@@ -88,7 +93,7 @@ export async function PUT(request: NextRequest) {
 
     updateDoc(queueDocRef, {compositions})
 
-    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 6);
+    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 1);
     if (!!compositionSelectedToBeTeam) { 
       updateDoc(queueDocRef, {
         compositions,

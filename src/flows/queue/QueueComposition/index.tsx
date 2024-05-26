@@ -62,9 +62,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
     const timeout = setTimeout(() => {
       setIsSelectingQueueComposition(false);
-    }, 2000);
-
-    return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout)
+    }, 1000);
   }
 
   async function handleStartMatch() {
@@ -116,7 +115,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
             </Button>
             ) : (
               <Button disabled>
-                <span>A <strong>Composição {queue.compositions.findIndex(({ votes }) => votes.length >= 6)}</strong> foi a mais votada. Aguardando <strong>{queue.hoster.name}</strong> iniciar a partida</span>
+                <span>A <strong>Composição {queue.compositions.findIndex(({ votes }) => votes.length >= 6)+1}</strong> foi a mais votada. Aguardando <strong>{queue.hoster.name}</strong> iniciar a partida</span>
               </Button>
             )
           )}

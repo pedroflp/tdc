@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
           won: 0,
           played: 0,
           mvps: 0,
+          bricklayer: 0,
+          hostage: 0,
           points: 0
         }
       });

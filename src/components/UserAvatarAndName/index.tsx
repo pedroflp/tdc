@@ -3,29 +3,42 @@ import Avatar from '../Avatar'
 import { UserDTO } from '@/app/api/user/types';
 import { Player } from '@/flows/queue/types';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { routeNames } from '@/app/route.names';
 
 export default function UserAvatarAndName({
   user,
   avatarClassName,
   size,
   fallbackSize,
-  nameSize = "text-lg"
+  canOpenProfileByAvatar,
+  name = {
+    size: "text-lg",
+    color: "text-foreground"
+  }
 }: { 
   user: UserDTO | Player, 
   avatarClassName?: string,
   size?: number;
   fallbackSize?: "text-xs" | "text-sm" | "text-md" | "text-lg";
-  nameSize?: "text-xs" | "text-sm" | "text-md" | "text-lg" | "text-xl"
+  name?: {
+    size?: "text-xs" | "text-sm" | "text-md" | "text-lg" | "text-xl",
+    color?: string
+  },
+  canOpenProfileByAvatar?: boolean;
 }) {
   if (!user) return null;
 
   return (
-    <div className='flex items-center gap-2'>
+    <Link href={routeNames.PROFILE(user.username)} className={cn(
+      'flex items-center gap-2',
+      !canOpenProfileByAvatar && 'pointer-events-none'
+    )}>
       <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
       <p className={cn(
         'font-bold text-foreground',
-        nameSize
+        name.size, name.color
       )}>{user?.username}</p>
-    </div>
+    </Link>
   )
 }

@@ -73,7 +73,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           </h2>
         </div>
         <div className='flex gap-8 items-center'>
-          {match.honors?.endDate && dateDifferenceInSeconds(new Date(), new Date(match.honors?.endDate!)) >= 0 && (
+          {!match.honors?.finished && (
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger className='ml-auto cursor-default'>

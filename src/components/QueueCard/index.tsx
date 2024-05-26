@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
 import { QueueCardProps } from './types'
 import Link from 'next/link'
+import UserAvatarAndName from '../UserAvatarAndName'
 
 export default function QueueCard({
   queue,
@@ -66,7 +67,7 @@ export default function QueueCard({
       onClick: () => void,
   }) => {
     if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
-    if (queue?.players.find((player: Player) => player?.username === user?.username)) return <Button variant="outline" onClick={onClick}>Voltar para a sala</Button>
+    if (queue?.players.find((player: Player) => player?.username === user?.username)) return <Button variant="secondary" onClick={onClick}>Voltar para a sala</Button>
     if (disabledJoinByStarted) return (
       <Link href={routeNames.MATCH(queue?.match?.id)}>
         <Button asChild>Visualizar essa partida</Button>
@@ -79,25 +80,24 @@ export default function QueueCard({
     <Card className="min-w-[500px] w-full">
       <CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
         <div className='flex flex-col gap-1'>
-          <div className="flex items-center gap-3">
-            <CardTitle className='text-xl'>{queue.name}</CardTitle>
-            <QueueBadgeStatus match={queue.match} />
-            {queue.players.find((player: Player) => player?.username === user?.username) && (
-              <Badge className='bg-emerald-400 text-slate-800'>Você está na sala!</Badge>
-            )}
-          </div>
-          <div className="text-xs text-muted-foreground/60 flex gap-1 items-center">
-            <p>Criada por</p>
-            <div className="flex gap-1 items-center">
-              <Avatar className='w-6 h-6' image={queue.hoster.avatar} fallback={String(queue.hoster.name).slice(0, 2)} size={120} fallbackSize='text-xs' />
-              <strong className="flex items-center gap-1 text-muted-foreground">{queue.hoster.name}</strong>
+          <div className="flex flex-col md:flex-row gap-2 md:gap-4">
+            <CardTitle className='text-2xl'>{queue.name}</CardTitle>
+            <div className='flex items-center gap-2'>
+              <QueueBadgeStatus match={queue.match} />
+              {queue.players.find((player: Player) => player?.username === user?.username) && (
+                <Badge className='bg-emerald-400 text-slate-800'>Você está na sala!</Badge>
+              )}
             </div>
           </div>
         </div>
-      <AvatarStack spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player?.username)} />
+      <AvatarStack canOpenProfileByAvatar spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player?.username)} />
       </CardHeader>
       <CardContent className="flex justify-between items-end gap-4">
         <div className="text-sm text-muted-foreground">
+          <div className="flex gap-1 items-center">
+            <p>Criada por</p>
+            <UserAvatarAndName canOpenProfileByAvatar size={8} name={{size: "text-sm", color: 'text-muted-foreground'}} user={queue.hoster} />
+          </div>
           <p className='flex gap-1 items-center'>
             Modo
             <Image

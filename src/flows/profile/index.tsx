@@ -19,9 +19,9 @@ export default async function ProfilePage({ user, username }: any) {
   if (!profileUser) redirect(routeNames.HOME);
 
   return (
-    <main className='grid lg:grid-cols-2 2xl:grid-cols-[1fr_2fr] w-full h-full m-auto gap-8'>
+    <main className='grid lg:grid-cols-2 2xl:grid-cols-[2fr_3fr] w-full h-full m-auto gap-8'>
       <div className='grid grid-rows-[auto_1fr] gap-8 w-full'>
-        <Card className='flex gap-2 p-6 h-max relative'>
+        <Card className='flex gap-2 p-6 h-max relative bg-secondary'>
           {user.username === profileUser.username && (
             <EditUserInformationDialog
               username={username}
@@ -29,12 +29,13 @@ export default async function ProfilePage({ user, username }: any) {
             />
           )}
           <div className='relative flex md:flex-row items-end justify-center'>
-            <Avatar className='xl:w-24 xl:h-24 w-16 h-16' image={profileUser.avatar} fallback={String(profileUser.name).slice(0, 2)} />
-            <Badge variant="secondary" className='font-bold -bottom-2 absolute'>{profileUser.username}</Badge>
+            <Avatar size={14} image={profileUser.avatar} fallback={String(profileUser.name).slice(0, 2)} />
           </div>
           <div className='flex flex-col justify-between'>
-            <h1 className='text-2xl font-bold'>{profileUser.name}</h1>
-            {profileUser.createdAt && <p className='text-sm text-muted-foreground'>Membro desde {formatDate(profileUser.createdAt)}</p>}
+            <div className='flex gap-1 items-center'>
+              <h1 className='text-2xl font-bold'>{profileUser.name}</h1> - <span className='text-muted-foreground font-bold'>{profileUser.username}</span>
+            </div>
+            {profileUser.createdAt && <p className='text-sm text-muted-foreground'>Membro desde <strong>{formatDate(profileUser.createdAt)}</strong></p>}
           </div>
         </Card>
         {profileUser.statistics && <UserStats user={profileUser} />}

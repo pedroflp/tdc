@@ -14,6 +14,8 @@ export type UserStatistics = {
   won: number;
   points: number;
   mvps: number;
+  bricklayer: number;
+  hostage: number;
 }
 
 export type GetUserResponseDTO = UserDTO | null;

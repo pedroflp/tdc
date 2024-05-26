@@ -41,7 +41,7 @@ export default function EditUserInformationDialog({
     if (imageFile?.type !== "image/jpeg" && imageFile?.type !== "image/png" && imageFile?.type !== "image/jpg") {
       setUploadErrorAlert({
         show: true,
-        message: "GIFs não são válidos, envie arquivos JPG, JPEG ou PNG!"
+        message: "Tipo de arquivo inválido! Envie arquivo do tipo JPG, JPEG ou PNG!"
       })
       return;
     };
@@ -83,7 +83,7 @@ export default function EditUserInformationDialog({
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
     <DialogTrigger asChild>
-      <Button variant="secondary" className='absolute top-4 right-4 gap-2 items-center'>
+      <Button className='absolute top-4 right-4 gap-2 items-center'>
         <Pen size={16} />
       </Button>
     </DialogTrigger>
@@ -124,7 +124,7 @@ export default function EditUserInformationDialog({
           minLength={4}
           maxLength={14}
           onChange={e => setDisplayName(e.target.value)}
-          value={displayName}
+          defaultValue={displayName}
           placeholder={profileUser?.name}
         />
       </div>

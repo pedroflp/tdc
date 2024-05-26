@@ -5,6 +5,7 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { HonorPlayersTimerMinutes } from "./honor/types";
 import { CreateMatchRequestDTO } from "./types";
+import { UserDTO } from "../user/types";
 
 export async function POST(request: Request) {
   const { teams, hoster, name, queueId, players }: CreateMatchRequestDTO = await request.json();
@@ -20,7 +21,6 @@ export async function POST(request: Request) {
       started: true
     }
   });
-
 
   await setDoc(doc(firestore, collections.MATCHES, queueId), {
     teams,
@@ -64,9 +64,10 @@ export async function PUT(request: Request) {
       mvp: [],
       hostage: [],
       bricklayer: [],
-      finished: false
+      finished: true
     },
-    finished: true
+    finished: true,
+    finishedAt: new Date().toISOString()
   });
 
   return NextResponse.json({
