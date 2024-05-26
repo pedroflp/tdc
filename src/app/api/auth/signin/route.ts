@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
 
     const { token } = await response.user.getIdTokenResult();
     cookies().set(cookiesKeys.TOKEN, token);
-    localStorage.setItem(cookiesKeys.TOKEN, token);
 
     return NextResponse.json({
       success: true,
