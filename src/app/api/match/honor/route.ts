@@ -57,7 +57,11 @@ export async function POST(request: Request) {
   await updateDoc(doc(firestore, collections.MATCHES, matchId), {
     honors: matchHonors,
     players: match.players.map((player) => honoredBy === player.username ? ({...player, alreadyHonored: true}) : player)
-  })
+  });
+
+  await updateDoc(doc(firestore, collections.USERS, honoredBy), {
+    activeMatch: ""
+  });
 
   return NextResponse.json({
     success: true,
@@ -81,15 +85,17 @@ export async function PUT(request: Request) {
     const [mvpPlayer, hostagePlayer, bricklayerPlayer] = [mvp, hostage, bricklayer].reduce((acc, honor) => {
       const honoredPlayer = honor.length > 0 
         ? honor.sort((playerA, playerB) => playerA.votes.length - playerB.votes.length)[0]
-        : undefined;
+        : null;
       acc.push(honoredPlayer);
       return acc;
-    }, [] as Array<HonorPlayerDTO | undefined>)
+    }, [] as Array<HonorPlayerDTO | null>)
+
 
     await updateDoc(doc(firestore, collections.MATCHES, matchId), {
       mvp: mvpPlayer,
       hostage: hostagePlayer,
-      bricklayer: bricklayerPlayer
+      bricklayer: bricklayerPlayer,
+      honors: { ...match.honors, finished: true }
     });
 
     match.players.map(async player => {
@@ -107,7 +113,6 @@ export async function PUT(request: Request) {
       });
 
       await updateDoc(userDocRef, {
-        activeMatch: "",
         statistics: {
           points,
           played: userData?.statistics?.played + 1,

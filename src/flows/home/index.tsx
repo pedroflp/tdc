@@ -8,11 +8,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { QueueItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
+import { UserDTO } from "@/app/api/user/types";
 
 export default function HomePage({ user }: any) {
   const { push } = useRouter();
@@ -36,13 +37,36 @@ export default function HomePage({ user }: any) {
     push(routeNames.QUEUE(queueId));
   }
 
+  function getUserActiveMatch(queues: Array<QueueItem>) {
+    getDoc(doc(firestore, collections.USERS, user.username))
+    .then(async document => {
+      if (!document.exists()) return;
+      const userData = document.data() as UserDTO;
+      const userActiveMatch = userData.activeMatch;
+
+      if (userActiveMatch && userActiveMatch.length > 0) {
+        const match = await getDoc(doc(firestore, collections.MATCHES, userActiveMatch));
+        if (match.exists()) {
+          return push(routeNames.MATCH(userActiveMatch))
+        }
+
+        if (!!queues.some(queue => queue.id === userActiveMatch)) {
+          return push(routeNames.QUEUE(userActiveMatch))
+        }
+      }
+    });
+  }
+
   function getAvailableQueues() {
     setFetchingQueues(true);
+
     return onSnapshot(collection(firestore, collections.QUEUES), (snapshot) => {
-      const queues = snapshot.docs.map((doc) => doc.data());
-      setAvailableQueues(queues as any);
+      const queues = snapshot.docs.map((doc) => doc.data()) as Array<QueueItem>;
+      setAvailableQueues(queues);
       setFetchingQueues(false);
-    })
+
+      if (user) getUserActiveMatch(queues);
+    });
   }
 
   useEffect(() => {

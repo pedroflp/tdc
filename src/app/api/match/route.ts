@@ -1,11 +1,10 @@
 import { MatchItem, QueueItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { HonorPlayersTimerMinutes } from "./honor/types";
 import { CreateMatchRequestDTO } from "./types";
-import { UserDTO } from "../user/types";
 
 export async function POST(request: Request) {
   const { teams, hoster, name, queueId, players }: CreateMatchRequestDTO = await request.json();
@@ -15,21 +14,15 @@ export async function POST(request: Request) {
   const matchId = queueId;
   const queueDocRef = doc(firestore, collections.QUEUES, queueId);
   const queueData = (await getDoc(queueDocRef)).data()! as QueueItem;
-  updateDoc(queueDocRef, { 
-    match: {
-      id: matchId,
-      started: true
-    }
-  });
+  await deleteDoc(queueDocRef);
 
   await setDoc(doc(firestore, collections.MATCHES, queueId), {
+    id: matchId,
     teams,
     hoster,
     name,
-    queueId,
-    id: queueId,
-    mode: queueData.mode,
     players,
+    mode: queueData.mode,
     winner: null,
     finished: false,
     createdAt: new Date().toISOString(),
@@ -64,7 +57,7 @@ export async function PUT(request: Request) {
       mvp: [],
       hostage: [],
       bricklayer: [],
-      finished: true
+      finished: false
     },
     finished: true,
     finishedAt: new Date().toISOString()

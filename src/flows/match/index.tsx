@@ -36,10 +36,8 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
 
     return (
       match.finished &&
-      !!match.honors &&
+      !match.honors?.finished &&
       isUserInThisMatch(match) &&
-      dateDifferenceInSeconds(new Date(), new Date(match.honors?.endDate!)) >= 0 &&
-      !match.honors.finished &&
       !match.players.find(player => player.username === user.username)?.alreadyHonored
     )
   }, []);
@@ -49,6 +47,9 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
       if (!doc.exists()) return router.push(routeNames.HOME);
 
       const match = doc.data() as MatchItem;
+      if (user && canUserVoteHonorsThisMatch(match, user, isUserInThisMatch)) 
+        router.push(routeNames.MATCH_HONOR(matchId));
+
       setMatch(match);
     })
   };
@@ -73,7 +74,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           </h2>
         </div>
         <div className='flex gap-8 items-center'>
-          {!match.honors?.finished && (
+          {(match.honors && !match.honors.finished) && (
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger className='ml-auto cursor-default'>
