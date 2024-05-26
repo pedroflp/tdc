@@ -1,11 +1,10 @@
-import { Host, MatchItem, QueueMatch, Teams } from "@/flows/queue/types";
+import { MatchItem, QueueItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
-import { CreateMatchRequestDTO } from "./types";
-import { match } from "assert";
 import { HonorPlayersTimerMinutes } from "./honor/types";
+import { CreateMatchRequestDTO } from "./types";
 
 export async function POST(request: Request) {
   const { teams, hoster, name, queueId, players }: CreateMatchRequestDTO = await request.json();
@@ -13,25 +12,27 @@ export async function POST(request: Request) {
   if (!teams) return;
 
   const matchId = queueId;
+  const queueDocRef = doc(firestore, collections.QUEUES, queueId);
+  const queueData = (await getDoc(queueDocRef)).data()! as QueueItem;
+  updateDoc(queueDocRef, { 
+    match: {
+      id: matchId,
+      started: true
+    }
+  });
+
+
   await setDoc(doc(firestore, collections.MATCHES, queueId), {
     teams,
     hoster,
     name,
     queueId,
     id: queueId,
+    mode: queueData.mode,
     players,
     winner: null,
-    matchIdInLoL: "",
     finished: false,
     createdAt: new Date().toISOString(),
-  });
-
-  const queueDocRef = doc(firestore, collections.QUEUES, queueId);
-  await updateDoc(queueDocRef, { 
-    match: {
-      id: matchId,
-      started: true
-    }
   });
 
   return NextResponse.json({

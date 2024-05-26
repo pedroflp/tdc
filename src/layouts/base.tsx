@@ -10,7 +10,7 @@ export default async function BaseLayout({ children }: any) {
   return (
     <ToastProvider>
       <Header user={user as UserDTO} />
-      <main className="w-screen h-full p-12 bg-background">{
+      <main className="w-full h-full p-12 bg-background">{
         React.Children.map(children, (child: any) =>
           React.isValidElement(child)
             ? React.cloneElement<any>(child, {

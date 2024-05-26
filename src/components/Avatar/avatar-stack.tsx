@@ -1,8 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import Avatar from "@/components/Avatar";
 import { Player } from "@/flows/queue/types";
 
@@ -32,7 +31,7 @@ const avatarStackVariants = cva(
 export interface AvatarStackProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof avatarStackVariants> {
-  avatars: Array<Player>;
+  avatars: Array<Player | any>;
   avatarsOffset?: number;
   maxAvatarsAmount?: number;
   size?: number;
@@ -52,12 +51,13 @@ function AvatarStack({ className, avatarClassName, size = 10, fallbackSize = "te
       )}
       {...props}
     >
-      {limitedAvatars.map((user) => !!user && (
-        <TooltipProvider key={user.username}>
+
+      {limitedAvatars.map((user) => (
+        <TooltipProvider key={user?.username}>
           <Tooltip delayDuration={100}>
             <TooltipTrigger className="cursor-default">
-              <TooltipContent>{user.name}</TooltipContent>
-              <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user.name).slice(0, 2)} image={user.avatar} />
+              <TooltipContent>{user?.name ?? user?.username}</TooltipContent>
+              <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
             </TooltipTrigger>
           </Tooltip>
         </TooltipProvider>

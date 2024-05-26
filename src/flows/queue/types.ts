@@ -54,7 +54,8 @@ export interface MatchItem {
   hoster: Host;
   teams: Teams;
   winner: MatchTeamsEnum,
-  finished: boolean;
+  finished: boolean,
+  mode: MatchModesEnum,
   matchIdInLoL: string,
   queueId: string,
   players: Array<Player & {

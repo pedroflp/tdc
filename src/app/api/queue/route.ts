@@ -55,35 +55,38 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const embedMessage = {
-      username: "TDCU Beta",
-      avatar_url: "https://firebasestorage.googleapis.com/v0/b/plol-tst.appspot.com/o/users%2Fenvy%2Fprofile%2Favatar?alt=media&token=5efc109b-fbce-4e54-af93-09871fb98454",
-      embeds: [
-        {
-          id: 998541052,
-          title: `Sala ${name}!`,
-          description: `[${userData.name}](https://beta.plol.pedroflp.dev/${userData.username}) acabou de criar uma nova sala para competir!\nEntre agora e dispute a vitória para ganhar pontos!\n\n[**Entrar na sala e participar da partida**](${`https://beta.plol.pedroflp.dev/queue/${queueId}`})`,
-          url: `https://beta.plol.pedroflp.dev/queue/${queueId}`,
-          color: 16777215,
-          author: {
-            name: `${userData.name}`,
-            url: `https://beta.plol.pedroflp.dev/${userData.username}`,
-            icon_url: userData.avatar
-          },
-          thumbnail: {
-            url: "https://beta.plol.pedroflp.dev/_next/image?url=%2Fassets%2Ficons%2Fdefault-match.png&w=2048&q=75"
+    if (!!process.env.NEXT_PUBLIC_discordWebhook) {
+      const embedMessage = {
+        username: "TDCU Beta",
+        avatar_url: "https://firebasestorage.googleapis.com/v0/b/plol-tst.appspot.com/o/users%2Fenvy%2Fprofile%2Favatar?alt=media&token=5efc109b-fbce-4e54-af93-09871fb98454",
+        embeds: [
+          {
+            id: 998541052,
+            title: `Sala ${name}!`,
+            description: `[${userData.name}](https://beta.plol.pedroflp.dev/${userData.username}) acabou de criar uma nova sala para competir!\nEntre agora e dispute a vitória para ganhar pontos!\n\n[**Entrar na sala e participar da partida**](${`https://beta.plol.pedroflp.dev/queue/${queueId}`})`,
+            url: `https://beta.plol.pedroflp.dev/queue/${queueId}`,
+            color: 16777215,
+            author: {
+              name: `${userData.name}`,
+              url: `https://beta.plol.pedroflp.dev/${userData.username}`,
+              icon_url: userData.avatar
+            },
+            thumbnail: {
+              url: "https://beta.plol.pedroflp.dev/_next/image?url=%2Fassets%2Ficons%2Fdefault-match.png&w=2048&q=75"
+            }
           }
-        }
-      ],
-    };
-
-    await fetch(process.env.NEXT_PUBLIC_discordWebhook, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(embedMessage),
-    });
+        ],
+      };
+  
+      await fetch(process.env.NEXT_PUBLIC_discordWebhook, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(embedMessage),
+      });
+  
+    }
 
     return NextResponse.json({
       success: true,
