@@ -94,13 +94,13 @@ export default function HomePage({ user }: any) {
             </div>
           ) : (
               availableQueues.length > 0 ? (
-                availableQueues.map((queue: any) => (
+                availableQueues.map((queue: QueueItem) => (
                   <QueueCard
                     key={queue.id}
                     user={user}
                     queue={queue}
                     disabledJoinByAuth={!user}
-                    disabledJoinByStarted={queue.match?.started}
+                    disabledJoinByStarted={!!queue.matchId}
                     handleEnterQueue={handleEnterQueue}
                   />
                 ))
