@@ -3,8 +3,8 @@ import { UserDTO } from "../user/types";
 import { ApiResponse } from "../types";
 
 export async function getLeadBoard(): Promise<ApiResponse<{ data: UserDTO[] }>> {
-    const response = await fetchApi("leadboard");
-    const data  = await response.json();
+	const response = await fetchApi("leadboard");
+	const data  = await response.json();
 
-    return data;
+	return data;
 }
