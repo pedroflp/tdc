@@ -16,4 +16,4 @@ export type HonorPlayerDTO = {
   votes: Array<UserDTO["username"]>
 }
 
-export const HonorPlayersTimerMinutes = 3;
+export const HonorPlayersTimerMinutes = 1;

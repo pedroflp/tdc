@@ -5,6 +5,7 @@ import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { HonorPlayersTimerMinutes } from "./honor/types";
 import { CreateMatchRequestDTO } from "./types";
+import { calculateAndDistributePlayersHonors } from "./honor/requests";
 
 export async function POST(request: Request) {
   const { teams, hoster, name, queueId, players }: CreateMatchRequestDTO = await request.json();
@@ -14,7 +15,6 @@ export async function POST(request: Request) {
   const matchId = queueId;
   const queueDocRef = doc(firestore, collections.QUEUES, queueId);
   const queueData = (await getDoc(queueDocRef)).data()! as QueueItem;
-  await deleteDoc(queueDocRef);
 
   await setDoc(doc(firestore, collections.MATCHES, queueId), {
     id: matchId,
@@ -62,6 +62,8 @@ export async function PUT(request: Request) {
     finished: true,
     finishedAt: new Date().toISOString()
   });
+    
+  calculateAndDistributePlayersHonors({ matchId });
 
   return NextResponse.json({
     success: true,

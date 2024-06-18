@@ -1,4 +1,3 @@
-import { UserDTO } from "../../user/types";
 
 const Pontuation = {
     BASE: 10,

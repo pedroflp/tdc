@@ -120,7 +120,7 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
       return;
     }
 
-    toast({title: 'Honras votadas!', description: 'Você votou nos jogadores honrados dessa partida, voltando para overview da partida!', duration: 4000 })
+    toast({title: 'Honras enviadas!', description: 'Você votou nos jogadores honrados dessa partida! Estamos voltando para overview da partida!', duration: 4000 })
     router.push(routeNames.MATCH(matchId));
     setIsVoteSubmitted(true);
   };

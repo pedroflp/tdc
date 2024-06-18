@@ -19,12 +19,14 @@ import DeclareWinnerDialog from './components/DeclareWinnerDialog';
 import Countdown from 'react-countdown';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { isAfter } from 'date-fns';
 
 export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
   
   const [match, setMatch] = useState<MatchItem>();
   const [winner, setWinner] = useState<MatchTeamsEnum>();
+  const [isDistributingHonors, setIsDistributingHonors] = useState(false);
 
   const isUserInThisMatch = useCallback((match: MatchItem) => {
     if (!match) return false;
@@ -45,8 +47,9 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
   function getMatchData() {
     return onSnapshot(doc(firestore, collections.MATCHES, matchId), (doc) => {
       if (!doc.exists()) return router.push(routeNames.HOME);
-
       const match = doc.data() as MatchItem;
+      
+      if (match.honors?.finished) setIsDistributingHonors(false);
       if (user && canUserVoteHonorsThisMatch(match, user, isUserInThisMatch)) 
         router.push(routeNames.MATCH_HONOR(matchId));
 
@@ -61,7 +64,6 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
 
   if (!match) return;
 
-  
   return (
     <main className='flex flex-col m-auto gap-12 min-w-[60%] w-full max-w-[60%]'>
       <div className='flex justify-between items-center'>
@@ -74,18 +76,23 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           </h2>
         </div>
         <div className='flex gap-8 items-center'>
-          {(!match?.honors?.finished) && (
-            <TooltipProvider>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger className='ml-auto cursor-default'>
-                  <Countdown
-                    date={new Date(match?.honors?.endDate!)}
-                    renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {isDistributingHonors ? (
+            <h1 className='text-xl font-bold'>Distribuindo honras para os jogadores...</h1>
+          ) : (
+              match.finished && !match?.honors?.finished) && (
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger className='ml-auto cursor-default'>
+                    <Countdown
+                      date={new Date(match?.honors?.endDate!)}
+                      precision={1}
+                      onComplete={() => setIsDistributingHonors(true)}
+                      renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
+                </Tooltip>
+              </TooltipProvider> 
           )}
           {canUserVoteHonorsThisMatch(match, user!, isUserInThisMatch) ? (
             <Button className='text-xl p-8 gap-4 font-bold' onClick={() => router.push(routeNames.MATCH_HONOR(matchId))}>

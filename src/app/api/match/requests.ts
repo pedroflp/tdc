@@ -31,7 +31,5 @@ export async function declareMatchWinnerAndStartHonorVotes(matchId: string, winn
   });
   
   const data = await response.json();
-  await calculateAndDistributePlayersHonors({matchId});
-
   return data;
 }

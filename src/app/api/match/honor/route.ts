@@ -1,12 +1,13 @@
 import { MatchItem } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
+import { isBefore } from 'date-fns';
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
-import { HonorPlayerDTO, HonorPlayersRequestDTO, HonorPlayersTimerMinutes } from "./types";
-import { UserDTO } from "../../user/types";
+import { calculateAndDistributePlayersHonors, deleteQueue } from "./requests";
+import { HonorPlayerDTO, HonorPlayersRequestDTO } from "./types";
 import { calculateMatchPontuation } from "./utils";
-import { CloudCog } from "lucide-react";
+import { UserDTO } from "../../user/types";
 
 export async function POST(request: Request) {
   const { honors, matchId, honoredBy }: HonorPlayersRequestDTO = await request.json();
@@ -70,67 +71,63 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) { 
   const { matchId }: { matchId: string } = await request.json();
-  if (!matchId) return NextResponse.error();
+  const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId));
+  const match = matchDoc.data() as MatchItem;
 
-  async function distributeHonors() {
-    const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId));
-    if (!matchDoc.exists()) return;
+  if (isBefore(new Date(), new Date(match.honors!.endDate))) {
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout) 
+      calculateAndDistributePlayersHonors({ matchId });
+    }, 10000);
 
-    const match = matchDoc.data() as MatchItem;
-    const honors = match.honors!;
-    const mvp = honors.mvp;
-    const hostage = honors.hostage;
-    const bricklayer = honors.bricklayer;
+    return NextResponse.json({ success: false });
+  };
 
-    const [mvpPlayer, hostagePlayer, bricklayerPlayer] = [mvp, hostage, bricklayer].reduce((acc, honor) => {
-      const honoredPlayer = honor.length > 0 
-        ? honor.sort((playerA, playerB) => playerA.votes.length - playerB.votes.length)[0]
-        : null;
-      acc.push(honoredPlayer);
-      return acc;
-    }, [] as Array<HonorPlayerDTO | null>)
+  const honors = match.honors!;
+  const mvp = honors.mvp;
+  const hostage = honors.hostage;
+  const bricklayer = honors.bricklayer;
 
+  const [mvpPlayer, hostagePlayer, bricklayerPlayer] = [mvp, hostage, bricklayer].reduce((acc, honor) => {
+    const honoredPlayer = honor.length > 0 
+      ? honor.sort((playerA, playerB) => playerA.votes.length - playerB.votes.length)[0]
+      : null;
+    acc.push(honoredPlayer);
+    return acc;
+  }, [] as Array<HonorPlayerDTO | null>)
 
-    await updateDoc(doc(firestore, collections.MATCHES, matchId), {
-      mvp: mvpPlayer,
-      hostage: hostagePlayer,
-      bricklayer: bricklayerPlayer,
-      honors: { ...match.honors, finished: true }
+  await updateDoc(doc(firestore, collections.MATCHES, matchId), {
+    mvp: mvpPlayer,
+    hostage: hostagePlayer,
+    bricklayer: bricklayerPlayer,
+    honors: { ...match.honors, finished: true }
+  });
+
+  match.players.forEach(async player => {
+    const userDocRef = doc(firestore, collections.USERS, player.username);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data() as UserDTO;
+    const isUserWinnerOfMatch = match.teams[match.winner].some(player => userData.username === player.username);
+
+    const points = calculateMatchPontuation(!!isUserWinnerOfMatch, {
+      mvp: mvpPlayer?.username === player.username, 
+      bricklayer: bricklayerPlayer?.username === player.username, 
+      hostage: hostagePlayer?.username === player.username
     });
 
-    match.players.map(async player => {
-      const userDocRef = doc(firestore, collections.USERS, player.username);
-      const userDoc = await getDoc(userDocRef);
-      if (!userDoc.exists()) return player;
+    await updateDoc(userDocRef, {
+      statistics: {
+        points,
+        played: userData?.statistics?.played + 1,
+        mvps: mvpPlayer?.username === player.username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
+        bricklayer: bricklayerPlayer?.username === player.username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,
+        hostage: hostagePlayer?.username === player.username ? userData?.statistics?.hostage + 1 : userData?.statistics?.hostage,
+        won: isUserWinnerOfMatch ?  userData?.statistics?.won + 1 :  userData?.statistics?.won,
+      }
+    } as UserDTO);
+  });
 
-      const userData = userDoc.data() as UserDTO;
-      const isUserWinnerOfMatch = match.teams[match.winner].some(player => userData.username === player.username);
-  
-      const points = calculateMatchPontuation(!!isUserWinnerOfMatch, {
-        mvp: mvpPlayer?.username === player.username, 
-        bricklayer: bricklayerPlayer?.username === player.username, 
-        hostage: hostagePlayer?.username === player.username
-      });
+  deleteQueue({ matchId });
 
-      await updateDoc(userDocRef, {
-        statistics: {
-          points,
-          played: userData?.statistics?.played + 1,
-          mvps: mvpPlayer?.username === player.username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
-          bricklayer: bricklayerPlayer?.username === player.username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,
-          hostage: hostagePlayer?.username === player.username ? userData?.statistics?.hostage + 1 : userData?.statistics?.hostage,
-          won: isUserWinnerOfMatch ?  userData?.statistics?.won + 1 :  userData?.statistics?.won,
-        }
-      } as UserDTO);
-    });
-
-    return NextResponse.json({ success: true, message: 'Honras foram distribuídas para os jogadores com mais votos' });
-  }
-  
-  const timeout = setTimeout(() => {
-    distributeHonors();
-    return () => clearTimeout(timeout);
-  }, HonorPlayersTimerMinutes * 60 * 1000);
-
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, message: 'Honras foram distribuídas para os jogadores com mais votos' });
 }

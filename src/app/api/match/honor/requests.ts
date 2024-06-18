@@ -25,13 +25,12 @@ export async function calculateAndDistributePlayersHonors({ matchId }: { matchId
   });
 
   const data = await response.json();
-
-  if (data.success) {
-    await fetchApi('queue', {
-      method: 'DELETE',
-      body: JSON.stringify({ queueId: matchId })
-    });
-  }
-
   return data;
 };
+
+export async function deleteQueue({ matchId }: { matchId: string }) {
+  await fetchApi('queue', {
+    method: 'DELETE',
+    body: JSON.stringify({ queueId: matchId })
+  });
+}
