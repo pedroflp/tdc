@@ -19,6 +19,7 @@ export async function honorPlayers({ matchId, honors, honoredBy }: HonorPlayersR
 export async function calculateAndDistributePlayersHonors({ matchId }: { matchId: string }): Promise<ApiResponse<{
   matchId: string
 }>> {
+  console.log('VERIFICANDO, CALCULANDO E DISTRIBUINDO')
   const response = await fetchApi('match/honor', {
     method: 'PUT',
     body: JSON.stringify({ matchId }),
