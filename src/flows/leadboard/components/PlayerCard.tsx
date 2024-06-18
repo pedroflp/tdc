@@ -50,8 +50,8 @@ export default function PlayerCard({ player, variant, position, className }: {
   className?: string
 }) {
   return (
-    <Link href={routeNames.PROFILE(player.username)}>
-      <Card className={cardVariants({ variant, className })}>
+    <Card className={cardVariants({ variant, className })}>
+      <Link href={routeNames.PROFILE(player.username)}>
         <div className={cn(
           'font-bold absolute -left-6 -top-6 rounded-full w-[80px] h-[80px] flex items-center justify-center',
           cardVariants({ position: variant })
@@ -65,7 +65,7 @@ export default function PlayerCard({ player, variant, position, className }: {
         <CardContent>
           <UserStats user={player} />
         </CardContent>
-      </Card>
-    </Link>
+      </Link>
+    </Card>
   )
 }
