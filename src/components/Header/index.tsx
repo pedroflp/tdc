@@ -18,18 +18,19 @@ export default function Header({ user }: { user: UserDTO }) {
     <Fragment>
       <div className='w-full bg-secondary/60 border-b-2 border-border p-4 px-16 flex justify-between items-center'>
         <div className='flex gap-8 items-center'>
-          <Link href={'/'} className='text-2xl font-black text-foreground flex gap-2 items-center'>TDC <Badge>BETA</Badge></Link>
-
+          <Link href={'/'} className='text-2xl font-black text-foreground flex gap-2 items-center'>TDC</Link>
         </div>
         <div className='flex items-center gap-2'>
           <nav className='flex gap-2'>
+            <Link href={routeNames.LEADBOARD}>
+              <Button className='gap-2 items-center' variant="ghost">
+                <Badge className='bg-emerald-500'>Novo</Badge>
+                Placar de líderes
+                </Button>
+            </Link>
             <Link href={routeNames.MATCHES}>
               <Button variant="ghost">Partidas finalizadas</Button>
             </Link>
-            <Button className='opacity-30 gap-2 items-center pointer-events-none' variant="ghost">
-              Placar de líderes
-              <Badge variant="secondary">Em breve</Badge>
-            </Button>
           </nav>
           <Button variant="ghost" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             <SunMoon />

@@ -1,8 +1,7 @@
 import MatchesPage from '@/flows/matches'
 import BaseLayout from '@/layouts/base'
-import React from 'react'
 
-export default function Match() {
+export default function Matches() {
   return (
     <BaseLayout>
       <MatchesPage />

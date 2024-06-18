@@ -74,7 +74,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           </h2>
         </div>
         <div className='flex gap-8 items-center'>
-          {(match.honors && !match.honors.finished) && (
+          {(!match?.honors?.finished) && (
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger className='ml-auto cursor-default'>
@@ -111,7 +111,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
       </div>
       <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
       <div className='space-y-4'>
-          <h1 className={cn('text-3xl font-bold text-left', match?.winner === MatchTeamsEnum.BLUE && 'text-yellow-500')}>{match?.winner === MatchTeamsEnum.BLUE && 'Vencedores - '} Time Azul</h1>
+          <h1 className={cn('text-3xl font-bold text-left', match?.winner === MatchTeamsEnum.BLUE && 'text-yellow-500')}>Time Azul</h1>
           {match.teams[MatchTeamsEnum.BLUE].map((player, index: number) => (
             <PlayerSlot match={match} className={cn(match?.winner === MatchTeamsEnum.BLUE && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')} key={index} player={player} />
           ))}
@@ -122,7 +122,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
             match.finished && match.winner ? 'bg-yellow-400' : 'bg-border/50'
           )} />
           <Image
-            src="/assets/icons/match-versus.png"
+            src={match.finished ? '/assets/icons/default-match.png' : '/assets/icons/match-versus.png'}
             alt="Match team versus team badge"
             width={100}
             height={100}
@@ -130,7 +130,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
           />
         </div>
         <div className='space-y-4'>
-          <h1 className={cn('text-3xl font-bold text-right', match?.winner === MatchTeamsEnum.RED && 'text-yellow-500')}>{match?.winner === MatchTeamsEnum.RED && 'Vencedores - '} Time Vermelho</h1>
+          <h1 className={cn('text-3xl font-bold text-right', match?.winner === MatchTeamsEnum.RED && 'text-yellow-500')}>Time Vermelho</h1>
           {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
             <PlayerSlot match={match} className={cn(match?.winner === MatchTeamsEnum.RED && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')} key={index} player={player} />
           ))}

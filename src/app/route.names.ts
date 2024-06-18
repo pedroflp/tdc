@@ -4,6 +4,7 @@ export const routeNames = {
   QUEUE_COMPOSITIONS: (queueId: string) => `/queue/${queueId}/compositions`,
   PROFILE: (username: string) => `/${username}`,
   MATCHES: '/matches',
+  LEADBOARD: '/leadboard',
   MATCH: (matchId: string) => `/match/${matchId}`,
   MATCH_HONOR: (matchId: string) => `/match/${matchId}/honor`,
 }

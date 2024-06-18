@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TDCU Beta",
+  title: "TDC",
   description: "TDC x Primos in TDCU to play the best of the joguinho",
 };
 
