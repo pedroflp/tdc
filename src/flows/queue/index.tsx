@@ -63,7 +63,7 @@ export default function QueuePage({ queueId, user }: any) {
       };
       const queueData = queueDoc.data() as QueueItem;
 
-      if (queueData?.match?.started) return router.push(routeNames.MATCH(queueData?.match?.id));
+      if (queueData?.matchId) return router.push(routeNames.MATCH(queueData?.matchId));
       if (queueData?.compositions?.length > 0) return router.push(routeNames.QUEUE_COMPOSITIONS(queueData.id));
 
       setQueue(queueData);

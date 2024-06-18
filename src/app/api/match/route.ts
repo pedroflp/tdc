@@ -16,6 +16,10 @@ export async function POST(request: Request) {
   const queueDocRef = doc(firestore, collections.QUEUES, queueId);
   const queueData = (await getDoc(queueDocRef)).data()! as QueueItem;
 
+  await updateDoc(queueDocRef, {
+    matchId,
+  })
+
   await setDoc(doc(firestore, collections.MATCHES, queueId), {
     id: matchId,
     teams,

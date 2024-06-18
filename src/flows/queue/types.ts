@@ -8,11 +8,6 @@ export interface Teams {
   [MatchTeamsEnum.BLUE]: Array<Player>;
   [MatchTeamsEnum.RED]: Array<Player>;
 }
-export interface QueueMatch {
-  id: string;
-  started: boolean;
-  finished: boolean;
-}
 
 export enum MatchTeamsEnum {
   BLUE = "blue",
@@ -35,7 +30,7 @@ export interface QueueItem {
   name: string;
   createdAt: string;
   hoster: Host;
-  match: QueueMatch;
+  matchId: string;
   mode: MatchModesEnum;
   readyToStartMatch: boolean;
   teams: Teams;

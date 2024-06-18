@@ -38,7 +38,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   if (!queue.players.some(player => player?.username === user?.username)) {
     router.push(routeNames.HOME);
-    toast({description: 'A partida foi iniciada e você não faz parte dos jogadores, levamos você para o início!', duration: 3000 })
+    toast({description: 'A partida foi iniciada e você não faz parte dos jogadores. Levamos você para o início!', duration: 3000 })
     return null;
   }
 
@@ -48,7 +48,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
       const queue = doc.data() as QueueItem;
 
-      if (queue?.match?.started) return router.push(routeNames.MATCH(queue?.match?.id));
+      if (queue?.matchId) return router.push(routeNames.MATCH(queue?.matchId));
       if (!queue?.compositions || queue?.compositions?.length === 0) return router.push(routeNames.QUEUE(queueId));
       
       setQueue(doc.data() as any);

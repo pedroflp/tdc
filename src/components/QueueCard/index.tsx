@@ -53,9 +53,8 @@ export default function QueueCard({
     handleEnterQueue(queue.id);
   }
 
-  const QueueBadgeStatus = useCallback(({match}: {match: QueueMatch}) => {
-    if (match?.started) return <Badge>Partida Iniciada</Badge>
-    if (match?.finished) return <Badge variant="outline">Partida Finalizada</Badge>
+  const QueueBadgeStatus = useCallback(({matchId}: {matchId: string}) => {
+    if (matchId) return <Badge>Partida Iniciada</Badge>
     return <Badge variant="secondary">Sala em preparação</Badge>;
   }, []);
 
@@ -69,7 +68,7 @@ export default function QueueCard({
     if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
     if (queue?.players.find((player: Player) => player?.username === user?.username)) return <Button variant="secondary" onClick={onClick}>Voltar para a sala</Button>
     if (disabledJoinByStarted) return (
-      <Link href={routeNames.MATCH(queue?.match?.id)}>
+      <Link href={routeNames.MATCH(queue?.matchId)}>
         <Button asChild>Visualizar essa partida</Button>
       </Link>
     )
@@ -83,7 +82,7 @@ export default function QueueCard({
           <div className="flex flex-col md:flex-row gap-2 md:gap-4">
             <CardTitle className='text-2xl'>{queue.name}</CardTitle>
             <div className='flex items-center gap-2'>
-              <QueueBadgeStatus match={queue.match} />
+              <QueueBadgeStatus matchId={queue.matchId} />
               {queue.players.find((player: Player) => player?.username === user?.username) && (
                 <Badge className='bg-emerald-400 text-slate-800'>Você está na sala!</Badge>
               )}
