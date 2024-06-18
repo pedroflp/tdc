@@ -78,9 +78,10 @@ export async function PUT(request: Request) {
   const bricklayer = honors.bricklayer;
 
   const [mvpPlayer, hostagePlayer, bricklayerPlayer] = [mvp, hostage, bricklayer].reduce((acc, honor) => {
-    const honoredPlayer = honor.length > 0 
-      ? honor.sort((playerA, playerB) => playerA.votes.length - playerB.votes.length)[0]
+    const honoredPlayer = honor.length > 0
+      ? honor.sort((playerA, playerB) => playerB.votes.length - playerA.votes.length)[0]
       : null;
+    
     acc.push(honoredPlayer);
     return acc;
   }, [] as Array<HonorPlayerDTO | null>)
@@ -98,7 +99,7 @@ export async function PUT(request: Request) {
     const userDocRef = doc(firestore, collections.USERS, username);
     const userDoc = await getDoc(userDocRef);
     const userData = userDoc.data() as UserDTO;
-    const isUserWinnerOfMatch = match.teams[match.winner].some(player => userData.username === username);
+    const isUserWinnerOfMatch = match.teams[match.winner].some(player => username === player.username);
 
     const points = calculateMatchPontuation(!!isUserWinnerOfMatch, {
       mvp: mvpPlayer?.username === username, 
@@ -107,7 +108,7 @@ export async function PUT(request: Request) {
     });
 
     const statistics = {
-      points,
+      points: userData.statistics.points + points,
       played: userData?.statistics?.played + 1,
       mvps: mvpPlayer?.username === username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
       bricklayer: bricklayerPlayer?.username === username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,

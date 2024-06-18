@@ -19,6 +19,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Countdown from 'react-countdown';
 import { MatchItem, MatchTeamsEnum } from '../queue/types';
 import DeclareWinnerDialog from './components/DeclareWinnerDialog';
+import { Card, CardDescription } from '@/components/ui/card';
 
 export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
@@ -92,9 +93,11 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
                 {distributeHonors.isDistributing ? 'Distribuindo honras...' : 'Distribuir as honras'}
               </Button>
             ) : (
-              <Button disabled>
-                {distributeHonors.isDistributing ? 'Distribuindo honras...' : `Aguardando ${match.hoster.name} distribuir as honras`}
-              </Button>
+              <Card>
+                <CardDescription className='p-4 text-foreground'>
+                  {distributeHonors.isDistributing ? 'Distribuindo honras...' : `Aguardando ${match.hoster.name} distribuir as honras`}
+                </CardDescription>
+              </Card>
             )
           ) : (
               match.finished && !match?.honors?.finished) && (
