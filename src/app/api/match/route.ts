@@ -66,8 +66,6 @@ export async function PUT(request: Request) {
     finished: true,
     finishedAt: new Date().toISOString()
   });
-    
-  calculateAndDistributePlayersHonors({ matchId });
 
   return NextResponse.json({
     success: true,

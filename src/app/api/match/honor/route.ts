@@ -73,16 +73,6 @@ export async function PUT(request: Request) {
   const { matchId }: { matchId: string } = await request.json();
   const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId));
   const match = matchDoc.data() as MatchItem;
-
-  if (isBefore(new Date(), new Date(match.honors!.endDate))) {
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout) 
-      calculateAndDistributePlayersHonors({ matchId });
-    }, 10000);
-
-    return NextResponse.json({ success: false });
-  };
-
   const honors = match.honors!;
   const mvp = honors.mvp;
   const hostage = honors.hostage;
@@ -103,31 +93,32 @@ export async function PUT(request: Request) {
     honors: { ...match.honors, finished: true }
   });
 
-  match.players.forEach(async player => {
-    const userDocRef = doc(firestore, collections.USERS, player.username);
+  async function distributeStatistics(username: string) {
+    const userDocRef = doc(firestore, collections.USERS, username);
     const userDoc = await getDoc(userDocRef);
     const userData = userDoc.data() as UserDTO;
-    const isUserWinnerOfMatch = match.teams[match.winner].some(player => userData.username === player.username);
+    const isUserWinnerOfMatch = match.teams[match.winner].some(player => userData.username === username);
 
     const points = calculateMatchPontuation(!!isUserWinnerOfMatch, {
-      mvp: mvpPlayer?.username === player.username, 
-      bricklayer: bricklayerPlayer?.username === player.username, 
-      hostage: hostagePlayer?.username === player.username
+      mvp: mvpPlayer?.username === username, 
+      bricklayer: bricklayerPlayer?.username === username, 
+      hostage: hostagePlayer?.username === username
     });
 
     await updateDoc(userDocRef, {
       statistics: {
         points,
         played: userData?.statistics?.played + 1,
-        mvps: mvpPlayer?.username === player.username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
-        bricklayer: bricklayerPlayer?.username === player.username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,
-        hostage: hostagePlayer?.username === player.username ? userData?.statistics?.hostage + 1 : userData?.statistics?.hostage,
+        mvps: mvpPlayer?.username === username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
+        bricklayer: bricklayerPlayer?.username === username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,
+        hostage: hostagePlayer?.username === username ? userData?.statistics?.hostage + 1 : userData?.statistics?.hostage,
         won: isUserWinnerOfMatch ?  userData?.statistics?.won + 1 :  userData?.statistics?.won,
       }
     } as UserDTO);
-  });
+  }
 
-  deleteQueue({ matchId });
+  await Promise.all([match.players.map(user => distributeStatistics(user.username))]);
+  await deleteQueue({ matchId });
 
   return NextResponse.json({ success: true, message: 'Honras foram distribuídas para os jogadores com mais votos' });
 }

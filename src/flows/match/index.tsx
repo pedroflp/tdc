@@ -1,32 +1,34 @@
 'use client';
 
+import { calculateAndDistributePlayersHonors } from '@/app/api/match/honor/requests';
 import { UserDTO } from '@/app/api/user/types';
 import { routeNames } from '@/app/route.names';
 import Avatar from '@/components/Avatar';
 import PlayerSlot from '@/components/PlayerSlot';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
-import { dateDifferenceInSeconds, formatSecondsInDateDifference } from '@/utils/dateDifference';
+import { formatSecondsInDateDifference } from '@/utils/dateDifference';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import Countdown from 'react-countdown';
 import { MatchItem, MatchTeamsEnum } from '../queue/types';
 import DeclareWinnerDialog from './components/DeclareWinnerDialog';
-import Countdown from 'react-countdown';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { isAfter } from 'date-fns';
 
 export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: string}) {
   const router = useRouter();
   
   const [match, setMatch] = useState<MatchItem>();
   const [winner, setWinner] = useState<MatchTeamsEnum>();
-  const [isDistributingHonors, setIsDistributingHonors] = useState(false);
+  const [distributeHonors, setDistributeHonors] = useState({
+    canDistribute: false,
+    isDistributing: false
+  });
 
   const isUserInThisMatch = useCallback((match: MatchItem) => {
     if (!match) return false;
@@ -49,13 +51,20 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
       if (!doc.exists()) return router.push(routeNames.HOME);
       const match = doc.data() as MatchItem;
       
-      if (match.honors?.finished) setIsDistributingHonors(false);
+      if (match.honors?.finished) setDistributeHonors({ canDistribute: false, isDistributing: false });
       if (user && canUserVoteHonorsThisMatch(match, user, isUserInThisMatch)) 
         router.push(routeNames.MATCH_HONOR(matchId));
 
       setMatch(match);
     })
   };
+
+  async function handleDistributeHonors() {
+    setDistributeHonors({ canDistribute: true, isDistributing: true })
+    const response = await calculateAndDistributePlayersHonors({ matchId });
+    
+    if (response) setDistributeHonors({ canDistribute: response.success, isDistributing: false })
+  }
 
   useEffect(() => {
     const unsubscribe = getMatchData();
@@ -75,9 +84,18 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
             </span>
           </h2>
         </div>
-        <div className='flex gap-8 items-center'>
-          {isDistributingHonors ? (
-            <h1 className='text-xl font-bold'>Distribuindo honras para os jogadores...</h1>
+        <div className='flex gap-4 items-center'>
+          {!match.honors?.finished && (
+            distributeHonors.canDistribute ? (
+            user?.username === match?.hoster?.username ? (
+              <Button disabled={distributeHonors.isDistributing} onClick={handleDistributeHonors}>
+                {distributeHonors.isDistributing ? 'Distribuindo honras...' : 'Distribuir as honras'}
+              </Button>
+            ) : (
+              <Button disabled>
+                {distributeHonors.isDistributing ? 'Distribuindo honras...' : `Aguardando ${match.hoster.name} distribuir as honras`}
+              </Button>
+            )
           ) : (
               match.finished && !match?.honors?.finished) && (
               <TooltipProvider>
@@ -86,26 +104,26 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
                     <Countdown
                       date={new Date(match?.honors?.endDate!)}
                       precision={1}
-                      onComplete={() => setIsDistributingHonors(true)}
+                      onComplete={() => setDistributeHonors({ canDistribute: true, isDistributing: false })}
                       renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
                     />
                   </TooltipTrigger>
                   <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
                 </Tooltip>
               </TooltipProvider> 
-          )}
+          ))}
           {canUserVoteHonorsThisMatch(match, user!, isUserInThisMatch) ? (
             <Button className='text-xl p-8 gap-4 font-bold' onClick={() => router.push(routeNames.MATCH_HONOR(matchId))}>
               Honrar jogadores
             </Button>
           ) : (
-            match.finished
+            match.honors?.finished
             ? (
               <Link href={routeNames.HOME}>
                 <Button variant="outline">Voltar para o início</Button>
               </Link>
             )
-            : match?.hoster?.username === user?.username && (
+            : !match.finished && match?.hoster?.username === user?.username && (
               <DeclareWinnerDialog
                 match={match}
                 winner={winner}
