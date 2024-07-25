@@ -1,8 +1,8 @@
-import { fetchApi } from "@/utils/fetchApi";
+import { fetchLOLApi } from "@/services/api/fetchLOLApi";
 import { ApiResponse } from "../../types";
 
 export async function getUserMatches(username: string): Promise<ApiResponse<{}>> {
-  const response = await fetchApi(`user/matches?username=${username}`, {
+  const response = await fetchLOLApi(`user/matches?username=${username}`, {
     method: 'GET',
   });
 

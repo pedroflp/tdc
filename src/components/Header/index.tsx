@@ -1,42 +1,24 @@
 'use client'
 
 import { UserDTO } from '@/app/api/user/types';
-import { SunMoon } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 import ProfileDropdown from './components/ProfileDropdown';
 import { SignDialog } from './components/SignDialog';
-import { routeNames } from '@/app/route.names';
+import { HeaderProps } from './types';
+import { Menu, X } from 'lucide-react';
+import { Button } from '../ui/button';
 
-export default function Header({ user }: { user: UserDTO }) {
-  const { theme, setTheme } = useTheme();
+export default function Header({ user, isSidebarOpen, toggleSidebar }: HeaderProps) {
 
   return (
     <Fragment>
-      <div className='w-full bg-secondary/60 border-b-2 border-border p-4 px-16 flex justify-between items-center'>
-        <div className='flex gap-8 items-center'>
+      <div className='relative w-full bg-secondary/60 border-b-2 border-border p-4 px-8 flex justify-between items-center'>
+        <Button variant="outline" onClick={toggleSidebar}>{isSidebarOpen ? <X size={24} /> : <Menu size={24} />}</Button>
+        <div className='flex gap-8 items-center absolute left-1/2 -translate-x-1/2'>
           <Link href={'/'} className='text-2xl font-black text-foreground flex gap-2 items-center'>TDC</Link>
         </div>
-        <div className='flex items-center gap-2'>
-          <nav className='flex gap-2'>
-            <Link href={routeNames.LEADBOARD}>
-              <Button className='gap-2 items-center' variant="ghost">
-                <Badge className='bg-emerald-500'>Novo</Badge>
-                Placar de líderes
-                </Button>
-            </Link>
-            <Link href={routeNames.MATCHES}>
-              <Button variant="ghost">Partidas finalizadas</Button>
-            </Link>
-          </nav>
-          <Button variant="ghost" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-            <SunMoon />
-          </Button>
-          {!!user ? <ProfileDropdown user={user} /> : <SignDialog />}
-        </div>
+        {!!user ? <ProfileDropdown user={user} /> : <SignDialog />}
       </div>
     </Fragment>
   )

@@ -1,11 +1,12 @@
 'use client';
 
-import { startQueue, validateQueueProtectionCode } from "@/app/api/queue/requests";
+import { startQueue } from "@/app/api/lol/queue/requests";
+import { UserDTO } from "@/app/api/user/types";
 import { routeNames } from "@/app/route.names";
 import QueueCard from "@/components/QueueCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueueItem } from "@/flows/queue/types";
+import { QueueItem } from "@/flows/lol/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
 import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
@@ -13,7 +14,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
-import { UserDTO } from "@/app/api/user/types";
 
 export default function HomePage({ user }: any) {
   const { push } = useRouter();

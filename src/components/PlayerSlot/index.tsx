@@ -3,7 +3,7 @@ import Avatar from '../Avatar'
 import { Button } from '../ui/button'
 import Image from 'next/image'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
-import { MatchItem, Player } from '@/flows/queue/types'
+import { MatchItem, Player } from '@/flows/lol/queue/types'
 import Link from 'next/link'
 import { routeNames } from '@/app/route.names'
 

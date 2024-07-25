@@ -1,4 +1,4 @@
-import { fetchApi } from "@/utils/fetchApi";
+import { fetchApi } from "@/services/api/fetchApi";
 
 export async function signOut() {
   try {

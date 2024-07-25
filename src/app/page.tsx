@@ -1,5 +1,5 @@
 import HomePage from '@/flows/home';
-import BaseLayout from '@/layouts/base';
+import BaseLayout from '@/layouts/Base';
 
 export default async function Home() {
   return (

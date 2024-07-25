@@ -1,9 +1,7 @@
-import { MatchItem, Player } from "@/flows/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { and, collection, doc, getDoc, getDocs, onSnapshot, or, query, updateDoc, where } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { NextResponse } from "next/server";
-import { UserDTO } from "../types";
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;

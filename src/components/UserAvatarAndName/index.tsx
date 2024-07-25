@@ -1,7 +1,7 @@
 import React from 'react'
 import Avatar from '../Avatar'
 import { UserDTO } from '@/app/api/user/types';
-import { Player } from '@/flows/queue/types';
+import { Player } from '@/flows/lol/queue/types';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { routeNames } from '@/app/route.names';

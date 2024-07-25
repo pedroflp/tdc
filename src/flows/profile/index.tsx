@@ -10,13 +10,25 @@ import { routeNames } from '@/app/route.names';
 import { redirect } from 'next/navigation';
 import EditUserInformationDialog from './components/EditUserInformationDialog';
 import UserStats from './components/UserStats';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { SearchCheck, UserRoundSearch } from 'lucide-react';
 
 export default async function ProfilePage({ user, username }: any) {
+
   const profileUser = await getUserData(username, {
     cache: "default",
   }) as UserDTO;
 
-  if (!profileUser) redirect(routeNames.HOME);
+  if (!profileUser) return (
+    <main className='flex flex-col gap-8 items-center justify-center'>
+      <UserRoundSearch size={80} />
+      <h1 className='text-3xl font-bold'>Usuário não encontrado</h1>
+      <Link href={routeNames.HOME}>
+        <Button variant="outline">Voltar para o início</Button>
+      </Link>
+    </main>
+  );
 
   return (
     <main className='grid lg:grid-cols-2 2xl:grid-cols-[2fr_3fr] w-full h-full m-auto gap-8'>
@@ -24,7 +36,7 @@ export default async function ProfilePage({ user, username }: any) {
         <Card className='flex gap-2 p-6 h-max relative bg-secondary'>
           {user.username === profileUser.username && (
             <EditUserInformationDialog
-              username={username}
+              username={profileUser.username}
               profileUser={profileUser}
             />
           )}

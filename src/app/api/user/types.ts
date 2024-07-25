@@ -1,4 +1,3 @@
-import { Player } from "@/flows/queue/types";
 
 export type UserDTO = { 
   username: string;
@@ -17,5 +16,3 @@ export type UserStatistics = {
   bricklayer: number;
   hostage: number;
 }
-
-export type GetUserResponseDTO = UserDTO | null;

@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import Avatar from "@/components/Avatar";
-import { Player } from "@/flows/queue/types";
+import { Player } from "@/flows/lol/queue/types";
 import Link from "next/link";
 import { routeNames } from "@/app/route.names";
 
