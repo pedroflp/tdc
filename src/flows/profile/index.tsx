@@ -34,7 +34,7 @@ export default async function ProfilePage({ user, username }: any) {
     <main className='grid lg:grid-cols-2 2xl:grid-cols-[2fr_3fr] w-full h-full m-auto gap-8'>
       <div className='grid grid-rows-[auto_1fr] gap-8 w-full'>
         <Card className='flex gap-2 p-6 h-max relative bg-secondary'>
-          {user.username === profileUser.username && (
+          {user?.username === profileUser.username && (
             <EditUserInformationDialog
               username={profileUser.username}
               profileUser={profileUser}
