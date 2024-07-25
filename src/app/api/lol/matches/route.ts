@@ -20,3 +20,5 @@ export async function GET() {
         matches
     })
 }
+
+export const dynamic = "force-dynamic";

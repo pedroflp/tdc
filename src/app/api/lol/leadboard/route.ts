@@ -17,3 +17,5 @@ export async function GET() {
         data: leadBoards
     })
 }
+
+export const dynamic = "force-dynamic";

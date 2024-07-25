@@ -63,7 +63,7 @@ export default function PlayerCard({ player, variant, position, className }: {
       </div>
       <CardHeader onClick={() => push(routeNames.PROFILE(player.username))}  className='items-center cursor-pointer'>
         <Avatar className={cardVariants({ avatar: variant })} image={player.avatar} fallback={String(player.username).slice(0, 2)} size={20} />
-        <CardTitle>{player.username}</CardTitle>
+        <CardTitle>{player.name}</CardTitle>
       </CardHeader>
       <CardContent>
         <UserStats user={player} />

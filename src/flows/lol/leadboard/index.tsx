@@ -37,7 +37,7 @@ export default async function LeadBoardPage() {
           <PlayerCard position={3} variant='third' player={third} />
         </div>
 
-        <div className='grid grid-cols-1 gap-12'>
+        <div className='grid grid-cols-1 gap-12 w-[60%]'>
           {others?.map((user, index) => (
             <Card key={user.username} className='relative'>
               <h1 className='text-4xl font-bold absolute -left-6 -top-6 bg-accent rounded-full w-[64px] h-[64px] flex items-center justify-center'>{index+4}</h1>
