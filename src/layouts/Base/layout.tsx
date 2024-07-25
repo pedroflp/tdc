@@ -48,7 +48,15 @@ export default function BaseLayoutElements({ user, children }: { user: UserDTO |
     sidebarSections.map(section => (
       <section key={section.title}>
         <header className='flex gap-2 items-center'>
-        {section.icon && <Image src={section.icon} width={1000} height={1000} style={{ width: 32, height: 32 }} />}
+          {section.icon &&
+            <Image
+              alt='Ícone de seção de navegação'
+              src={section.icon}
+              width={1000}
+              height={1000}
+              style={{ width: 32, height: 32 }}
+            />
+          }
         <h1>{section.title}</h1>
         </header>
         <nav className='flex flex-col gap-2 mt-2 overflow-hidden'>

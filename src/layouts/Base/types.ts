@@ -6,7 +6,7 @@ type Link = {
 }
 
 type SidebarSection = {
-  icon?: React.ReactNode;
+  icon?: string;
   title: string;
   links: Link[];
 }
