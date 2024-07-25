@@ -12,7 +12,7 @@ export default async function MatchesPage({ user }: { user?: UserDTO }) {
 	const { matches } = await getMatches();
 	
 	return (
-		<div className="xl:max-w-[50%] md:max-w-[80%] max-w-[90%] flex flex-col m-auto gap-8">
+		<div className="xl:max-w-[60%] md:max-w-[80%] max-w-[90%] flex flex-col m-auto gap-8">
 			<div className="flex justify-between gap-16 items-center">
 				<div className="space-y-2">
 					<h1 className="text-3xl font-bold">Partidas finalizadas</h1>

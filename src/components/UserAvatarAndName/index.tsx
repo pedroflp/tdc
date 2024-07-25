@@ -31,7 +31,7 @@ export default function UserAvatarAndName({
 
   return (
     <Link href={routeNames.PROFILE(user.username)} className={cn(
-      'flex items-center gap-2',
+      'flex items-center gap-2 cursor-pointer',
       !canOpenProfileByAvatar && 'pointer-events-none'
     )}>
       <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
