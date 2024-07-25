@@ -1,9 +1,9 @@
-import { fetchLOLApi } from "@/services/api/fetchLOLApi";
+import { fetchApi } from "@/services/api/fetchApi";
 import { ApiResponse } from "../../types";
 import { SignInResponseDTO } from "./types";
 
 export async function signIn(username: string, password: string): Promise<ApiResponse<SignInResponseDTO>> {
-  const response = await fetchLOLApi('auth/signin', {
+  const response = await fetchApi('auth/signin', {
     method: 'POST',
     body: JSON.stringify({username, password}),
   });
