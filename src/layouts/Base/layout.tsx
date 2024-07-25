@@ -6,14 +6,13 @@ import Header from '@/components/Header'
 import ToggleTheme from '@/components/ToggleTheme';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react'
 
-const sidebarSections: Array<{
-  title: string
-  links: { text: string, href: string, disabled?: boolean }[]
-}> = [
+const sidebarSections = [
   {
     title: 'Geral',
     links: [
@@ -22,6 +21,7 @@ const sidebarSections: Array<{
   },
   {
     title: 'League of Legends',
+    icon: '/assets/icons/lol.svg',
     links: [
       { text: 'Placar de líderes', href: routeNames.LEADBOARD, },
       { text: 'Partidas finalizadas', href: routeNames.MATCHES }
@@ -29,6 +29,7 @@ const sidebarSections: Array<{
   },
   {
     title: 'Dead by Daylight',
+    icon: '/assets/icons/dbd.svg',
     links: [
       { text: 'Survive With COLEGAS', href: routeNames.MATCHES, disabled: true }
     ]
@@ -46,7 +47,10 @@ export default function BaseLayoutElements({ user, children }: { user: UserDTO |
   const Sections = ({ sidebarSections }: { sidebarSections: SidebarSection[] }) =>
     sidebarSections.map(section => (
       <section key={section.title}>
-        <header>{section.title}</header>
+        <header className='flex gap-2 items-center'>
+        {section.icon && <Image src={section.icon} width={1000} height={1000} style={{ width: 32, height: 32 }} />}
+        <h1>{section.title}</h1>
+        </header>
         <nav className='flex flex-col gap-2 mt-2 overflow-hidden'>
           {section.links.map(link => (
             <Link
@@ -66,6 +70,7 @@ export default function BaseLayoutElements({ user, children }: { user: UserDTO |
             </Link>
           ))}
         </nav>
+        <Separator className='h-[1px] w-full bg-muted-foreground/10 mt-6' />
       </section>
     )
   ); 
