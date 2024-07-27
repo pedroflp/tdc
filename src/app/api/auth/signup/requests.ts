@@ -1,11 +1,11 @@
-import { fetchLOLApi } from "@/services/api/fetchLOLApi";
-import { SignUpResponseDTO } from "./types";
 import { fetchApi } from "@/services/api/fetchApi";
+import { DiscordUserDTO } from "../../user/types";
+import { SignUpResponseDTO } from "./types";
 
-export async function signUp(username: string, password: string): Promise<SignUpResponseDTO> {
+export async function signUp(user: DiscordUserDTO): Promise<SignUpResponseDTO> {
   const response = await fetchApi('auth/signup', {
     method: 'POST',
-    body: JSON.stringify({username, password}),
+    body: JSON.stringify({user}),
   });
 
   const data = await response.json();

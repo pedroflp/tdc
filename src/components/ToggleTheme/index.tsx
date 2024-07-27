@@ -28,7 +28,7 @@ export default function ToggleTheme() {
   }
 
   return (
-    <Button variant="outline" className='w-full gap-2 hover:bg-background' onClick={handleToggleTheme}>
+    <Button variant="outline" className='w-full gap-2 hover:bg-background overflow-hidden' onClick={handleToggleTheme}>
       {theme === ThemeEnum.DARK
         ? <Sun size={18} />
         : <Moon size={18} />

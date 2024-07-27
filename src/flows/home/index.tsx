@@ -37,10 +37,12 @@ export default function HomePage({ user }: any) {
     push(routeNames.QUEUE(queueId));
   }
 
-  function getUserActiveMatch(queues: Array<QueueItem>) {
-    getDoc(doc(firestore, collections.USERS, user.username))
-    .then(async document => {
-      if (!document.exists()) return;
+  async function getUserActiveMatch(queues: Array<QueueItem>) {
+    if (!user) return;
+    
+    const document = await getDoc(doc(firestore, collections.USERS, user.username));
+
+    if (!document.exists()) return;
       const userData = document.data() as UserDTO;
       const userActiveMatch = userData.activeMatch;
 
@@ -54,7 +56,6 @@ export default function HomePage({ user }: any) {
           return push(routeNames.QUEUE(userActiveMatch))
         }
       }
-    });
   }
 
   function getAvailableQueues() {
@@ -65,7 +66,7 @@ export default function HomePage({ user }: any) {
       setAvailableQueues(queues);
       setFetchingQueues(false);
 
-      if (user) getUserActiveMatch(queues);
+      // if (user) getUserActiveMatch(queues);
     });
   }
 

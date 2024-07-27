@@ -6,6 +6,7 @@ export type UserDTO = {
   createdAt: string;
   statistics: UserStatistics;
   activeMatch?: string;
+  verified: boolean;
 }
 
 export type UserStatistics = {
@@ -15,4 +16,11 @@ export type UserStatistics = {
   mvps: number;
   bricklayer: number;
   hostage: number;
+}
+
+export type DiscordUserDTO = {
+  id: string;
+  username: string;
+  avatar?: string | null;
+  email?: string | null;
 }
