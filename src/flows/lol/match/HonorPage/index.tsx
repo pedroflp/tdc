@@ -127,51 +127,36 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
 
   return (
     <main className='max-w-[70%] m-auto space-y-14'>
-      <div className='grid grid-cols-[2fr_2fr] gap-24 items-start'>
-        <div className='flex flex-col justify-between h-full'>
-          <div className='space-y-4'>
-            <h1 className='text-4xl font-bold'>Honre os jogadores da partida</h1>
-            <p className='text-sm text-muted-foreground'>Vote nos jogadores que você deseja honrar como MVP, Refém ou Pedreiro, para atribuir (ou desatribuir) pontos extras aos somatórios de pontos individuais dos jogadores.</p>
-          </div>
-          <Button
-            disabled={fetchingVotes || isVoteSubmitted || !vote.mvp}
-            onClick={handleHonorPlayers}
-            className='w-full py-6'
-          >
-            {isVoteSubmitted ? "As honras foram concedidas com sucesso..." : 'Confirmar as honras escolhidas'}
-          </Button>
+      <div className='grid grid-cols-[2fr_2fr] gap-24 items-center'>
+        <div className='space-y-4'>
+          <h1 className='text-3xl font-bold'>Honras da partida</h1>
+          <p className='text-sm text-muted-foreground'>Vote nos jogadores que você deseja honrar como MVP, Refém ou Pedreiro, para atribuir (ou desatribuir) pontos extras aos somatórios de pontos individuais dos jogadores.</p>
         </div>
         <div>
           {!match ? (
-            <Skeleton className='w-full h-40' />
+            <Skeleton className='w-full h-24' />
           ) : (    
-          <Card className='border-transparent flex justify-between bg-secondary/50'>
-            <CardHeader className='grid grid-rows-[auto_1fr] gap-4 w-full'>
-              <div className='grid grid-cols-[auto_1fr] items-start'>
-                <div>
-                  <CardTitle>
-                    <p>Partida {match?.name}</p>
-                  </CardTitle>
-                  <p className='text-xs flex items-center gap-1'>Criada por <strong>{match?.hoster.name}</strong></p>
-                </div>
-                <TooltipProvider>
-                  <Tooltip delayDuration={100}>
-                    <TooltipTrigger className='ml-auto cursor-default'>
-                      <Countdown
-                        date={new Date(match?.honors?.endDate!)}
-                        renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
-                  </Tooltip>
+            <div className='flex flex-col justify-end gap-4'>
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger className='ml-auto cursor-default'>
+                    <Countdown
+                      date={new Date(match?.honors?.endDate!)}
+                      renderer={({ minutes, seconds }) => <h2 className='text-5xl font-bold'>{formatSecondsInDateDifference(minutes * 60 + seconds)}</h2>}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>As honras serão contabilizadas e concedidas <br /> automaticamente ao fim deste tempo!</TooltipContent>
+                </Tooltip>
                 </TooltipProvider>
-              </div>
-              <div className='grid grid-cols-[auto_1fr] items-end'>
-                <Image className='w-14' src="/assets/icons/default-match.png" alt='Default Match Icon' width={1000} height={1000} />
-                <AvatarStack className='ml-auto' maxAvatarsAmount={10} spacing="lg" avatars={match?.players!} />
-              </div>
-              </CardHeader>
-          </Card>
+                <Button
+                  disabled={fetchingVotes || isVoteSubmitted || !vote.mvp}
+                  onClick={handleHonorPlayers}
+                  loading={fetchingVotes}
+                  className='w-full py-6'
+                >
+                {isVoteSubmitted ? "As honras foram concedidas com sucesso..." : 'Confirmar as honras escolhidas'}
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -180,21 +165,21 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
       ) : (
         <div className='grid grid-cols-3 gap-4'>
           {honorOptions.map(option => (
-            <Card key={option.title} className='flex flex-col items-center'>
+            <Card key={option.title} className='bg-gradient-to-tl from-secondary/60 flex flex-col items-center relative overflow-hidden'>
               <CardHeader>
                 <Image
                   src={option.icon}
                   alt={`Badge de honra para ${option.title}`}
                   width={1000}
                   height={1000}
-                  className='w-32 h-32'
+                  className='w-24 h-24'
                 />
               </CardHeader>
-              <CardContent className='h-full flex flex-col gap-8 justify-between items-center'>
+              <CardContent className='h-full relative z-[2] flex flex-col gap-8 justify-between items-center'>
                 <div className='mt-auto flex flex-col items-center gap-4'>
-                  <div className='flex flex-col items-center gap-2'>
-                    {option.required && <Badge variant="secondary">Obrigatório</Badge>}
+                  <div className='flex items-center gap-2'>
                     <h1 className='text-3xl font-bold'>{option.title}</h1>
+                    {option.required && <Badge>Obrigatório</Badge>}
                   </div>
                   <p className='text-center text-sm text-muted-foreground'>{option.description} <br />
                     <strong>{option.disclaimer}</strong>
@@ -213,6 +198,13 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
                   </SelectContent>
                 </Select>
               </CardContent>
+              <Image
+                src={option.icon}
+                alt={`Badge de honra para ${option.title}`}
+                width={1000}
+                height={1000}
+                className='w-90 h-90 absolute -bottom-16 -right-32 rotate-12 blur-md opacity-10'
+              />
             </Card>
           ))}
         </div>
