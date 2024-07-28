@@ -11,8 +11,9 @@ import { Plus } from 'lucide-react';
 
 export default function MatchCreation({
   creatingQueue,
-  onCreateMatch
-}: { creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum, protectMode: { enabled: boolean, code: string }) => void }) {
+  onCreateMatch,
+  disableCreation
+}: { disableCreation?: boolean, creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum, protectMode: { enabled: boolean, code: string }) => void }) {
   const [name, setName] = useState("");
   const [selectedMode, setSelectedMode] = useState<MatchModesEnum>(MatchModesEnum.CLASSIC);
   const [protectMode, setProtectMode] = useState({
@@ -53,7 +54,7 @@ export default function MatchCreation({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className='gap-1 py-6 text-md'>
+        <Button disabled={disableCreation} className='gap-1 py-6 text-md'>
           <Plus />
           Criar sala
         </Button>
@@ -114,7 +115,7 @@ export default function MatchCreation({
             )}
           </div>
         </div>
-        <Button disabled={!canCreateQueue} onClick={handleCreateMatch} className='w-full mt-4'>
+        <Button disabled={disableCreation || !canCreateQueue} onClick={handleCreateMatch} className='w-full mt-4'>
           {createQueueAlert}
         </Button>
       </DialogContent>

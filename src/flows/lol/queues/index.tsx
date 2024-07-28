@@ -4,21 +4,20 @@ import { startQueue } from "@/app/api/lol/queue/requests";
 import { UserDTO } from "@/app/api/user/types";
 import { routeNames } from "@/app/route.names";
 import QueueCard from "@/components/QueueCard";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QueueItem } from "@/flows/lol/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { collection, doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { handleEnterQueue } from "../queue";
+import EmptyState from "./components/EmptyState";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
-import EmptyState from "./components/EmptyState";
-import { handleEnterQueue } from "../queue";
 
-export default function QueuesPage({ user }: any) {
-  const { push } = useRouter();
+export default function QueuesPage({ user }: {user: UserDTO}) {
+  const { push, refresh } = useRouter();
   const [availableQueues, setAvailableQueues] = useState<Array<QueueItem>>([]);
   const [fetchingQueues, setFetchingQueues] = useState(true); 
   const [creatingQueue, setCreatingQueue] = useState(false);
@@ -33,6 +32,7 @@ export default function QueuesPage({ user }: any) {
     }
     
     push(routeNames.QUEUE(response?.queueId));
+    refresh();
   }
 
   async function getUserActiveMatch(queues: Array<QueueItem>) {
@@ -64,7 +64,7 @@ export default function QueuesPage({ user }: any) {
       setAvailableQueues(queues);
       setFetchingQueues(false);
 
-      if (user) getUserActiveMatch(queues);
+      // if (user) getUserActiveMatch(queues);
     });
   }
 
@@ -82,6 +82,7 @@ export default function QueuesPage({ user }: any) {
             <MatchCreation
               creatingQueue={creatingQueue}
               onCreateMatch={handleCreateMatch}
+              disableCreation={!!user.activeMatch}
             />
           ) : null}
         </div>
@@ -100,6 +101,7 @@ export default function QueuesPage({ user }: any) {
                     queue={queue}
                     disabledJoinByAuth={!user}
                     disabledJoinByStarted={!!queue.matchId}
+                    disabledJoinByHasMatchActive={!!user?.activeMatch}
                     handleEnterQueue={handleEnterQueue}
                   />
                 ))

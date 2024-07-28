@@ -3,7 +3,6 @@ import { QueueItem } from "@/flows/lol/queue/types"
 
 export type QueueSlotProps = {
   player: UserDTO,
-  disabled: boolean,
   handleKickPlayer: (username: string) => void,
   user: UserDTO,
   queue: QueueItem

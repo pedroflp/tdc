@@ -1,16 +1,14 @@
+import { routeNames } from "@/app/route.names";
 import { cookiesKeys } from "@/constants/cookies";
+import { QueueItem } from "@/flows/lol/queue/types";
 import { MatchModesEnum } from "@/flows/lol/queues/components/MatchOptionCard/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { getUserFromToken } from "@/utils/getUsernameFromToken";
-import { parseEmailToUsername } from "@/utils/parseUsername";
+import bcrypt from 'bcrypt';
 import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from 'bcrypt';
-import { QueueItem } from "@/flows/lol/queue/types";
 import { getUserDataByToken } from "../../user/requests";
-import { routeNames } from "@/app/route.names";
 import { UserDTO } from "../../user/types";
 
 export async function POST(request: NextRequest) {
@@ -40,6 +38,9 @@ export async function POST(request: NextRequest) {
 
     const queueId = queue.id;
     await updateDoc(queue, { id: queueId });
+    await updateDoc(doc(firestore, collections.USERS, user.username), {
+      activeMatch: queueId
+    })
 
     if (protectMode.enabled) {
       bcrypt.hash(protectMode.code, 5, async (err, hash) => {

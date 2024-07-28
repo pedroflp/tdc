@@ -19,6 +19,8 @@ export async function handleEnterQueue(queueId: string, user: UserDTO) {
   const queueDoc = await getDoc(queueRef);
   const queue = queueDoc.data() as QueueItem;
 
+  if (queue.blackList?.includes(user.username)) return;
+
   const newPlayers = queue.players; 
   const indexToAddPlayer = newPlayers.findIndex(player => !player.username);
 
@@ -27,11 +29,14 @@ export async function handleEnterQueue(queueId: string, user: UserDTO) {
     avatar: user.avatar,
     name: user.name
   }
-
-  setDoc(queueRef, {
+  await updateDoc(doc(firestore, collections.USERS, user.username), {
+    activeMatch: queueId
+  });
+  
+  await setDoc(queueRef, {
     ...queue,
     players: newPlayers
-  })
+  });
 }
 
 export default function QueuePage({ queueId, user }: any) {
@@ -40,34 +45,24 @@ export default function QueuePage({ queueId, user }: any) {
   const [isFetching, setIsFetching] = useState(true);
 
   if (!user) router.push(routeNames.QUEUES);
-
-  async function deleteQueue() { 
-    if (!queue) return;
-
-    await deleteDoc(doc(firestore, collections.QUEUES, queue.id));
-  }
-
-  async function handleExitFromQueue(username: string) {
-    if (!queue) return;
-
-    const newPlayers = queue.players.map(player => player?.username === username ? {} : player);
-    updateDoc(doc(firestore, collections.QUEUES, queueId), {
-      players: newPlayers
-    });
-  }
-
   function getQueueData() {
     return onSnapshot(doc(firestore, collections.QUEUES, queueId), async (queueDoc) => {
       if (!queueDoc.exists()) {
         const match = await getDoc(doc(firestore, collections.MATCHES, queueId));
         if (match.exists()) router.push(routeNames.MATCH(queueId));
-        else router.push(routeNames.HOME);
+        else router.push(routeNames.QUEUES);
         return;
       };
+
       const queueData = queueDoc.data() as QueueItem;
 
-      if (!queueData.players.some(player => player?.username === user?.username)) {
-        if (queueData.players.every(player => player?.username)) return router.push(routeNames.QUEUES);
+      if (!queueData.players.some(player => player.username === user.username)) {
+        if (queueData.players.every(player => player.username)) return router.push(routeNames.QUEUES);
+        if (queueData.blackList?.includes(user.username)) {
+          await handleExitFromQueue(user?.username);
+          return router.push(routeNames.QUEUES);
+        }
+
         handleEnterQueue(queueId, user);
       }
       if (queueData?.matchId) return router.push(routeNames.MATCH(queueData?.matchId));
@@ -78,22 +73,47 @@ export default function QueuePage({ queueId, user }: any) {
     })
   }
 
-  useEffect(() => {
-    const unsubscribe = getQueueData();
-    return () => unsubscribe();
-  }, []);
+  async function deleteQueue() { 
+    if (!queue) return;
+
+    await updateDoc(doc(firestore, collections.USERS, user.username), {
+      activeMatch: null
+    });
+    router.refresh();
+
+    await deleteDoc(doc(firestore, collections.QUEUES, queue.id));
+  }
+
+  async function handleExitFromQueue(username: string) {
+    if (!queue) return;
+
+    const userAlreadyInBlackList = queue.blackList?.includes(username)
+    const newPlayers = queue.players.map(player => player?.username === username ? {} : player);
+    
+    await updateDoc(doc(firestore, collections.USERS, username), {
+      activeMatch: null
+    });
+    router.refresh();
+    await updateDoc(doc(firestore, collections.QUEUES, queueId), {
+      players: newPlayers,
+      blackList: userAlreadyInBlackList ? queue.blackList : [...(queue.blackList ?? []), username]
+    });
+  }
+
+  async function handleUnlockUserToJoin(username: string) {
+    if (!queue) return;
+
+    const blackList = queue.blackList?.filter(player => player !== username);
+    await updateDoc(doc(firestore, collections.QUEUES, queueId), {
+      blackList
+    });
+  }
 
   const isQueueReadyToPlay = useMemo(() => {
     if (!queue?.players) return false;
 
     return !queue?.players.some((player: any) => !player?.username);
   }, [queue?.players]);
-
-  const playerAlreadyInQueue = useMemo(() => {
-    if (!queue?.players) return false;
-    return !!queue?.players.find((player: any) => player?.username === user?.username);
-  }, [queue?.players, user?.username]);
-
 
   async function generateQueueCompositions() {
     const response = await createQueueCompositions(queueId);
@@ -105,6 +125,11 @@ export default function QueuePage({ queueId, user }: any) {
     router.push(routeNames.QUEUE_COMPOSITIONS(queueId));
   }
 
+  useEffect(() => {
+    const unsubscribe = getQueueData();
+    return () => unsubscribe();
+  }, []);
+
   return (
     <main className="flex justify-center items-center gap-10">
       {
@@ -115,11 +140,11 @@ export default function QueuePage({ queueId, user }: any) {
             user={user}
             queue={queue!}
             deleteQueue={deleteQueue}
-            playerAlreadyInQueue={playerAlreadyInQueue}
             isQueueReadyToPlay={isQueueReadyToPlay}
             generateQueueCompositions={generateQueueCompositions}
             handleNavigateToComposition={handleNavigateToComposition}
             handleExitFromQueue={handleExitFromQueue}
+            handleUnlockUserToJoin={handleUnlockUserToJoin}
           />
         )}
     </main>

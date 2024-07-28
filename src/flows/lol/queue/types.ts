@@ -36,6 +36,7 @@ export interface QueueItem {
   teams: Teams;
   compositions: Array<Composition>;
   players: Array<Player>;
+  blackList?: Array<Player['username']>;
   protection: {
     enabled: boolean;
     code: string;

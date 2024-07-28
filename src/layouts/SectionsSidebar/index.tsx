@@ -21,7 +21,7 @@ const sections: SidebarSection[] = [
     title: 'Dead by Daylight',
     icon: '/assets/icons/dbd.svg',
     links: [
-      { text: 'Survive With COLEGAS', href: routeNames.MATCHES, disabled: true }
+      { text: 'SwCOLEGAS', href: routeNames.MATCHES, disabled: true }
     ]
   },
   {
@@ -35,8 +35,8 @@ const sections: SidebarSection[] = [
 export default function SectionsSidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
   return (
     <aside className={cn(
-      'bg-border h-full grid grid-rows-[1fr_auto] gap-8 transition-all duration-300 ease-in-out text-nowrap overflow-hidden',
-      isSidebarOpen ? 'w-[24%]' : 'w-0',
+      'bg-border/30 border-r-2 border-border/40 h-full grid grid-rows-[1fr_auto] gap-8 transition-all duration-300 ease-in-out text-nowrap overflow-hidden',
+      isSidebarOpen ? 'w-[380px]' : 'w-0',
     )}>
       <div className="overflow-y-scroll bg-red w-full h-full bg-blue pt-8 px-8">
         {sections.map(section => (

@@ -4,9 +4,9 @@ import { QueueItem } from "../../types"
 export type QueueLobbyProps = {
   user: UserDTO,
   queue: QueueItem,
-  playerAlreadyInQueue: boolean,
   isQueueReadyToPlay: boolean,
   handleExitFromQueue: (username: string) => void,
+  handleUnlockUserToJoin: (username: string) => void,
   deleteQueue: () => void,
   generateQueueCompositions: () => void,
   handleNavigateToComposition: () => void,
