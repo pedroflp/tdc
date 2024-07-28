@@ -32,14 +32,14 @@ export async function handleEnterQueue(queueId: string, user: UserDTO) {
   await updateDoc(doc(firestore, collections.USERS, user.username), {
     activeMatch: queueId
   });
-  
+
   await setDoc(queueRef, {
     ...queue,
     players: newPlayers
   });
 }
 
-export default function QueuePage({ queueId, user }: any) {
+export default function QueuePage({ queueId, user }: { queueId: string, user?: UserDTO }) {
   const router = useRouter();
   const [queue, setQueue] = useState<QueueItem>();
   const [isFetching, setIsFetching] = useState(true);
@@ -56,7 +56,7 @@ export default function QueuePage({ queueId, user }: any) {
 
       const queueData = queueDoc.data() as QueueItem;
 
-      if (!queueData.players.some(player => player.username === user.username)) {
+      if (user && !queueData.players.some(player => player.username === user.username)) {
         if (queueData.players.every(player => player.username)) return router.push(routeNames.QUEUES);
         if (queueData.blackList?.includes(user.username)) {
           await handleExitFromQueue(user?.username);
@@ -74,7 +74,7 @@ export default function QueuePage({ queueId, user }: any) {
   }
 
   async function deleteQueue() { 
-    if (!queue) return;
+    if (!queue || !user) return;
 
     await updateDoc(doc(firestore, collections.USERS, user.username), {
       activeMatch: null

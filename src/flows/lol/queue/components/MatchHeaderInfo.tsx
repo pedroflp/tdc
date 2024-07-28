@@ -14,12 +14,14 @@ export default function QueueHeader({
   onDeleteQueue,
   onExitQueue,
   handleUnlockUserToJoin
-}: { queue: QueueItem, user: UserDTO, onDeleteQueue: () => void, onExitQueue: (user: UserDTO["username"]) => void, handleUnlockUserToJoin: (user: UserDTO["username"]) => void }) {
+}: { queue: QueueItem, user?: UserDTO, onDeleteQueue: () => void, onExitQueue: (user: UserDTO["username"]) => void, handleUnlockUserToJoin: (user: UserDTO["username"]) => void }) {
+  if (!queue || !user) return null;
+  
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
         <h1 className='text-4xl font-bold '>Sala da {queue.name}</h1>
-        {user?.username === queue?.hoster?.username
+        {user.username === queue.hoster.username
           ? (
             <div className='flex gap-4'>
               {queue.blackList && queue.blackList.length > 0 &&
@@ -33,7 +35,7 @@ export default function QueueHeader({
                   <PopoverContent sideOffset={12} className='space-y-4 shadow-lg shadow-primary/5'>
                     <p className='text-xs'>Usuários bloqueados de entrar na sala e participar da partida:</p>
                     {queue.blackList.map((username) => (
-                      <div className='flex items-center gap-4 justify-between'>
+                      <div key={username} className='flex items-center gap-4 justify-between'>
                         <strong>{username}</strong>
                         <Button className='text-xs' onClick={() => handleUnlockUserToJoin(username)} variant="secondary">Desbloquear</Button>
                       </div>

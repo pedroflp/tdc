@@ -75,7 +75,7 @@ export default function MatchCreation({
                 src={MatchModesIcons[MatchModesEnum.CLASSIC]}
                 alt="Badge de experiência do modo clássico"
                 onClick={setSelectedMode}
-                description="Os jogadores serão aleatoriamente escolhidos para os times. Os jogadores do time vencedor ganharão pontuação pela vitória."
+                description="Os jogadores serão aleatoriamente escolhidos para os time e poderão jogar como preferir."
               />
               <MatchOptionCard
                 name={MatchModesNames[MatchModesEnum.HARDCORE]}
@@ -85,7 +85,7 @@ export default function MatchCreation({
                 alt="Troféu vitorioso do modo hardcore"
                 onClick={setSelectedMode}
                 disabled
-                description="Os jogadores serão aleatoriamente escolhidos para o time com a role predefinida. Os jogadores do time vencedor ganharão pontos pela vitória e desempenho individual."
+                description="Os jogadores serão aleatoriamente escolhidos para o time com a role já predefinida."
               />
             </div>
           </div>

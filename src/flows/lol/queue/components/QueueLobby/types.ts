@@ -2,7 +2,7 @@ import { UserDTO } from "@/app/api/user/types"
 import { QueueItem } from "../../types"
 
 export type QueueLobbyProps = {
-  user: UserDTO,
+  user?: UserDTO,
   queue: QueueItem,
   isQueueReadyToPlay: boolean,
   handleExitFromQueue: (username: string) => void,

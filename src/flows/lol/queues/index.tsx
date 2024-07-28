@@ -16,7 +16,7 @@ import EmptyState from "./components/EmptyState";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
 
-export default function QueuesPage({ user }: {user: UserDTO}) {
+export default function QueuesPage({ user }: {user?: UserDTO}) {
   const { push, refresh } = useRouter();
   const [availableQueues, setAvailableQueues] = useState<Array<QueueItem>>([]);
   const [fetchingQueues, setFetchingQueues] = useState(true); 
@@ -99,7 +99,6 @@ export default function QueuesPage({ user }: {user: UserDTO}) {
                     key={queue.id}
                     user={user}
                     queue={queue}
-                    disabledJoinByAuth={!user}
                     disabledJoinByStarted={!!queue.matchId}
                     disabledJoinByHasMatchActive={!!user?.activeMatch}
                     handleEnterQueue={handleEnterQueue}

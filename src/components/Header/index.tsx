@@ -1,18 +1,14 @@
 'use client'
 
-import { handleDiscordAuth, signIn } from '@/app/api/auth/signin/requests';
-import { routeNames } from '@/app/route.names';
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment } from 'react';
+import DiscordOAuth from '../DiscordOAuth';
 import { Button } from '../ui/button';
 import ProfileDropdown from './components/ProfileDropdown';
 import { HeaderProps } from './types';
-import { SignDialog } from './components/SignDialog';
-import DiscordOAuth from '../DiscordOAuth';
 
 export default function Header({ user, isSidebarOpen, toggleSidebar }: HeaderProps) {
   const params = useSearchParams();

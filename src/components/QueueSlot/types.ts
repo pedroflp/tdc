@@ -1,10 +1,10 @@
 import { UserDTO } from "@/app/api/user/types"
-import { QueueItem } from "@/flows/lol/queue/types"
+import { Player, QueueItem } from "@/flows/lol/queue/types"
 
 export type QueueSlotProps = {
-  player: UserDTO,
-  handleKickPlayer: (username: string) => void,
-  user: UserDTO,
-  queue: QueueItem
+  player?: Player,
+  handleKickPlayer?: (username: string) => void,
+  user?: UserDTO,
+  queue?: QueueItem
   className?: string,
 }

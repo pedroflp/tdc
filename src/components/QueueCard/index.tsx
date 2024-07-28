@@ -20,7 +20,6 @@ import { useRouter } from 'next/navigation'
 export default function QueueCard({
   queue,
   user,
-  disabledJoinByAuth,
   disabledJoinByStarted,
   disabledJoinByHasMatchActive,
   handleEnterQueue
@@ -33,6 +32,8 @@ export default function QueueCard({
   });
 
   const joinQueue = () => {
+    if (!user) return;
+
     if (queue.protection?.enabled && !queue.players.some(player => player?.username === user?.username)) {
       setProtectionInput({show: true, code: ""});
       return;
@@ -43,7 +44,7 @@ export default function QueueCard({
   }
 
   async function handleValidateProtectionCode() {
-    if (!protectionInput.code) return;
+    if (!protectionInput.code || !user) return;
 
     const response = await validateQueueProtectionCode(queue.id, protectionInput.code);
 
@@ -57,15 +58,13 @@ export default function QueueCard({
   }
 
   const QueueJoinButton = useCallback(({
-    disabledJoinByAuth,
     disabledJoinByStarted,
     disabledJoinByHasMatchActive,
     onClick
-  }: Pick<QueueCardProps, 'disabledJoinByAuth' | 'disabledJoinByStarted' | 'disabledJoinByHasMatchActive'> & {
+  }: Pick<QueueCardProps,  'disabledJoinByStarted' | 'disabledJoinByHasMatchActive'> & {
       onClick: () => void,
     }) => {
-    
-    if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
+    if (!user) return <Button disabled>Faça login para participar</Button>
     if (queue?.players.some((player: Player) => player?.username === user?.username)) return (
       <Link href={routeNames.QUEUE(queue.id)}>
         <Button>Voltar para a sala</Button>
@@ -117,25 +116,6 @@ export default function QueueCard({
           maxAvatarsAmount={10}
           avatars={queue.players.filter((player: Player) => !!player?.username)}
         />
-        {/* <div className="text-sm text-muted-foreground">
-          <div className="flex gap-1 items-center">
-            <p>Criada por</p>
-            <UserAvatarAndName canOpenProfileByAvatar size={8} name={{size: "text-sm", color: 'text-muted-foreground'}} user={queue.hoster} />
-          </div>
-          <p className='flex gap-1 items-center'>
-            Modo
-            <Image
-              src={MatchModesIcons[queue?.mode]}
-              width={1000}
-              height={1000}
-              objectFit='cover'
-              className='w-8 h-8'
-              alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
-            />
-            <strong>{MatchModesNames[queue.mode]}</strong>
-          </p>
-          <p>Iniciado em <strong>{formatDate(queue.createdAt)}</strong></p>
-        </div> */}
         <div className='flex flex-col gap-4 items-end 2xl:flex-row'>
           {queue.protection?.enabled && (
             <Badge className='bg-secondary/70 text-secondary-foreground/50 p-3 px-6'>
@@ -170,7 +150,6 @@ export default function QueueCard({
               </div>
             ) : (     
               <QueueJoinButton
-                disabledJoinByAuth={disabledJoinByAuth}
                 disabledJoinByStarted={disabledJoinByStarted}
                 disabledJoinByHasMatchActive={disabledJoinByHasMatchActive}
                 onClick={joinQueue}
@@ -182,7 +161,7 @@ export default function QueueCard({
             width={1000}
             height={1000}
             objectFit='cover'
-            className='absolute -top-6 -right-16 -rotate-12 w-64 h-64 z-0 blur-md opacity-20'
+            className='absolute -top-6 -right-20 -rotate-12 w-72 z-0 blur-md opacity-20'
             alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
           />
         </div>

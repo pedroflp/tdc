@@ -20,8 +20,9 @@ import Loading from './components/Loading';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
+import { UserDTO } from '@/app/api/user/types';
 
-export default function QueueCompositionPage({ queueId, user }: any) {
+export default function QueueCompositionPage({ queueId, user }: { queueId: string, user?: UserDTO }) {
   const router = useRouter();
 
   const [queue, setQueue] = useState<QueueItem>();
@@ -34,7 +35,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
     return () => unsubscribe();
   }, []);
 
-  if (!queue) return null;
+  if (!queue || !user) return null;
 
   if (!queue.players.some(player => player?.username === user?.username)) {
     router.push(routeNames.HOME);
@@ -58,12 +59,8 @@ export default function QueueCompositionPage({ queueId, user }: any) {
 
   async function handleSelectQueueCompositions(compositionId: string) {
     setIsSelectingQueueComposition(true);
-    await selectQueueCompositions(queue!.id, compositionId, user);
-
-    const timeout = setTimeout(() => {
-      setIsSelectingQueueComposition(false);
-      return () => clearTimeout(timeout)
-    }, 1000);
+    await selectQueueCompositions(queue!.id, compositionId, user!);
+    setIsSelectingQueueComposition(false);
   }
 
   async function handleStartMatch() {
@@ -150,7 +147,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                       <div className='space-y-4'>
                         <h1 className='text-2xl font-bold'>Time Azul</h1>
                         {blue.map((player: Player, index: number) => (
-                          <QueueSlot disabled key={index} player={player} />
+                          <QueueSlot key={index} player={player} />
                         ))}
                       </div>
                       <div className='flex items-center justify-center relative mx-8 overflow-hidden'>
@@ -166,7 +163,7 @@ export default function QueueCompositionPage({ queueId, user }: any) {
                       <div className='space-y-4'>
                         <h1 className='text-2xl font-bold text-right'>Time Vermelho</h1>
                         {red.map((player: Player, index: number) => (
-                          <QueueSlot disabled key={index} player={player} />
+                          <QueueSlot key={index} player={player} />
                         ))}
                       </div>
                     </div>
