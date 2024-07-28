@@ -6,11 +6,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { UserDTO } from "../../../user/types";
 import { handleRandomizeTeam } from "./utils";
 
+const QUEUE_COMPOSITIONS_QUANTITY = 4;
+const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 6;
+
 export async function POST(request: NextRequest) {
   const { queueId }: {queueId: string} = await request.json();
   if (!queueId) return NextResponse.error();
-
-  const QUEUE_COMPOSITIONS_QUANTITY = 4;
 
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
@@ -92,7 +93,7 @@ export async function PUT(request: NextRequest) {
 
     updateDoc(queueDocRef, {compositions})
 
-    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 1);
+    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY);
     if (!!compositionSelectedToBeTeam) { 
       updateDoc(queueDocRef, {
         compositions,
