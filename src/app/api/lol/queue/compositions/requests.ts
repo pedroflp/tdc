@@ -23,7 +23,7 @@ export async function selectQueueCompositions(queueId: string, compositionId: st
       method: 'PUT',
       body: JSON.stringify({
         queueId,
-        compositionId: `${queueId}-${compositionId}`,
+        compositionId,
         user,
       })
     });

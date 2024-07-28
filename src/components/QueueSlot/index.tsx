@@ -6,8 +6,6 @@ import { Card } from '../ui/card'
 import { QueueSlotProps } from './types'
 
 export default function QueueSlot({ player, handleKickPlayer, className, user, queue }: QueueSlotProps) {
-  if (!user) return null
-
   if (!player?.username) return (
     <Card className='grid place-items-center w-50 h-40 border-dashed border-2'>
       <User className='text-slate-800' />
@@ -21,7 +19,7 @@ export default function QueueSlot({ player, handleKickPlayer, className, user, q
         className,
       )}>
         <Avatar className={cn(
-          player.username === user.username && 'ring ring-primary',
+          player.username === user?.username && 'ring ring-primary',
         )} size={16} image={player?.avatar} fallback={String(player?.name).slice(0, 2)} />
         <p className={cn(
           'text-md text-primary/60',

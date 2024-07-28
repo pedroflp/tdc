@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
   const { queueId }: {queueId: string} = await request.json();
   if (!queueId) return NextResponse.error();
 
+  const QUEUE_COMPOSITIONS_QUANTITY = 4;
+
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
     const queueDoc = await getDoc(queueDocRef);
@@ -18,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const queueData = queueDoc.data() as QueueItem;
 
-    const compositions = new Array(5).fill(null).map(() => handleRandomizeTeam(queueData.players));
+    const compositions = new Array(QUEUE_COMPOSITIONS_QUANTITY).fill(null).map(() => handleRandomizeTeam(queueData.players));
 
     updateDoc(queueDocRef, {
       compositions: compositions.map((composition, index) => ({
@@ -90,7 +92,7 @@ export async function PUT(request: NextRequest) {
 
     updateDoc(queueDocRef, {compositions})
 
-    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 6);
+    const compositionSelectedToBeTeam = compositions?.find(composition => composition.votes.length >= 1);
     if (!!compositionSelectedToBeTeam) { 
       updateDoc(queueDocRef, {
         compositions,

@@ -2,7 +2,6 @@ import QueueSlot from '@/components/QueueSlot'
 import { Button } from '@/components/ui/button'
 import QueueHeader from '../MatchHeaderInfo'
 import { QueueLobbyProps } from './types'
-import { Player } from '../../types'
 
 export default function QueueLobby({
   queue,
@@ -41,7 +40,7 @@ export default function QueueLobby({
           user?.username === queue?.hoster?.username &&
             <Button
               onClick={generateQueueCompositions}
-              disabled={!isQueueReadyToPlay}
+              // disabled={!isQueueReadyToPlay}
               className='min-w-60 px-10 h-20 mt-6'>
               {!isQueueReadyToPlay
                 ? `Aguardando todos os jogadores preencherem os slots`

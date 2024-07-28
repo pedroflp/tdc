@@ -56,7 +56,7 @@ export default function QueueHeader({
         }
       </div>
 
-      <p className='text-muted-foreground/50'>Selecione um slot para entrar no lobby de espera e participar da composição de time e formação da partida!</p>
+      <p className='text-muted-foreground/50'>Aguardando novos jogadores preencherem as vagas da disputa para ser possível iniciar a competição.</p>
     </div>
   )
 }
