@@ -5,7 +5,7 @@ import { AvatarStack } from "@/components/Avatar/avatar-stack";
 import UserAvatarAndName from "@/components/UserAvatarAndName";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MatchModesIcons, MatchModesEnum, MatchModesNames } from "@/flows/home/components/MatchOptionCard/types";
+import { MatchModesIcons, MatchModesEnum, MatchModesNames } from "@/flows/lol/queues/components/MatchOptionCard/types";
 import { MatchItem } from "@/flows/lol/queue/types";
 import { formatDate } from "@/utils/formatDate";
 import { match } from "assert";

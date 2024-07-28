@@ -2,40 +2,44 @@
 
 import { createQueueCompositions } from '@/app/api/lol/queue/compositions/requests';
 import { routeNames } from '@/app/route.names';
-import { collections, remoteConfigs } from '@/services/constants';
+import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
-import { remoteConfig } from '@/services/remoteConfig';
 import { deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
-import { getValue } from 'firebase/remote-config';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import Loading from './components/Loading';
 import QueueLobby from './components/QueueLobby';
-import { MatchTeamsEnum, Player, QueueItem } from './types';
+import { QueueItem } from './types';
 import { UserDTO } from '@/app/api/user/types';
+
+export async function handleEnterQueue(queueId: string, user: UserDTO) {
+  if (!queueId) return;
+
+  const queueRef = doc(firestore, collections.QUEUES, queueId)
+  const queueDoc = await getDoc(queueRef);
+  const queue = queueDoc.data() as QueueItem;
+
+  const newPlayers = queue.players; 
+  const indexToAddPlayer = newPlayers.findIndex(player => !player.username);
+
+  newPlayers[indexToAddPlayer] =  {
+    username: user.username,
+    avatar: user.avatar,
+    name: user.name
+  }
+
+  setDoc(queueRef, {
+    ...queue,
+    players: newPlayers
+  })
+}
 
 export default function QueuePage({ queueId, user }: any) {
   const router = useRouter();
   const [queue, setQueue] = useState<QueueItem>();
   const [isFetching, setIsFetching] = useState(true);
 
-  if (!user) router.push(routeNames.HOME)
-  
-  async function joinQueue(slot: number) {
-    if (!queue) return;
-
-    const newPlayers = queue.players;
-    newPlayers[slot] = {
-      username: user.username,
-      avatar: user.avatar,
-      name: user.name
-    }
-
-    setDoc(doc(firestore, collections.QUEUES, queueId), {
-      ...queue,
-      players: newPlayers
-    })
-  }
+  if (!user) router.push(routeNames.QUEUES);
 
   async function deleteQueue() { 
     if (!queue) return;
@@ -43,11 +47,10 @@ export default function QueuePage({ queueId, user }: any) {
     await deleteDoc(doc(firestore, collections.QUEUES, queue.id));
   }
 
-  async function handleRemoveFromQueue(position: number) {
+  async function handleExitFromQueue(username: string) {
     if (!queue) return;
-    const newPlayers = queue.players;
-    newPlayers[position] = null as unknown as UserDTO;
 
+    const newPlayers = queue.players.map(player => player?.username === username ? {} : player);
     updateDoc(doc(firestore, collections.QUEUES, queueId), {
       players: newPlayers
     });
@@ -63,6 +66,10 @@ export default function QueuePage({ queueId, user }: any) {
       };
       const queueData = queueDoc.data() as QueueItem;
 
+      if (!queueData.players.some(player => player?.username === user?.username)) {
+        if (queueData.players.every(player => player?.username)) return router.push(routeNames.QUEUES);
+        handleEnterQueue(queueId, user);
+      }
       if (queueData?.matchId) return router.push(routeNames.MATCH(queueData?.matchId));
       if (queueData?.compositions?.length > 0) return router.push(routeNames.QUEUE_COMPOSITIONS(queueData.id));
 
@@ -112,8 +119,7 @@ export default function QueuePage({ queueId, user }: any) {
             isQueueReadyToPlay={isQueueReadyToPlay}
             generateQueueCompositions={generateQueueCompositions}
             handleNavigateToComposition={handleNavigateToComposition}
-            joinQueue={joinQueue}
-            handleRemove={handleRemoveFromQueue}
+            handleExitFromQueue={handleExitFromQueue}
           />
         )}
     </main>

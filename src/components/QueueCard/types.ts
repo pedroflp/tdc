@@ -6,5 +6,5 @@ export type QueueCardProps = {
   user: UserDTO,
   disabledJoinByAuth: boolean,
   disabledJoinByStarted: boolean,
-  handleEnterQueue: (queueId: string) => void,
+  handleEnterQueue: (queueId: string, user: UserDTO) => void,
 }

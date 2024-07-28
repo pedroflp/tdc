@@ -13,18 +13,7 @@ export async function GET(request: Request) {
   const token = request.headers.get(cookiesKeys.TOKEN);
   if (!token) return NextResponse.json({ error: true }, { status: 400 });
 
-  const isTokenJwt = token.split('.').length === 3;
-  let username = null;
-  
-  if (isTokenJwt) {
-    const user = getUserFromToken(token);
-    username = parseEmailToUsername(user.email);
-  } else {
-    const { username: discordUsername } = await discordAuth.getUser(token);
-    username = discordUsername;
-  }
-
-
+ const { username } = await discordAuth.getUser(token);
 
   try {
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));

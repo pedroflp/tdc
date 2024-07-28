@@ -3,35 +3,28 @@ import { Button } from '../ui/button'
 import Avatar from '../Avatar'
 import { LogOut, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { QueueSlotProps } from './types'
 
-export default function QueueSlot({ player, onClick, onRemove, disabled, className, user, queue, canExitOrCick }: any) {
+export default function QueueSlot({ player, disabled, handleKickPlayer, className, user, queue }: QueueSlotProps) {
   if (!player?.username) return (
-    <Button disabled={disabled} onClick={onClick} className='min-w-60 w-full h-20' variant={disabled ? "secondary" : "outline"}>
+    <Button disabled={disabled} className='w-50 h-40' variant={disabled ? "secondary" : "outline"}>
       <Plus className='text-slate-400' />
     </Button>
   )
 
   return (
-    <div className='relative'>
+    <div className='w-50 h-40 relative'>
       <Button className={cn(
-        'min-w-60 w-full h-20 pointer-events-none space-x-2 relative',
+        'w-full h-full flex flex-col gap-4 pointer-events-none space-x-2 relative',
         className,
       )} variant="outline">
-        <Avatar image={player?.avatar} fallback={String(player?.name).slice(0, 2)} />
-        <p className='text-lg font-bold'>{player?.name}</p>
+        <Avatar size={16} image={player?.avatar} fallback={String(player?.name).slice(0, 2)} />
+        <p className='text-md font-bold'>{player?.name}</p>
       </Button>
-      {(
-        canExitOrCick &&
-        (user?.username === queue?.hoster?.username && user?.username !== player?.username) ||
-        (user?.username !== queue?.hoster?.username && user?.username === player?.username)
-      ) && (
-        <Button onClick={onRemove} variant="destructive" className='absolute top-[25%] right-4 text-xs'>{
-          user?.username === player?.username ? (
-            <span className='flex items-center gap-2'><LogOut size={14} /></span>
-          ) : (
-            <span className='flex items-center gap-1'><X size={14} /></span>
-          )
-        }</Button>
+      {(user?.username === queue?.hoster?.username && user?.username !== player?.username) && (
+        <Button onClick={() =>handleKickPlayer(player.username)} variant="destructive" className='p-2 absolute top-2 right-2 text-xs'>
+          <span className='flex items-center gap-1'>Expulsar</span>
+        </Button>
       )}
     </div>
   )

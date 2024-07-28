@@ -3,6 +3,7 @@ const subRouteFrom = (route: string, subRoute: string) => `/${route}/${subRoute}
 export const routeNames = {
   HOME: '/',
   VIDEOS: '/videos',
+  QUEUES: subRouteFrom('lol', 'queues'),
   QUEUE: (queueId: string) => subRouteFrom('lol', `queue/${queueId}`),
   QUEUE_COMPOSITIONS: (queueId: string) => subRouteFrom('lol', `queue/${queueId}/compositions`),
   PROFILE: (username: string) => subRouteFrom('user', `${username}`),

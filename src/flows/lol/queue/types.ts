@@ -1,5 +1,5 @@
 import { UserDTO } from "@/app/api/user/types";
-import { MatchModesEnum } from "../../home/components/MatchOptionCard/types";
+import { MatchModesEnum } from "../queues/components/MatchOptionCard/types";
 import { HonorPlayerDTO } from "@/app/api/lol/match/honor/types";
 
 export type Player = Pick<UserDTO, "name" | "avatar" | "username">

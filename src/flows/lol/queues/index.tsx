@@ -9,13 +9,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { QueueItem } from "@/flows/lol/queue/types";
 import { collections } from "@/services/constants";
 import { firestore } from "@/services/firebase";
-import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
+import EmptyState from "./components/EmptyState";
+import { handleEnterQueue } from "../queue";
 
-export default function HomePage({ user }: any) {
+export default function QueuesPage({ user }: any) {
   const { push } = useRouter();
   const [availableQueues, setAvailableQueues] = useState<Array<QueueItem>>([]);
   const [fetchingQueues, setFetchingQueues] = useState(true); 
@@ -31,10 +33,6 @@ export default function HomePage({ user }: any) {
     }
     
     push(routeNames.QUEUE(response?.queueId));
-  }
-
-  async function handleEnterQueue(queueId: string) {
-    push(routeNames.QUEUE(queueId));
   }
 
   async function getUserActiveMatch(queues: Array<QueueItem>) {
@@ -66,7 +64,7 @@ export default function HomePage({ user }: any) {
       setAvailableQueues(queues);
       setFetchingQueues(false);
 
-      // if (user) getUserActiveMatch(queues);
+      if (user) getUserActiveMatch(queues);
     });
   }
 
@@ -106,17 +104,7 @@ export default function HomePage({ user }: any) {
                   />
                 ))
               ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-xl text-primary/70">Nenhuma sala encontrada!</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-primary/50">
-                        Não foi possível encontrar nenhuma sala disponível.
-                        <strong> Crie uma nova sala para abrir a fila e iniciar novas partidas!</strong>
-                      </CardDescription>
-                  </CardContent>
-                </Card>
+               <EmptyState />
               )
           )}
         </div>

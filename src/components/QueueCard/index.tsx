@@ -1,6 +1,6 @@
 import { validateQueueProtectionCode } from '@/app/api/lol/queue/requests'
 import { routeNames } from '@/app/route.names'
-import { MatchModesIcons, MatchModesNames } from '@/flows/home/components/MatchOptionCard/types'
+import { MatchModesIcons, MatchModesNames } from '@/flows/lol/queues/components/MatchOptionCard/types'
 import { Player } from '@/flows/lol/queue/types'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
@@ -35,7 +35,7 @@ export default function QueueCard({
       return;
     }
 
-    handleEnterQueue(queue.id);
+    handleEnterQueue(queue.id, user);
   }
 
   async function handleValidateProtectionCode() {
@@ -48,7 +48,7 @@ export default function QueueCard({
       return
     }
 
-    handleEnterQueue(queue.id);
+    handleEnterQueue(queue.id, user);
   }
 
   const QueueBadgeStatus = useCallback(({matchId}: {matchId: string}) => {
@@ -62,15 +62,20 @@ export default function QueueCard({
     onClick
   }: Pick<QueueCardProps, 'disabledJoinByAuth' | 'disabledJoinByStarted'> & {
       onClick: () => void,
-  }) => {
+    }) => {
+    
     if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
-    if (queue?.players.find((player: Player) => player?.username === user?.username)) return <Button variant="secondary" onClick={onClick}>Voltar para a sala</Button>
-    if (disabledJoinByStarted) return (
-      <Link href={routeNames.MATCH(queue?.matchId)}>
-        <Button asChild>Visualizar essa partida</Button>
+    if (queue?.players.some((player: Player) => player?.username === user?.username)) return (
+      <Link href={routeNames.QUEUE(queue.id)}>
+        <Button>Voltar para a sala</Button>
       </Link>
     )
-    return <Button onClick={onClick}>Entrar na sala da partida</Button>;
+    if (disabledJoinByStarted) return (
+      <Link href={routeNames.MATCH(queue?.matchId)}>
+        <Button>Visualizar essa partida</Button>
+      </Link>
+    )
+    return <Button onClick={onClick}>Participar e entrar na sala</Button>;
   }, [user, queue]);
 
   return (
@@ -81,13 +86,17 @@ export default function QueueCard({
             <CardTitle className='text-2xl'>{queue.name}</CardTitle>
             <div className='flex items-center gap-2'>
               <QueueBadgeStatus matchId={queue.matchId} />
-              {queue.players.find((player: Player) => player?.username === user?.username) && (
-                <Badge className='bg-emerald-400 text-slate-800'>Você está na sala!</Badge>
-              )}
             </div>
           </div>
         </div>
-      <AvatarStack canOpenProfileByAvatar spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player?.username)} />
+        <AvatarStack
+          highlightUser={user?.username}
+          canOpenProfileByAvatar
+          spacing="xl"
+          id="avatar-stack"
+          maxAvatarsAmount={10}
+          avatars={queue.players.filter((player: Player) => !!player?.username)}
+        />
       </CardHeader>
       <CardContent className="flex justify-between items-end gap-4">
         <div className="text-sm text-muted-foreground">

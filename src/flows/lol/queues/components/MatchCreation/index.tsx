@@ -7,13 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp';
+import { Plus } from 'lucide-react';
 
 export default function MatchCreation({
   creatingQueue,
   onCreateMatch
 }: { creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum, protectMode: { enabled: boolean, code: string }) => void }) {
   const [name, setName] = useState("");
-  const [selectedMode, setSelectedMode] = useState<MatchModesEnum>();
+  const [selectedMode, setSelectedMode] = useState<MatchModesEnum>(MatchModesEnum.CLASSIC);
   const [protectMode, setProtectMode] = useState({
     enabled: false,
     code: ""
@@ -24,13 +25,13 @@ export default function MatchCreation({
   }, [name]);
   
   function handleCreateMatch() {
-    onCreateMatch(matchName, selectedMode!, protectMode);
+    onCreateMatch(matchName, selectedMode, protectMode);
   };
 
   const { canCreateQueue, createQueueAlert } = useMemo(() => {
     if (creatingQueue) return {
       canCreateQueue: false,
-      createQueueAlert: "Criando a sala..."
+      createQueueAlert: "Criando sala..."
     }
 
     if (protectMode.enabled && protectMode.code.length !== 6) return {
@@ -52,11 +53,14 @@ export default function MatchCreation({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Criar nova sala</Button>
+        <Button className='gap-1 py-6 text-md'>
+          <Plus />
+          Criar sala
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className='text-2xl'>Criar nova sala</DialogTitle>
+          <DialogTitle className='text-2xl'>Criar sala</DialogTitle>
         </DialogHeader>
         <DialogDescription>Aqui você manda na competição. Defina o modo de jogo da sua sala e chame os amigos para competir!</DialogDescription>
         <div className='space-y-4'>

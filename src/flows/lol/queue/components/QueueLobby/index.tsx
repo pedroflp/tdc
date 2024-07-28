@@ -11,25 +11,27 @@ export default function QueueLobby({
   playerAlreadyInQueue,
   isQueueReadyToPlay,
   generateQueueCompositions,
-  joinQueue,
-  handleRemove,
+  handleExitFromQueue,
   handleNavigateToComposition
 }: QueueLobbyProps) {
   return (
-    <div className='w-full max-w-[60%]'>
-      <div className='flex flex-col gap-8'>
-        <QueueHeader queue={queue!} user={user} onDeleteQueue={deleteQueue} />
-        <div className='grid grid-cols-2 grid-rows-5 gap-6'>
+    <div className='w-full xl:max-w-[70%]'>
+      <div className='flex flex-col gap-12'>
+        <QueueHeader
+          queue={queue!}
+          user={user}
+          onDeleteQueue={deleteQueue}
+          onExitQueue={handleExitFromQueue}
+        />
+        <div className='grid grid-cols-5 grid-rows-2 gap-4'>
           {queue?.players.map((player: any, index: number) => (
             <QueueSlot
               key={index}
               disabled={playerAlreadyInQueue}
-              onRemove={() => handleRemove(index)}
-              onClick={() => joinQueue(index)}
+              handleKickPlayer={handleExitFromQueue}
               player={player}
               user={user}
               queue={queue}
-              canExitOrCick
             />
           ))}
         </div>

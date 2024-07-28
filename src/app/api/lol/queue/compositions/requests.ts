@@ -1,6 +1,6 @@
 import { fetchLOLApi } from "@/services/api/fetchLOLApi";
 import { StartQueueResponseDTO } from "../types";
-import { MatchModesEnum } from "@/flows/home/components/MatchOptionCard/types";
+import { MatchModesEnum } from "@/flows/lol/queues/components/MatchOptionCard/types";
 import { UserDTO } from "../../../user/types";
 
 export async function createQueueCompositions(queueId: string): Promise<StartQueueResponseDTO> {
