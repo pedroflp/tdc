@@ -22,20 +22,20 @@ export async function POST(request: NextRequest) {
 
   const queryIfUserIdAlreadyExistsInOtherUsername = query(collection(firestore, collections.USERS), where("id", "==", id));
   const queryUser = (await getDocs(queryIfUserIdAlreadyExistsInOtherUsername)).docs[0];
+  
+  if (queryUser) {
+    const queryUserData = queryUser.data() as UserDTO;
 
-  if (!queryUser.exists()) {
+    if (queryUserData.username !== discordUsername) {
+      await setDoc(doc(firestore, collections.USERS, discordUsername), {
+        ...queryUserData,
+        username: discordUsername
+      })
+  
+      await deleteDoc(doc(firestore, collections.USERS, queryUserData.username));
+    }
+  } else {
     await signUp({ avatar, email, id, username: discordUsername });
-  }
-
-  const queryUserData = queryUser.data() as UserDTO;
-
-  if (queryUserData.username !== discordUsername) {
-    await setDoc(doc(firestore, collections.USERS, discordUsername), {
-      ...queryUserData,
-      username: discordUsername
-    })
-
-    await deleteDoc(doc(firestore, collections.USERS, queryUserData.username));
   }
 
   cookies().set(cookiesKeys.TOKEN, accessToken, { expires: new Date().setSeconds(expires) });

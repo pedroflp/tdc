@@ -11,7 +11,8 @@ export async function getUserDataByToken(): Promise<UserDTO | null> {
   const isInvalidToken = token.value.split("").includes(".");
   
   if (isInvalidToken) {
-    return await signOut();
+    await signOut();
+    return null;
   }
 
   const response = await fetchApi('user', {
