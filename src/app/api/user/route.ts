@@ -5,22 +5,12 @@ import { firestore } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import { signOut } from "../auth/signout/requests";
-import { getUserDataByToken } from "./requests";
-import { getUserFromToken } from "@/utils/getUsernameFromToken";
-import { parseEmailToUsername } from "@/utils/parseUsername";
 
 export async function GET(request: Request) {
   const token = request.headers.get(cookiesKeys.TOKEN);
   if (!token) return NextResponse.json({ error: true }, { status: 400 });
 
-  const isInvalidToken = token.split("").includes(".");
-  
-  if (isInvalidToken) {
-    await signOut();
-    return NextResponse.json(null);
-  }
-
-  const { username} = await discordAuth.getUser(token);
+  const { username } = await discordAuth.getUser(token);
 
   try {
     const userDoc = await getDoc(doc(firestore, collections.USERS, username));
