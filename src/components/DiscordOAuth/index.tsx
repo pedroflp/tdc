@@ -16,7 +16,7 @@ export default function DiscordOAuth({
   async function onSignIn(authCode: string) {
     const auth = await signIn(authCode);
 
-    if (!auth?.success) {
+    if (auth && !auth.success) {
       window.location.assign('/');
       return;  
     }
