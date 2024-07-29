@@ -2,34 +2,35 @@ import QueueSlot from '@/components/QueueSlot'
 import { Button } from '@/components/ui/button'
 import QueueHeader from '../MatchHeaderInfo'
 import { QueueLobbyProps } from './types'
-import { Player } from '../../types'
 
 export default function QueueLobby({
   queue,
   user,
   deleteQueue,
-  playerAlreadyInQueue,
   isQueueReadyToPlay,
   generateQueueCompositions,
-  joinQueue,
-  handleRemove,
-  handleNavigateToComposition
+  handleExitFromQueue,
+  handleNavigateToComposition,
+  handleUnlockUserToJoin
 }: QueueLobbyProps) {
   return (
-    <div className='w-full max-w-[60%]'>
-      <div className='flex flex-col gap-8'>
-        <QueueHeader queue={queue!} user={user} onDeleteQueue={deleteQueue} />
-        <div className='grid grid-cols-2 grid-rows-5 gap-6'>
+    <div className='w-full xl:max-w-[70%]'>
+      <div className='flex flex-col gap-12'>
+        <QueueHeader
+          queue={queue!}
+          user={user}
+          onDeleteQueue={deleteQueue}
+          onExitQueue={handleExitFromQueue}
+          handleUnlockUserToJoin={handleUnlockUserToJoin}
+        />
+        <div className='grid grid-cols-5 grid-rows-2 gap-4'>
           {queue?.players.map((player: any, index: number) => (
             <QueueSlot
               key={index}
-              disabled={playerAlreadyInQueue}
-              onRemove={() => handleRemove(index)}
-              onClick={() => joinQueue(index)}
+              handleKickPlayer={handleExitFromQueue}
               player={player}
               user={user}
               queue={queue}
-              canExitOrCick
             />
           ))}
         </div>

@@ -3,8 +3,8 @@ import { QueueItem } from "@/flows/lol/queue/types"
 
 export type QueueCardProps = {
   queue: QueueItem,
-  user: UserDTO,
-  disabledJoinByAuth: boolean,
+  user?: UserDTO,
   disabledJoinByStarted: boolean,
-  handleEnterQueue: (queueId: string) => void,
+  disabledJoinByHasMatchActive: boolean,
+  handleEnterQueue: (queueId: string, user: UserDTO) => void,
 }

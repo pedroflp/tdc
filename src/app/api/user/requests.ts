@@ -2,17 +2,24 @@ import { cookiesKeys } from "@/constants/cookies";
 import { fetchApi } from "@/services/api/fetchApi";
 import { cookies } from "next/headers";
 import { UserDTO } from "./types";
+import { signOut } from "../auth/signout/requests";
 
-export async function getUserDataByToken(options?: RequestInit): Promise<UserDTO | null> {
+export async function getUserDataByToken(): Promise<UserDTO | null> {
   const token = cookies().get(cookiesKeys.TOKEN);
   if (!token) return null;
+
+  const isInvalidToken = token.value.split("").includes(".");
+  
+  if (isInvalidToken) {
+    await signOut();
+    return null;
+  }
 
   const response = await fetchApi('user', {
     method: 'GET',
     headers: {
       [cookiesKeys.TOKEN]: token.value
     },
-    ...options,
   });
 
   const data = await response.json();

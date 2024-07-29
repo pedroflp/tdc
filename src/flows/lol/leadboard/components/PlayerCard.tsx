@@ -53,6 +53,8 @@ export default function PlayerCard({ player, variant, position, className }: {
   className?: string
 }) {
   const { push } = useRouter();
+  if (!player) return null;
+
   return (
     <Card className={cn(
       cardVariants({ variant, className }),

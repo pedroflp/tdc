@@ -9,5 +9,7 @@ namespace NodeJS {
     NEXT_PUBLIC_appId: string;
     NEXT_PUBLIC_apiBaseUrl: string;
     NEXT_PUBLIC_discordWebhook: string;
+    NEXT_PUBLIC_discordAuthClientId: string;
+    NEXT_PUBLIC_discordAuthClientSecret: string;
   }
 }

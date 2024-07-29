@@ -1,37 +1,37 @@
-import React from 'react'
-import { Button } from '../ui/button'
-import Avatar from '../Avatar'
-import { LogOut, Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { User, X } from 'lucide-react'
+import Avatar from '../Avatar'
+import { Button } from '../ui/button'
+import { Card } from '../ui/card'
+import { QueueSlotProps } from './types'
 
-export default function QueueSlot({ player, onClick, onRemove, disabled, className, user, queue, canExitOrCick }: any) {
+export default function QueueSlot({ player, handleKickPlayer, className, user, queue }: QueueSlotProps) {
   if (!player?.username) return (
-    <Button disabled={disabled} onClick={onClick} className='min-w-60 w-full h-20' variant={disabled ? "secondary" : "outline"}>
-      <Plus className='text-slate-400' />
-    </Button>
+    <Card className='grid place-items-center w-50 h-40 border-dashed border-2'>
+      <User className='text-slate-800' />
+    </Card>
   )
 
   return (
-    <div className='relative'>
-      <Button className={cn(
-        'min-w-60 w-full h-20 pointer-events-none space-x-2 relative',
+    <div className='w-50 h-40 relative'>
+      <Card className={cn(
+        'bg-border/40 grid place-items-center w-full h-full pointer-events-none relative border-2',
         className,
-      )} variant="outline">
-        <Avatar image={player?.avatar} fallback={String(player?.name).slice(0, 2)} />
-        <p className='text-lg font-bold'>{player?.name}</p>
-      </Button>
-      {(
-        canExitOrCick &&
-        (user?.username === queue?.hoster?.username && user?.username !== player?.username) ||
-        (user?.username !== queue?.hoster?.username && user?.username === player?.username)
-      ) && (
-        <Button onClick={onRemove} variant="destructive" className='absolute top-[25%] right-4 text-xs'>{
-          user?.username === player?.username ? (
-            <span className='flex items-center gap-2'><LogOut size={14} /></span>
-          ) : (
-            <span className='flex items-center gap-1'><X size={14} /></span>
-          )
-        }</Button>
+      )}>
+        <Avatar className={cn(
+          player.username === user?.username && 'ring ring-primary',
+        )} size={16} image={player?.avatar} fallback={String(player?.name).slice(0, 2)} />
+        <p className={cn(
+          'text-md text-primary/60',
+          player.username === queue?.hoster.username && 'text-primary font-bold',
+        )}>
+          {player.username}
+        </p>
+      </Card>
+      {(user?.username === queue?.hoster?.username && user?.username !== player?.username) && (
+        <Button onClick={() => handleKickPlayer?.(player.username)} variant="destructive" className='p-2 absolute top-2 right-2 text-xs'>
+          <span className='flex items-center gap-1'><X /></span>
+        </Button>
       )}
     </div>
   )

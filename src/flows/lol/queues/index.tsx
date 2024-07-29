@@ -4,7 +4,6 @@ import { startQueue } from "@/app/api/lol/queue/requests";
 import { UserDTO } from "@/app/api/user/types";
 import { routeNames } from "@/app/route.names";
 import QueueCard from "@/components/QueueCard";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QueueItem } from "@/flows/lol/queue/types";
 import { collections } from "@/services/constants";
@@ -12,11 +11,13 @@ import { firestore } from "@/services/firebase";
 import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { handleEnterQueue } from "../queue";
+import EmptyState from "./components/EmptyState";
 import MatchCreation from "./components/MatchCreation";
 import { MatchModesEnum } from "./components/MatchOptionCard/types";
 
-export default function HomePage({ user }: any) {
-  const { push } = useRouter();
+export default function QueuesPage({ user }: {user?: UserDTO}) {
+  const { push, refresh } = useRouter();
   const [availableQueues, setAvailableQueues] = useState<Array<QueueItem>>([]);
   const [fetchingQueues, setFetchingQueues] = useState(true); 
   const [creatingQueue, setCreatingQueue] = useState(false);
@@ -31,16 +32,15 @@ export default function HomePage({ user }: any) {
     }
     
     push(routeNames.QUEUE(response?.queueId));
+    refresh();
   }
 
-  async function handleEnterQueue(queueId: string) {
-    push(routeNames.QUEUE(queueId));
-  }
+  async function getUserActiveMatch(queues: Array<QueueItem>) {
+    if (!user) return;
+    
+    const document = await getDoc(doc(firestore, collections.USERS, user.username));
 
-  function getUserActiveMatch(queues: Array<QueueItem>) {
-    getDoc(doc(firestore, collections.USERS, user.username))
-    .then(async document => {
-      if (!document.exists()) return;
+    if (!document.exists()) return;
       const userData = document.data() as UserDTO;
       const userActiveMatch = userData.activeMatch;
 
@@ -54,7 +54,6 @@ export default function HomePage({ user }: any) {
           return push(routeNames.QUEUE(userActiveMatch))
         }
       }
-    });
   }
 
   function getAvailableQueues() {
@@ -65,7 +64,7 @@ export default function HomePage({ user }: any) {
       setAvailableQueues(queues);
       setFetchingQueues(false);
 
-      if (user) getUserActiveMatch(queues);
+      // if (user) getUserActiveMatch(queues);
     });
   }
 
@@ -83,6 +82,7 @@ export default function HomePage({ user }: any) {
             <MatchCreation
               creatingQueue={creatingQueue}
               onCreateMatch={handleCreateMatch}
+              disableCreation={!!user.activeMatch}
             />
           ) : null}
         </div>
@@ -99,23 +99,13 @@ export default function HomePage({ user }: any) {
                     key={queue.id}
                     user={user}
                     queue={queue}
-                    disabledJoinByAuth={!user}
                     disabledJoinByStarted={!!queue.matchId}
+                    disabledJoinByHasMatchActive={!!user?.activeMatch}
                     handleEnterQueue={handleEnterQueue}
                   />
                 ))
               ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-xl text-primary/70">Nenhuma sala encontrada!</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-primary/50">
-                        Não foi possível encontrar nenhuma sala disponível.
-                        <strong> Crie uma nova sala para abrir a fila e iniciar novas partidas!</strong>
-                      </CardDescription>
-                  </CardContent>
-                </Card>
+               <EmptyState />
               )
           )}
         </div>

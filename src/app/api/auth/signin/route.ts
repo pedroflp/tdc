@@ -1,37 +1,45 @@
 import { cookiesKeys } from "@/constants/cookies";
 import { collections } from "@/services/constants";
-import { auth, firestore } from "@/services/firebase";
-import { parseEmailToUsername, parseUsernameToEmail } from "@/utils/parseUsername";
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import discordAuth from "@/services/discord";
+import { firestore } from "@/services/firebase";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where,  } from "firebase/firestore";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { SignInErrors, signInErrorsMessages } from "./types";
+import { signUp } from "../signup/requests";
+import { UserDTO } from "../../user/types";
+import { signOut } from "../signout/requests";
 
 export async function POST(request: NextRequest) {
-  try {
-    const body: { username: string, password: string } = await request.json();
-    const email = parseUsernameToEmail(body.username);
-    
-    const response = await signInWithEmailAndPassword(auth, email, body.password);
+  const { accessToken, expires, refreshToken } = await request.json();
 
-    if (!response?.user?.email) return;
-
-    const { token } = await response.user.getIdTokenResult();
-    cookies().set(cookiesKeys.TOKEN, token, {
-      expires: new Date().setDate(new Date().getDate() + 24), // 24 days
-    });
-
-    return NextResponse.json({
-      success: true,
-      token,
-      userId: response.user.uid
-    })
-  } catch (err) {
-    const error = err as { code: SignInErrors };
-    return NextResponse.json(
-      { success: false, error: signInErrorsMessages[error.code] },
-      { status: 400 }
-    );
+  const isInvalidToken = accessToken.split("").includes(".");
+  if (isInvalidToken) {
+    await signOut();
+    return NextResponse.json({ success: false, message: "Token inválido!" });
   }
+
+  const { id, avatar, username: discordUsername, email } = await discordAuth.getUser(accessToken);
+
+  const queryIfUserIdAlreadyExistsInOtherUsername = query(collection(firestore, collections.USERS), where("id", "==", id));
+  const queryUser = (await getDocs(queryIfUserIdAlreadyExistsInOtherUsername)).docs[0];
+  
+  if (queryUser) {
+    const queryUserData = queryUser.data() as UserDTO;
+
+    if (queryUserData.username !== discordUsername) {
+      await setDoc(doc(firestore, collections.USERS, discordUsername), {
+        ...queryUserData,
+        username: discordUsername
+      })
+  
+      await deleteDoc(doc(firestore, collections.USERS, queryUserData.username));
+    }
+  } else {
+    await signUp({ avatar, email, id, username: discordUsername });
+  }
+
+  cookies().set(cookiesKeys.TOKEN, accessToken, { expires: new Date().setSeconds(expires) });
+  cookies().set(cookiesKeys.REFRESH_TOKEN, refreshToken);
+  
+  return NextResponse.json({ success: true });
 }

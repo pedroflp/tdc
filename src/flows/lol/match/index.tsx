@@ -116,7 +116,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
               </TooltipProvider> 
           ))}
           {canUserVoteHonorsThisMatch(match, user!, isUserInThisMatch) ? (
-            <Button className='text-xl p-8 gap-4 font-bold' onClick={() => router.push(routeNames.MATCH_HONOR(matchId))}>
+            <Button className='gap-4 font-bold' onClick={() => router.push(routeNames.MATCH_HONOR(matchId))}>
               Honrar jogadores
             </Button>
           ) : (

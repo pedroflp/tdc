@@ -1,6 +1,6 @@
 import { fetchLOLApi } from "@/services/api/fetchLOLApi";
 import { StartQueueResponseDTO } from "./compositions/types";
-import { MatchModesEnum } from "@/flows/home/components/MatchOptionCard/types";
+import { MatchModesEnum } from "@/flows/lol/queues/components/MatchOptionCard/types";
 import { ApiResponse } from "../../types";
 import { QueueItem } from "@/flows/lol/queue/types";
 

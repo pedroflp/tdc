@@ -7,7 +7,11 @@ export default async function BaseLayout({ children }: any) {
 
   return (
     <ToastProvider>
-      <BaseLayoutElements user={user}>{children}</BaseLayoutElements>
+      <BaseLayoutElements
+        user={user}
+      >
+        {children}
+      </BaseLayoutElements>
     </ToastProvider>
   )
 }

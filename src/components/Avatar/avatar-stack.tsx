@@ -40,9 +40,23 @@ export interface AvatarStackProps
   fallbackSize?: "text-xs" | "text-sm" | "text-md" | "text-lg";
   avatarClassName?: string;
   canOpenProfileByAvatar?: boolean;
+  highlightUser?: string;
 }
 
-function AvatarStack({ canOpenProfileByAvatar, className, avatarClassName, size = 10, fallbackSize = "text-sm", orientation, avatars, spacing, avatarsOffset = 4, maxAvatarsAmount = 4, ...props }: AvatarStackProps) {
+function AvatarStack({
+  highlightUser,
+  canOpenProfileByAvatar,
+  className,
+  avatarClassName,
+  size = 10,
+  fallbackSize = "text-sm",
+  orientation,
+  avatars,
+  spacing,
+  avatarsOffset = 4,
+  maxAvatarsAmount = 4,
+  ...props
+}: AvatarStackProps) {
   const limitedAvatars = avatars.slice(0, maxAvatarsAmount);
 
   return (
@@ -66,7 +80,17 @@ function AvatarStack({ canOpenProfileByAvatar, className, avatarClassName, size 
                   !canOpenProfileByAvatar && 'pointer-events-none'
                 )}
               >
-                <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
+                <Avatar
+                  image={user?.avatar}
+                  size={size}
+                  fallbackSize={fallbackSize}
+                  fallback={String(user?.name ?? user?.username).slice(0, 2)}
+                  className={cn(
+                    "ring-2 ring-primary-foreground",
+                    highlightUser === user?.username && 'ring-primary',
+                    avatarClassName
+                  )}
+                />
               </Link>
             </TooltipTrigger>
           </Tooltip>

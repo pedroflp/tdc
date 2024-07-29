@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST() {
-  await signOut(auth);
   cookies().delete(cookiesKeys.TOKEN);
+  cookies().delete(cookiesKeys.REFRESH_TOKEN);
   
   return NextResponse.json({success: true});
 }

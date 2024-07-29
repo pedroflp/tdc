@@ -83,7 +83,7 @@ export default function EditUserInformationDialog({
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
     <DialogTrigger asChild>
-      <Button className='absolute top-4 right-4 gap-2 items-center'>
+      <Button className='absolute z-10 top-4 right-4 gap-2 items-center'>
         <Pen size={16} />
       </Button>
     </DialogTrigger>

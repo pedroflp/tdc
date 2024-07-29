@@ -1,6 +1,6 @@
 import { validateQueueProtectionCode } from '@/app/api/lol/queue/requests'
 import { routeNames } from '@/app/route.names'
-import { MatchModesIcons, MatchModesNames } from '@/flows/home/components/MatchOptionCard/types'
+import { MatchModesIcons, MatchModesNames } from '@/flows/lol/queues/components/MatchOptionCard/types'
 import { Player } from '@/flows/lol/queue/types'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
@@ -15,14 +15,16 @@ import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
 import { QueueCardProps } from './types'
+import { useRouter } from 'next/navigation'
 
 export default function QueueCard({
   queue,
   user,
-  disabledJoinByAuth,
   disabledJoinByStarted,
+  disabledJoinByHasMatchActive,
   handleEnterQueue
 }: QueueCardProps) {
+  const { push } = useRouter();
   const [protectionInput, setProtectionInput] = useState<{show?: boolean, code?: string, error?: string | null}>({
     show: false,
     code: "",
@@ -30,16 +32,19 @@ export default function QueueCard({
   });
 
   const joinQueue = () => {
+    if (!user) return;
+
     if (queue.protection?.enabled && !queue.players.some(player => player?.username === user?.username)) {
       setProtectionInput({show: true, code: ""});
       return;
     }
 
-    handleEnterQueue(queue.id);
+    handleEnterQueue(queue.id, user);
+    push(routeNames.QUEUE(queue.id));
   }
 
   async function handleValidateProtectionCode() {
-    if (!protectionInput.code) return;
+    if (!protectionInput.code || !user) return;
 
     const response = await validateQueueProtectionCode(queue.id, protectionInput.code);
 
@@ -48,67 +53,69 @@ export default function QueueCard({
       return
     }
 
-    handleEnterQueue(queue.id);
+    handleEnterQueue(queue.id, user);
+    push(routeNames.QUEUE(queue.id));
   }
 
-  const QueueBadgeStatus = useCallback(({matchId}: {matchId: string}) => {
-    if (matchId) return <Badge>Partida Iniciada</Badge>
-    return <Badge variant="secondary">Sala em preparação</Badge>;
-  }, []);
-
   const QueueJoinButton = useCallback(({
-    disabledJoinByAuth,
     disabledJoinByStarted,
+    disabledJoinByHasMatchActive,
     onClick
-  }: Pick<QueueCardProps, 'disabledJoinByAuth' | 'disabledJoinByStarted'> & {
+  }: Pick<QueueCardProps,  'disabledJoinByStarted' | 'disabledJoinByHasMatchActive'> & {
       onClick: () => void,
-  }) => {
-    if (disabledJoinByAuth) return <Button disabled>Faça login para participar</Button>
-    if (queue?.players.find((player: Player) => player?.username === user?.username)) return <Button variant="secondary" onClick={onClick}>Voltar para a sala</Button>
-    if (disabledJoinByStarted) return (
-      <Link href={routeNames.MATCH(queue?.matchId)}>
-        <Button asChild>Visualizar essa partida</Button>
+    }) => {
+    if (!user) return <Button disabled>Faça login para participar</Button>
+    if (queue?.players.some((player: Player) => player?.username === user?.username)) return (
+      <Link href={routeNames.QUEUE(queue.id)}>
+        <Button>Voltar para a sala</Button>
       </Link>
     )
-    return <Button onClick={onClick}>Entrar na sala da partida</Button>;
+    if (disabledJoinByStarted) return (
+      <Link href={routeNames.MATCH(queue?.matchId)}>
+        <Button>Visualizar essa partida</Button>
+      </Link>
+    )
+    if (disabledJoinByHasMatchActive) return <Button disabled>Você já está em uma sala ou partida ativa</Button>
+    if (queue.blackList?.includes(user?.username)) return <Button disabled>Você está bloqueado para entrar</Button>
+    return <Button onClick={onClick}>Participar e entrar na sala</Button>;
   }, [user, queue]);
 
   return (
-    <Card className="min-w-[500px] w-full">
+    <Card className="relative bg-gradient-to-r from-secondary/80 to-transparent min-w-[500px] w-full overflow-hidden">
       <CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
-        <div className='flex flex-col gap-1'>
-          <div className="flex flex-col md:flex-row gap-2 md:gap-4">
+        <div className='flex flex-col gap-2'>
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
             <CardTitle className='text-2xl'>{queue.name}</CardTitle>
-            <div className='flex items-center gap-2'>
-              <QueueBadgeStatus matchId={queue.matchId} />
-              {queue.players.find((player: Player) => player?.username === user?.username) && (
-                <Badge className='bg-emerald-400 text-slate-800'>Você está na sala!</Badge>
-              )}
+            <Badge className='w-max'>{queue.matchId ? "Partida iniciada" : "Sala em preparação"}</Badge>
+          </div>
+          <div className='flex items-center gap-4'>
+            <div className="flex gap-2 items-center">
+              <p className='text-xs text-muted-foreground'>Criada por</p>
+              <UserAvatarAndName size={6} name={{size: "text-xs", color: 'text-muted-foreground'}} user={queue.hoster} />
+            </div>
+            <div className='flex items-center gap-1'>
+              <Image
+                src={MatchModesIcons[queue?.mode]}
+                width={1000}
+                height={1000}
+                objectFit='cover'
+                className='w-6 h-6'
+                alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
+              />
+              <span className='text-xs text-muted-foreground'>Modo {MatchModesNames[queue.mode]}</span>
             </div>
           </div>
         </div>
-      <AvatarStack canOpenProfileByAvatar spacing="lg" id="avatar-stack" maxAvatarsAmount={6} avatars={queue.players.filter((player: Player) => !!player?.username)} />
       </CardHeader>
       <CardContent className="flex justify-between items-end gap-4">
-        <div className="text-sm text-muted-foreground">
-          <div className="flex gap-1 items-center">
-            <p>Criada por</p>
-            <UserAvatarAndName canOpenProfileByAvatar size={8} name={{size: "text-sm", color: 'text-muted-foreground'}} user={queue.hoster} />
-          </div>
-          <p className='flex gap-1 items-center'>
-            Modo
-            <Image
-              src={MatchModesIcons[queue?.mode]}
-              width={1000}
-              height={1000}
-              objectFit='cover'
-              className='w-8 h-8'
-              alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
-            />
-            <strong>{MatchModesNames[queue.mode]}</strong>
-          </p>
-          <p>Iniciado em <strong>{formatDate(queue.createdAt)}</strong></p>
-        </div>
+        <AvatarStack
+          highlightUser={user?.username}
+          canOpenProfileByAvatar
+          spacing="xl"
+          id="avatar-stack"
+          maxAvatarsAmount={10}
+          avatars={queue.players.filter((player: Player) => !!player?.username)}
+        />
         <div className='flex flex-col gap-4 items-end 2xl:flex-row'>
           {queue.protection?.enabled && (
             <Badge className='bg-secondary/70 text-secondary-foreground/50 p-3 px-6'>
@@ -118,35 +125,45 @@ export default function QueueCard({
               </span>
             </Badge>
           )}
-          {protectionInput.show ? (
-             <div className="flex flex-col gap-2">
-              <InputOTP value={protectionInput.code} onChange={e => setProtectionInput({ ...protectionInput, error: null, code: e })} maxLength={6}>
-              <InputOTPGroup>
-                <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={0} />
-                <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={1} />
-                <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
-                <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={3} />
-                <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={4} />
-                <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={5} />
-              </InputOTPGroup>
-              </InputOTP>
-              <Button
-                onClick={handleValidateProtectionCode}
-                disabled={protectionInput?.code?.length !== 6}
-              >
-                Entrar na sala da partida
-              </Button>
-            </div>
-          ) : (     
-            <QueueJoinButton
-              disabledJoinByAuth={disabledJoinByAuth}
-              disabledJoinByStarted={disabledJoinByStarted}
-              onClick={joinQueue}
-            />
-          )}
+          <div className='relative z-[2]'>
+            {protectionInput.show ? (
+              <div className="flex flex-col gap-2">
+                <InputOTP value={protectionInput.code} onChange={e => setProtectionInput({ ...protectionInput, error: null, code: e })} maxLength={6}>
+                <InputOTPGroup>
+                  <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={0} />
+                  <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={1} />
+                  <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={2} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={3} />
+                  <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={4} />
+                  <InputOTPSlot className={cn(protectionInput.error && 'border-destructive')} index={5} />
+                </InputOTPGroup>
+                </InputOTP>
+                <Button
+                  onClick={handleValidateProtectionCode}
+                  disabled={protectionInput?.code?.length !== 6}
+                >
+                  Entrar na sala da partida
+                </Button>
+              </div>
+            ) : (     
+              <QueueJoinButton
+                disabledJoinByStarted={disabledJoinByStarted}
+                disabledJoinByHasMatchActive={disabledJoinByHasMatchActive}
+                onClick={joinQueue}
+              />
+            )}
+          </div>
+          <Image
+            src={MatchModesIcons[queue?.mode]}
+            width={1000}
+            height={1000}
+            objectFit='cover'
+            className='absolute -top-6 -right-20 -rotate-12 w-72 z-0 blur-md opacity-20'
+            alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
+          />
         </div>
       </CardContent>
     </Card>

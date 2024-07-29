@@ -5,16 +5,7 @@ import { ApiResponse } from "../../types";
 import { UserDTO } from "../types";
 
 export async function getUserData(username: string, options?: RequestInit): Promise<ApiResponse<UserDTO> | null> {
-  const token = cookies().get(cookiesKeys.TOKEN);
-  if (!token) return null;
-
-  const response = await fetchApi(`user/${username}`, {
-    method: 'GET',
-    headers: {
-      [cookiesKeys.TOKEN]: token.value
-    },
-    ...options,
-  });
+  const response = await fetchApi(`user/${username}`);
 
   const data = await response.json();
   return data;
