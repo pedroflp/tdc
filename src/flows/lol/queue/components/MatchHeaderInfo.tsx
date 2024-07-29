@@ -49,10 +49,26 @@ export default function QueueHeader({
               </Button>
             </div>
           )
-          : <Button className='gap-2' onClick={() => onExitQueue(user.username)} variant="destructive">
-            <LogOut size={16} />
-            Sair desta sala
-          </Button>
+          : (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button className='gap-2' variant="destructive">
+                  <LogOut size={16} />
+                  Sair desta sala
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align='end' className='w-[400px]'>
+                <p>
+                  <strong>Sair de uma sala bloqueará que você entre novamente!</strong> <br />
+                  O Host precisará desbloquear para que você consiga entrar.
+                </p>
+                <Button className='mt-4 w-full gap-2' onClick={() => onExitQueue(user.username)} variant="destructive">
+                  <LogOut size={16} />
+                  Sair mesmo assim
+                </Button>
+              </PopoverContent>
+            </Popover>
+          )
         }
       </div>
 
