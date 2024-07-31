@@ -6,7 +6,8 @@ export type MatchOptionCardProps = {
   onClick: (mode: MatchModesEnum) => void,
   disabled?: boolean,
   selected: boolean,
-  mode: MatchModesEnum
+  mode: MatchModesEnum,
+  showFire?: boolean,
 }
 
 export enum MatchModesEnum {

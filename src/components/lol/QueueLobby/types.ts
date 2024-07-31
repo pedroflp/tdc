@@ -1,5 +1,5 @@
 import { UserDTO } from "@/app/api/user/types"
-import { QueueItem } from "../../types"
+import { QueueItem } from "../../../flows/lol/queue/types"
 
 export type QueueLobbyProps = {
   user?: UserDTO,

@@ -15,7 +15,7 @@ export default function MatchCreation({
   disableCreation
 }: { disableCreation?: boolean, creatingQueue: boolean, onCreateMatch: (name: string, mode: MatchModesEnum, protectMode: { enabled: boolean, code: string }) => void }) {
   const [name, setName] = useState("");
-  const [selectedMode, setSelectedMode] = useState<MatchModesEnum>(MatchModesEnum.CLASSIC);
+  const [selectedMode, setSelectedMode] = useState<MatchModesEnum>();
   const [protectMode, setProtectMode] = useState({
     enabled: false,
     code: ""
@@ -26,7 +26,7 @@ export default function MatchCreation({
   }, [name]);
   
   function handleCreateMatch() {
-    onCreateMatch(matchName, selectedMode, protectMode);
+    onCreateMatch(matchName, selectedMode!, protectMode);
   };
 
   const { canCreateQueue, createQueueAlert } = useMemo(() => {
@@ -75,7 +75,7 @@ export default function MatchCreation({
                 src={MatchModesIcons[MatchModesEnum.CLASSIC]}
                 alt="Badge de experiência do modo clássico"
                 onClick={setSelectedMode}
-                description="Os jogadores serão aleatoriamente escolhidos para os time e poderão jogar como preferir."
+                description="Os jogadores serão aleatoriamente escolhidos para 4 opções de time e podem jogar como preferir."
               />
               <MatchOptionCard
                 name={MatchModesNames[MatchModesEnum.HARDCORE]}
@@ -84,8 +84,8 @@ export default function MatchCreation({
                 src={MatchModesIcons[MatchModesEnum.HARDCORE]}
                 alt="Troféu vitorioso do modo hardcore"
                 onClick={setSelectedMode}
-                disabled
-                description="Os jogadores serão aleatoriamente escolhidos para o time com a role já predefinida."
+                description="Os jogadores serão aleatoriamente escolhidos para 2 opções de time com as roles já predefinida."
+                showFire
               />
             </div>
           </div>

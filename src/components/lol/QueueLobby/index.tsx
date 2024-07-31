@@ -1,6 +1,6 @@
-import QueueSlot from '@/components/QueueSlot'
+import QueueSlot from '../QueueSlot'
 import { Button } from '@/components/ui/button'
-import QueueHeader from '../MatchHeaderInfo'
+import QueueHeader from '../../../flows/lol/queue/components/MatchHeaderInfo'
 import { QueueLobbyProps } from './types'
 
 export default function QueueLobby({

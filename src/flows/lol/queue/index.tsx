@@ -8,7 +8,7 @@ import { deleteDoc, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import Loading from './components/Loading';
-import QueueLobby from './components/QueueLobby';
+import QueueLobby from '../../../components/lol/QueueLobby';
 import { QueueItem } from './types';
 import { UserDTO } from '@/app/api/user/types';
 

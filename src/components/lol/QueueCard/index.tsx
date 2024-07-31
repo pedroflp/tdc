@@ -8,12 +8,12 @@ import { Lock } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
-import { AvatarStack } from '../Avatar/avatar-stack'
-import UserAvatarAndName from '../UserAvatarAndName'
-import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
+import { AvatarStack } from '@/components/Avatar/avatar-stack'
+import UserAvatarAndName from '@/components/UserAvatarAndName'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 import { QueueCardProps } from './types'
 import { useRouter } from 'next/navigation'
 
@@ -161,7 +161,7 @@ export default function QueueCard({
             width={1000}
             height={1000}
             objectFit='cover'
-            className='absolute -top-6 -right-20 -rotate-12 w-72 z-0 blur-md opacity-20'
+            className='absolute top-0 -right-20 w-72 z-0 blur-md opacity-20'
             alt={`Badge modo de partida ${MatchModesNames[queue?.mode]}`}
           />
         </div>

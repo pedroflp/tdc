@@ -3,7 +3,7 @@
 import { startQueue } from "@/app/api/lol/queue/requests";
 import { UserDTO } from "@/app/api/user/types";
 import { routeNames } from "@/app/route.names";
-import QueueCard from "@/components/QueueCard";
+import QueueCard from "@/components/lol/QueueCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QueueItem } from "@/flows/lol/queue/types";
 import { collections } from "@/services/constants";
