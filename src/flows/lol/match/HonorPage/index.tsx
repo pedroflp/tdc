@@ -25,6 +25,7 @@ import { useEffect, useMemo, useState } from 'react';
 import LoadingHonorPage from './components/Loading';
 import { cn } from '@/lib/utils';
 import Countdown from 'react-countdown';
+import { isPast } from 'date-fns';
 
 export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: string }) {
   const router = useRouter();
@@ -46,6 +47,12 @@ export default function HonorPage({ matchId, user }: { user?: UserDTO, matchId: 
     const match = matchDoc.data() as MatchItem; 
 
     if (!matchDoc.exists()) return router.push(routeNames.HOME);
+
+    if (
+      match.honors?.finished ||
+      match.honors?.endDate && isPast(new Date(match.honors.endDate))
+    ) return router.push(routeNames.MATCH(matchId));
+
     if (match.players.find(player => player.username === user?.username)?.alreadyHonored) {
       toast({title: 'Não é possível mais votar!',description: 'Você já concedeu as honras para esta partida, e por isso não pode votar mais!', duration: 2500 })
       router.push(routeNames.MATCH(matchId));

@@ -4,13 +4,14 @@ import { calculateAndDistributePlayersHonors } from '@/app/api/lol/match/honor/r
 import { UserDTO } from '@/app/api/user/types';
 import { routeNames } from '@/app/route.names';
 import Avatar from '@/components/Avatar';
-import PlayerSlot from '@/components/PlayerSlot';
+import PlayerSlot from '@/components/lol/PlayerSlot';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
-import { formatSecondsInDateDifference } from '@/utils/dateDifference';
+import { dateDifferenceInSeconds, formatSecondsInDateDifference } from '@/utils/dateDifference';
+import { isFuture, isPast } from 'date-fns';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -43,6 +44,7 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
       match.finished &&
       !match.honors?.finished &&
       isUserInThisMatch(match) &&
+      match.honors?.endDate && isFuture(new Date(match.honors.endDate)) &&
       !match.players.find(player => player.username === user.username)?.alreadyHonored
     )
   }, []);
@@ -53,7 +55,10 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
       const match = doc.data() as MatchItem;
       
       if (match.honors?.finished) setDistributeHonors({ canDistribute: false, isDistributing: false });
-      if (user && canUserVoteHonorsThisMatch(match, user, isUserInThisMatch)) 
+      if (
+        user &&
+        canUserVoteHonorsThisMatch(match, user, isUserInThisMatch)
+      ) 
         router.push(routeNames.MATCH_HONOR(matchId));
 
       setMatch(match);

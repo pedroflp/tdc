@@ -5,9 +5,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { UserDTO } from "../../../user/types";
 import { handleRandomizeTeam } from "./utils";
-
-const QUEUE_COMPOSITIONS_QUANTITY = 4;
-const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 6;
+import { MatchModesEnum } from "@/flows/lol/queues/components/MatchOptionCard/types";
 
 export async function POST(request: NextRequest) {
   const { queueId }: {queueId: string} = await request.json();
@@ -20,6 +18,11 @@ export async function POST(request: NextRequest) {
     if (!queueDoc.exists) return NextResponse.error();
 
     const queueData = queueDoc.data() as QueueItem;
+    const compositionsQuantityByMode = {
+      [MatchModesEnum.CLASSIC]: 4,
+      [MatchModesEnum.HARDCORE]: 2
+    }
+    const QUEUE_COMPOSITIONS_QUANTITY = compositionsQuantityByMode[queueData.mode];
 
     const compositions = new Array(QUEUE_COMPOSITIONS_QUANTITY).fill(null).map(() => handleRandomizeTeam(queueData.players));
 
@@ -57,6 +60,7 @@ export async function PUT(request: NextRequest) {
     user: UserDTO,
   } = await request.json();
   if (!queueId) return NextResponse.error();
+  const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 1;
 
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)

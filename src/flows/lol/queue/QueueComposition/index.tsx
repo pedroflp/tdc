@@ -2,13 +2,13 @@
 
 import { createMatch } from '@/app/api/lol/match/requests';
 import { selectQueueCompositions } from '@/app/api/lol/queue/compositions/requests';
+import { UserDTO } from '@/app/api/user/types';
 import { routeNames } from '@/app/route.names';
-import Avatar from '@/components/Avatar';
 import { AvatarStack } from '@/components/Avatar/avatar-stack';
-import QueueSlot from '@/components/QueuePlayerCard';
+import QueuePlayerCard from '@/components/lol/QueuePlayerCard';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
 import { collections } from '@/services/constants';
 import { firestore } from '@/services/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -17,14 +17,9 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Player, QueueItem } from '../types';
 import Loading from './components/Loading';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { toast } from '@/components/ui/use-toast';
-import { UserDTO } from '@/app/api/user/types';
-import QueuePlayerCard from '@/components/QueuePlayerCard';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MatchModesEnum, MatchModesIcons } from '../../queues/components/MatchOptionCard/types';
+import { QueueRoleIconsByPlayer } from './types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import LoadingRoot from '@/app/lol/queue/[id]/compositions/loading';
 
 export default function QueueCompositionPage({ queueId, user }: { queueId: string, user?: UserDTO }) {
   const router = useRouter();
@@ -119,25 +114,67 @@ export default function QueueCompositionPage({ queueId, user }: { queueId: strin
             <TabsContent key={id} className='space-y-4 p-6 py-4 bg-secondary/40 rounded-md' value={id}>
               <div className='grid grid-cols-[2fr_auto_2fr] gap-4'>
                 <div className='space-y-4'>
-                  <h1 className='text-2xl font-bold'>Time Azul</h1>
+                  <h1 className='text-2xl text-right font-bold'>Time Azul</h1>
                   {blue.map((player: Player, index: number) => (
-                    <QueuePlayerCard user={user} key={index} player={player} />
+                    <div className='flex gap-4 items-center' key={player.username}>
+                      {queue.mode === MatchModesEnum.HARDCORE &&
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Image
+                                src={QueueRoleIconsByPlayer[index].icon}
+                                alt={`Ícone representativo da ${QueueRoleIconsByPlayer[index].label}`}
+                                width={100}
+                                height={100}
+                                className="w-12"
+                              />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{QueueRoleIconsByPlayer[index].label}</p>
+                              </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      }
+                      <QueuePlayerCard user={user} player={player} />
+                    </div>
                   ))}
                 </div>
                 <div className='flex items-center justify-center relative mx-8 overflow-hidden'>
                   <Separator className='w-[2px] h-full bg-border absolute z-0' />
-                  <Image
-                    src="/assets/icons/default-match.png"
-                    alt="versus"
-                    width={1000}
-                    height={1000}
-                    className='w-24 relative z-2 p-4 bg-secondary rounded-full'
-                  />
+                  <div className='p-4 bg-secondary rounded-full relative z-2'>
+                    <Image
+                      src={MatchModesIcons[queue.mode]}
+                      alt="versus"
+                      width={100}
+                      height={100}
+                      className='w-16'
+                    />
+                  </div>
                 </div>
                 <div className='space-y-4'>
-                  <h1 className='text-2xl font-bold text-right'>Time Vermelho</h1>
+                  <h1 className='text-2xl font-bold'>Time Vermelho</h1>
                   {red.map((player: Player, index: number) => (
-                    <QueuePlayerCard user={user} key={index} player={player} />
+                    <div className='flex flex-row-reverse gap-4 items-center' key={player.username}>
+                      {queue.mode === MatchModesEnum.HARDCORE &&
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Image
+                                src={QueueRoleIconsByPlayer[index].icon}
+                                alt={`Ícone representativo da ${QueueRoleIconsByPlayer[index].label}`}
+                                width={100}
+                                height={100}
+                                className="w-12"
+                              />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{QueueRoleIconsByPlayer[index].label}</p>
+                              </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      }
+                      <QueuePlayerCard user={user} player={player} />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -148,3 +185,4 @@ export default function QueueCompositionPage({ queueId, user }: { queueId: strin
     </main>
   )
 }
+

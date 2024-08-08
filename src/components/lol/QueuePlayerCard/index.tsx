@@ -1,8 +1,6 @@
+import Avatar from '@/components/Avatar'
+import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { User, X } from 'lucide-react'
-import Avatar from '../Avatar'
-import { Button } from '../ui/button'
-import { Card } from '../ui/card'
 import { QueueSlotProps } from './types'
 
 export default function QueuePlayerCard({ player, className, user }: QueueSlotProps) {
