@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
     user: UserDTO,
   } = await request.json();
   if (!queueId) return NextResponse.error();
-  const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 1;
+  const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 6;
 
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
