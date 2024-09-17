@@ -1,14 +1,10 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "../providers/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { cookies } from "next/headers";
-import { cookiesKeys } from "@/constants/cookies";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
+import { Space_Grotesk } from "next/font/google";
+import { ThemeProvider } from "../providers/ThemeProvider";
+import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
+const primaryFont = Space_Grotesk({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "TDC",
@@ -22,7 +18,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html>
-      <body className={jakarta.className}>
+      <body className={primaryFont.className}>
         <ThemeProvider
           attribute="class"
           disableTransitionOnChange

@@ -5,17 +5,14 @@ import { AvatarStack } from "@/components/Avatar/avatar-stack";
 import UserAvatarAndName from "@/components/UserAvatarAndName";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MatchModesIcons, MatchModesEnum, MatchModesNames } from "@/flows/lol/queues/components/MatchOptionCard/types";
 import { MatchItem } from "@/flows/lol/queue/types";
+import { MatchModesEnum, MatchModesIcons, MatchModesNames } from "@/flows/lol/queues/components/MatchOptionCard/types";
 import { formatDate } from "@/utils/formatDate";
-import { match } from "assert";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import router from "next/router";
 
 export function MatchCard({ match }: {match: MatchItem}) {
-    const router = useRouter();
     return (
     <Card key={match.id} >
         <CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
