@@ -75,7 +75,7 @@ export function MatchCard({ match }: { match: MatchItem }) {
                     <AvatarStack canOpenProfileByAvatar avatarClassName="border-2 border-yellow-500" spacing="2xl" maxAvatarsAmount={10} avatars={match.teams[match.winner]} />
                 </div>
                 {honors.map(({ icon, text, honored }) => honored && (
-                    <div className="flex gap-2 items-center">
+                    <div key={honored.username} className="flex gap-2 items-center">
                         <Image
                             src={icon}
                             width={1000}
