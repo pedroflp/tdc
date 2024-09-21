@@ -34,11 +34,11 @@ export default function UserAvatarAndName({
       'flex items-center gap-2 cursor-pointer',
       !canOpenProfileByAvatar && 'pointer-events-none'
     )}>
-      <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name ?? user?.username).slice(0, 2)} image={user?.avatar} />
+      <Avatar className={avatarClassName} fallbackSize={fallbackSize} size={size} fallback={String(user?.name).slice(0, 2)} image={user?.avatar} />
       <p className={cn(
         'font-bold text-foreground',
         name.size, name.color
-      )}>{user?.username}</p>
+      )}>{user?.name}</p>
     </Link>
   )
 }

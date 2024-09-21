@@ -4,7 +4,6 @@ import { routeNames } from "@/app/route.names";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { MatchItem } from "../queue/types";
 import { MatchCard } from "./components/MatchCard";
 

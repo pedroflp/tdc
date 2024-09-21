@@ -165,7 +165,11 @@ export default function MatchPage({ user, matchId }: {user?: UserDTO, matchId: s
         <div className='space-y-4'>
           <h1 className={cn('text-3xl font-bold text-right', match?.winner === MatchTeamsEnum.RED && 'text-yellow-500')}>Time Vermelho</h1>
           {match.teams[MatchTeamsEnum.RED].map((player, index: number) => (
-            <PlayerSlot match={match} className={cn(match?.winner === MatchTeamsEnum.RED && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')} key={index} player={player} />
+            <PlayerSlot
+              match={match}
+              className={cn(match?.winner === MatchTeamsEnum.RED && 'border-[1px] text-yellow-500 bg-yellow-500/15 border-yellow-400')}
+              key={index} player={player}
+            />
           ))}
         </div>
       </div>

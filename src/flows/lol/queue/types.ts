@@ -1,6 +1,6 @@
 import { UserDTO } from "@/app/api/user/types";
 import { MatchModesEnum } from "../queues/components/MatchOptionCard/types";
-import { HonorPlayerDTO } from "@/app/api/lol/match/honor/types";
+import { HonorPlayerDTO, HonorUserDTO } from "@/app/api/lol/match/honor/types";
 
 export type Player = Pick<UserDTO, "name" | "avatar" | "username">
 
@@ -57,14 +57,14 @@ export interface MatchItem {
   players: Array<Player & {
     alreadyHonored?: boolean
   }>,
-  mvp?: Player,
-  hostage?: Player,
-  bricklayer?: Player,
+  mvp?: HonorPlayerDTO,
+  hostage?: HonorPlayerDTO,
+  bricklayer?: HonorPlayerDTO,
   honors?: {
     finished: boolean,
     endDate: string,
-    mvp: Array<HonorPlayerDTO> | [],
-    hostage: Array<HonorPlayerDTO> | [],
-    bricklayer: Array<HonorPlayerDTO> | [],
+    mvp: Array<HonorUserDTO> | [],
+    hostage: Array<HonorUserDTO> | [],
+    bricklayer: Array<HonorUserDTO> | [],
   }
 }

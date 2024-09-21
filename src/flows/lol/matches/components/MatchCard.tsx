@@ -12,7 +12,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export function MatchCard({ match }: {match: MatchItem}) {
+export function MatchCard({ match }: { match: MatchItem }) {
+    const honors = [
+        {
+            icon: '/assets/icons/mvp.png',
+            text: 'MVP da partida',
+            honored: match.mvp?.player,
+        },
+        {
+            icon: '/assets/icons/hostage.png',
+            text: 'Hostage da partida',
+            honored: match.hostage?.player,
+        },
+        {
+            icon: '/assets/icons/bricklayer.png',
+            text: 'Bricklayer da partida',
+            honored: match.bricklayer?.player,
+        },
+    ];
+
     return (
     <Card key={match.id} >
         <CardHeader className="flex flex-row justify-between gap-16 items-start mb-4">
@@ -54,47 +72,21 @@ export function MatchCard({ match }: {match: MatchItem}) {
                         className='w-8 h-8'
                         alt={`Badge modo de partida ${MatchModesNames[match.mode ?? MatchModesEnum.CLASSIC]}`}
                     />
-                    <AvatarStack canOpenProfileByAvatar avatarClassName="border-2 border-yellow-500" spacing="2xl" maxAvatarsAmount={10} avatars={match.teams[match.winner] } />
+                    <AvatarStack canOpenProfileByAvatar avatarClassName="border-2 border-yellow-500" spacing="2xl" maxAvatarsAmount={10} avatars={match.teams[match.winner]} />
                 </div>
-                {match.mvp && (
+                {honors.map(({ icon, text, honored }) => honored && (
                     <div className="flex gap-2 items-center">
                         <Image
-                            src="/assets/icons/mvp.png"
+                            src={icon}
                             width={1000}
                             height={1000}
                             objectFit='cover'
-                            className='w-8 h-8'
-                            alt={`Badge medalha MVP`}
+                            className='w-6 h-6'
+                            alt={text}
                         />
-                        <UserAvatarAndName canOpenProfileByAvatar name={{size: "text-md"}} user={match.mvp} />
+                        <UserAvatarAndName canOpenProfileByAvatar size={9} name={{size: "text-md"}} user={honored} />
                     </div>
-                )}
-                {match.hostage && (
-                    <div className="flex gap-2 items-center">
-                        <Image
-                            src="/assets/icons/hostage.png"
-                            width={1000}
-                            height={1000}
-                            objectFit='cover'
-                            className='w-8 h-8'
-                            alt={`Badge medalha Refém`}
-                        />
-                        <UserAvatarAndName canOpenProfileByAvatar name={{size: "text-md"}} user={match.hostage} />
-                    </div>
-                )}
-                {match.bricklayer && (
-                    <div className="flex gap-2 items-center">
-                        <Image
-                            src="/assets/icons/bricklayer.png"
-                            width={1000}
-                            height={1000}
-                            objectFit='cover'
-                            className='w-8 h-8'
-                            alt={`Badge medalha Pedreiro`}
-                        />
-                        <UserAvatarAndName canOpenProfileByAvatar name={{size: "text-md"}} user={match.bricklayer} />
-                    </div>
-                )}
+                ))}
             </div>
             <Link href={routeNames.MATCH(match.id)}>
                 <Button variant="secondary">Visualizar detalhes da partida</Button>

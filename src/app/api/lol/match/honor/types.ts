@@ -11,8 +11,13 @@ export type HonorPlayersRequestDTO = {
   honoredBy: UserDTO["username"]
 }
 
+export type HonorUserDTO = {
+  username: UserDTO["username"],
+  votes: Array<UserDTO["username"]>
+}
+
 export type HonorPlayerDTO = {
-  username: string,
+  player: Player
   votes: Array<UserDTO["username"]>
 }
 

@@ -73,25 +73,39 @@ export async function PUT(request: Request) {
   const matchDoc = await getDoc(doc(firestore, collections.MATCHES, matchId));
   const match = matchDoc.data() as MatchItem;
   const honors = match.honors!;
-  const mvp = honors.mvp;
-  const hostage = honors.hostage;
-  const bricklayer = honors.bricklayer;
+  const { bricklayer, mvp, hostage } = honors;
 
   const [mvpPlayer, hostagePlayer, bricklayerPlayer] = [mvp, hostage, bricklayer].reduce((acc, honor) => {
-    const honoredPlayer = honor.length > 0
+    const mostHonoredUser = honor.length > 0
       ? honor.sort((playerA, playerB) => playerB.votes.length - playerA.votes.length)[0]
       : null;
-    
-    acc.push(honoredPlayer);
-    return acc;
-  }, [] as Array<HonorPlayerDTO | null>)
 
-  await updateDoc(doc(firestore, collections.MATCHES, matchId), {
+    if (mostHonoredUser) {
+      const { username, votes } = mostHonoredUser!;
+      const { avatar, name } = match.players.find(player => player.username === username)!;
+
+      acc.push({
+        player: {
+          username,
+          avatar,
+          name
+        },
+        votes
+      });
+    }
+    else acc.push(null);
+
+    return acc;
+  }, [] as Array<HonorPlayerDTO | null>);
+
+  const data = {
     mvp: mvpPlayer,
     hostage: hostagePlayer,
     bricklayer: bricklayerPlayer,
     honors: { ...match.honors, finished: true }
-  });
+  };
+
+  await updateDoc(doc(firestore, collections.MATCHES, matchId), data);
 
   async function distributeStatistics(username: string) {
     if (!username) return;
@@ -102,17 +116,17 @@ export async function PUT(request: Request) {
     const isUserWinnerOfMatch = match.teams[match.winner].some(player => username === player.username);
 
     const points = calculateMatchPontuation(!!isUserWinnerOfMatch, {
-      mvp: mvpPlayer?.username === username, 
-      bricklayer: bricklayerPlayer?.username === username, 
-      hostage: hostagePlayer?.username === username
+      mvp: mvpPlayer?.player.username === username, 
+      bricklayer: bricklayerPlayer?.player.username === username, 
+      hostage: hostagePlayer?.player.username === username
     });
 
     const statistics = {
       points: userData.statistics.points + points,
       played: userData?.statistics?.played + 1,
-      mvps: mvpPlayer?.username === username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
-      bricklayer: bricklayerPlayer?.username === username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,
-      hostage: hostagePlayer?.username === username ? userData?.statistics?.hostage + 1 : userData?.statistics?.hostage,
+      mvps: mvpPlayer?.player.username === username ? userData?.statistics?.mvps + 1 : userData?.statistics?.mvps,
+      bricklayer: bricklayerPlayer?.player.username === username ? userData?.statistics?.bricklayer + 1 : userData?.statistics?.bricklayer,
+      hostage: hostagePlayer?.player.username === username ? userData?.statistics?.hostage + 1 : userData?.statistics?.hostage,
       won: isUserWinnerOfMatch ?  userData?.statistics?.won + 1 :  userData?.statistics?.won,
     }
 

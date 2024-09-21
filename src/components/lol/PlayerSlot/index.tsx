@@ -8,6 +8,28 @@ import Link from 'next/link'
 import { routeNames } from '@/app/route.names'
 
 export default function PlayerSlot({ match, player, className }: { match?: MatchItem, player: Player, className?: string }) {
+  if (!match) return;
+
+  const { mvp, hostage, bricklayer } = match;
+  
+  const honors = [
+    {
+      icon: '/assets/icons/mvp.png',
+      text: 'MVP da partida',
+      honored: mvp?.player?.username,
+    },
+    {
+      icon: '/assets/icons/hostage.png',
+      text: 'Hostage da partida',
+      honored: hostage?.player?.username,
+    },
+    {
+      icon: '/assets/icons/bricklayer.png',
+      text: 'Bricklayer da partida',
+      honored: bricklayer?.player?.username,
+    },
+  ]
+
   return (
     <TooltipProvider>
       <div className={cn(
@@ -26,30 +48,14 @@ export default function PlayerSlot({ match, player, className }: { match?: Match
           </Tooltip>
         </div>
         <div className='flex gap-4 items-center'>
-          {match?.mvp?.username === player?.username && ( 
-            <Tooltip delayDuration={100}>
+          {honors.map((honor) => honor.honored === player?.username && (   
+            <Tooltip key={honor.honored} delayDuration={100}>
               <TooltipTrigger className='cursor-default'>
-                <Image alt='' width={1000} height={1000} className='w-10 object-contain' src="/assets/icons/mvp.png" />
+                <Image alt={honor.text} width={1000} height={1000}  className='w-9 object-contain' src={honor.icon} />
               </TooltipTrigger>
-              <TooltipContent>MVP da partida</TooltipContent>
+              <TooltipContent>{honor.text}</TooltipContent>
             </Tooltip>
-          )}
-          {match?.bricklayer?.username === player?.username && (
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger className='cursor-default'>
-                <Image alt='' width={1000} height={1000}  className='w-11 object-contain'  src="/assets/icons/bricklayer.png" />
-              </TooltipTrigger>
-              <TooltipContent>Pedreiro da partida</TooltipContent>
-            </Tooltip>
-          )}
-          {match?.hostage?.username === player?.username && (
-            <Tooltip delayDuration={100}>
-              <TooltipTrigger className='cursor-default'>
-                <Image alt='' width={1000} height={1000}  className='w-9 object-contain'  src="/assets/icons/hostage.png" />
-              </TooltipTrigger>
-              <TooltipContent>Refém da partida</TooltipContent>
-            </Tooltip>
-          )}
+          ))}
         </div>
       </div>
     </TooltipProvider>

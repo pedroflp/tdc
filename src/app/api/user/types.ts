@@ -7,6 +7,7 @@ export type UserDTO = {
   statistics: UserStatistics;
   activeMatch?: string;
   verified: boolean;
+  roles: UserRoles;
 }
 
 export type UserStatistics = {
@@ -23,4 +24,8 @@ export type DiscordUserDTO = {
   username: string;
   avatar?: string | null;
   email?: string | null;
+}
+
+export enum UserRoles {
+  ADMIN = "admin"
 }

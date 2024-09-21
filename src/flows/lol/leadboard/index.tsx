@@ -1,15 +1,11 @@
 import { getLeadBoard } from '@/app/api/lol/leadboard/requests';
 import UserAvatarAndName from '@/components/UserAvatarAndName';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import PlayerCard from './components/PlayerCard';
-import { Skeleton } from '@/components/ui/skeleton';
-import Link from 'next/link';
-import { routeNames } from '@/app/route.names';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 export default async function LeadBoardPage() {
   const { data } = await getLeadBoard();

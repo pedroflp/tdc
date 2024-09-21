@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Loading from './components/Loading';
 import QueueLobby from '../../../components/lol/QueueLobby';
 import { QueueItem } from './types';
-import { UserDTO } from '@/app/api/user/types';
+import { UserDTO, UserRoles } from '@/app/api/user/types';
 
 export async function handleEnterQueue(queueId: string, user: UserDTO) {
   if (!queueId) return;
@@ -49,14 +49,16 @@ export default function QueuePage({ queueId, user }: { queueId: string, user?: U
     return onSnapshot(doc(firestore, collections.QUEUES, queueId), async (queueDoc) => {
       if (!queueDoc.exists()) {
         const match = await getDoc(doc(firestore, collections.MATCHES, queueId));
-        if (match.exists()) router.push(routeNames.MATCH(queueId));
-        else router.push(routeNames.QUEUES);
-        return;
+        if (!match.exists()) return router.push(routeNames.QUEUES);
+        
+        return router.push(routeNames.MATCH(queueId));
       };
 
       const queueData = queueDoc.data() as QueueItem;
 
       if (user && !queueData.players.some(player => player.username === user.username)) {
+        if (user.roles.includes(UserRoles.ADMIN)) return;
+
         if (queueData.players.every(player => player.username)) return router.push(routeNames.QUEUES);
         if (queueData.blackList?.includes(user.username)) {
           await handleExitFromQueue(user?.username);
@@ -111,6 +113,7 @@ export default function QueuePage({ queueId, user }: { queueId: string, user?: U
 
   const isQueueReadyToPlay = useMemo(() => {
     if (!queue?.players) return false;
+    if (process.env.NODE_ENV === 'development') return true;
 
     return !queue?.players.some((player: any) => !player?.username);
   }, [queue?.players]);

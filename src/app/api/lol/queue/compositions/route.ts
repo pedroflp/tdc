@@ -23,7 +23,6 @@ export async function POST(request: NextRequest) {
       [MatchModesEnum.HARDCORE]: 2
     }
     const QUEUE_COMPOSITIONS_QUANTITY = compositionsQuantityByMode[queueData.mode];
-
     const compositions = new Array(QUEUE_COMPOSITIONS_QUANTITY).fill(null).map(() => handleRandomizeTeam(queueData.players));
 
     updateDoc(queueDocRef, {
@@ -60,7 +59,8 @@ export async function PUT(request: NextRequest) {
     user: UserDTO,
   } = await request.json();
   if (!queueId) return NextResponse.error();
-  const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 6;
+  const QUEUE_COMPOSITION_MINIMUM_VOTES_QUANTITY = 
+    process.env.NODE_ENV === "development" ? 1 : 6;
 
   try {
     const queueDocRef = doc(firestore, collections.QUEUES, queueId)
